@@ -1,0 +1,59 @@
+# ─────────────────────────────────────────────
+# ai-engineer-roadmap · .gitignore
+# 哲学：git 是"已验证学习进度"的投影，不是写作过程的备份
+# ─────────────────────────────────────────────
+
+# === 原始素材（输入，不是产出；且涉及第三方版权） ===
+assets/source-materials/
+
+# === 未经验证的草稿章节（只在真正学习/迭代后才入 git） ===
+02-Deep-Learning-Engineering/
+03-NLP-and-Transformer/
+04-LLM-and-Agent-Architecture/
+05-Model-Inference-and-Optimization/
+06-Knowledge-Graph-and-IE/
+
+# === 私人 / 本地 / 临时 ===
+.gemini_chats_backup/
+.claude/
+.aider*
+
+# === IDE / 编辑器 ===
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# === 系统文件 ===
+.DS_Store
+Thumbs.db
+
+# === git 备份（reinit 时用的临时目录） ===
+.git.bak/
+
+# === Python 运行时（未来 code-demos 会用到） ===
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# === Node 运行时（未来 demo 可能涉及） ===
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# === 模型文件（大文件，应走 git-lfs 或外部存储） ===
+*.onnx
+*.pmml
+*.pkl
+*.pt
+*.pth
+*.h5
+*.bin

@@ -7,11 +7,11 @@
 assets/source-materials/
 
 # === 未经验证的草稿章节（只在真正学习/迭代后才入 git） ===
-02-Deep-Learning-Engineering/
-03-NLP-and-Transformer/
-04-LLM-and-Agent-Architecture/
-05-Model-Inference-and-Optimization/
-06-Knowledge-Graph-and-IE/
+assets/plan/02-Deep-Learning-Engineering/
+assets/plan/03-NLP-and-Transformer/
+assets/plan/04-LLM-and-Agent-Architecture/
+assets/plan/05-Model-Inference-and-Optimization/
+assets/plan/06-Knowledge-Graph-and-IE/
 
 # === 私人 / 本地 / 临时 ===
 .gemini_chats_backup/

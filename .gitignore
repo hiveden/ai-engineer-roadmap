@@ -3,15 +3,8 @@
 # 哲学：git 是"已验证学习进度"的投影，不是写作过程的备份
 # ─────────────────────────────────────────────
 
-# === 原始素材（输入，不是产出；且涉及第三方版权） ===
-assets/source-materials/
-
-# === 未经验证的草稿章节（只在真正学习/迭代后才入 git） ===
-assets/plan/02-Deep-Learning-Engineering/
-assets/plan/03-NLP-and-Transformer/
-assets/plan/04-LLM-and-Agent-Architecture/
-assets/plan/05-Model-Inference-and-Optimization/
-assets/plan/06-Knowledge-Graph-and-IE/
+# === assets 整体不入 git（原始素材、草稿、legacy-projects 等都是本地工作区）===
+assets/
 
 # === 私人 / 本地 / 临时 ===
 .gemini_chats_backup/

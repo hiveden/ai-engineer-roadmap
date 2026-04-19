@@ -24,10 +24,11 @@ max_iter=10000
   — 最大迭代次数，模型内部优化的上限
   — 数据复杂时默认值(100)可能不够，会报警告，调大就行
 """
+
 import pandas as pd
 from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
 
 raw = load_breast_cancer()
 df = pd.DataFrame(raw.data, columns=raw.feature_names)
@@ -44,7 +45,9 @@ print("=== 模型对前 5 条测试数据的判断 ===")
 sample_X = X_test[:5]
 sample_y = y_test.values[:5]
 predictions = model.predict(sample_X)
+print("predictions =========== " + str(predictions))
 probas = model.predict_proba(sample_X)
+print("probas =============== " + str(probas))
 
 label = {0: "恶性", 1: "良性"}
 for i in range(5):

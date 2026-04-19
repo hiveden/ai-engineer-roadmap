@@ -7,6 +7,7 @@ Step 2 — 切分数据
 和 demo-01 的 step2 一模一样，只是数据换了。
 ML 的流程是通用的，不管什么数据集都是这几步。
 """
+
 import pandas as pd
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import train_test_split
@@ -24,7 +25,7 @@ print(f"全部数据：{len(df)} 条")
 print(f"训练集：  {len(X_train)} 条")
 print(f"测试集：  {len(X_test)} 条")
 
-print(f"\n=== 训练集标签分布 ===")
+print("\n=== 训练集标签分布 ===")
 counts = y_train.value_counts()
 print(f"  良性(1)：{counts[1]} 例")
 print(f"  恶性(0)：{counts[0]} 例")

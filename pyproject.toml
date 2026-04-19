@@ -1,0 +1,16 @@
+[tool.ruff]
+line-length = 100
+extend-exclude = ["assets"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# demo 是教学代码：import 跟随叙事、zip 不加 strict 减少噪音
+"demos/**" = ["E402", "B905"]
+
+[tool.pyright]
+typeCheckingMode = "basic"
+reportMissingImports = "warning"
+exclude = ["assets", "**/__pycache__"]

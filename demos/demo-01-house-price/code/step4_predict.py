@@ -30,11 +30,12 @@ y_test.mean()
   — 可视化误差大小，误差越大色块越长
   — abs() 取绝对值，int() 取整，字符串 * N 重复 N 次
 """
+
 import pandas as pd
 from sklearn.datasets import fetch_california_housing
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import train_test_split
 
 raw = fetch_california_housing()
 df = pd.DataFrame(raw.data, columns=raw.feature_names)

@@ -2,13 +2,14 @@
 Demo 01 — 用房子的特征预测房价
 你要看到的三件事：数据长什么样、模型怎么学、预测准不准
 """
+
 import pandas as pd
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
 
 # ── 第一步：拿到历史数据 ──────────────────────────────
 # 加州房价数据集（sklearn 内置，不用联网）
 from sklearn.datasets import fetch_california_housing
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
 
 raw = fetch_california_housing()
 df = pd.DataFrame(raw.data, columns=raw.feature_names)
@@ -38,11 +39,13 @@ print(f"  {'偏置(底价)':>10s} → {model.intercept_:+.4f}")
 y_pred = model.predict(X_test)
 
 print("\n=== 预测 vs 真实（看前 10 条）===")
-comparison = pd.DataFrame({
-    "真实房价": y_test.values[:10],
-    "预测房价": y_pred[:10],
-    "误差": y_pred[:10] - y_test.values[:10]
-}).round(3)
+comparison = pd.DataFrame(
+    {
+        "真实房价": y_test.values[:10],
+        "预测房价": y_pred[:10],
+        "误差": y_pred[:10] - y_test.values[:10],
+    }
+).round(3)
 print(comparison.to_string(index=False))
 
 # 整体表现

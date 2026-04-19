@@ -28,6 +28,7 @@ df["Diagnosis"].value_counts()
   — 统计某列中每个值出现了多少次
   — 类比 SQL：SELECT Diagnosis, COUNT(*) FROM df GROUP BY Diagnosis
 """
+
 import pandas as pd
 from sklearn.datasets import load_breast_cancer
 
@@ -40,7 +41,7 @@ print(df.iloc[:5, list(range(6)) + [-1]])
 
 print(f"\n总共 {df.shape[0]} 行，{df.shape[1]} 列")
 
-print(f"\n=== 诊断分布 ===")
+print("\n=== 诊断分布 ===")
 counts = df["Diagnosis"].value_counts()
 print(f"  良性(1)：{counts[1]} 例")
 print(f"  恶性(0)：{counts[0]} 例")

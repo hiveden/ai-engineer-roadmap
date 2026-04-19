@@ -34,19 +34,27 @@ assets/source-materials/第4阶段-机器学习/
 
 ## 2. 当前仓库的章节 · 完整映射表
 
-| 仓库章节 | 对应原 day | 性质 |
-|---|---|---|
-| `00-Orientation.md` | ❌ 无 | **新增**——工程师转型导引，原课程没有 |
-| `01-Overview-for-Developers.md` | day-01 `机器学习概述.md` | 重构（视角换成全栈工程师） |
-| `02-KNN-and-Vector-Search.md` | day-02 `KNN算法.md` | 重构 + 加向量检索类比 |
-| `03-Linear-Regression-Engineering.md` | day-03 `线性回归.md` | 重构（去数学，加工程） |
-| `04-Logistic-Regression-and-Classification-Metrics.md` | day-04 `逻辑回归.md` | 重构 + 合并分类指标 |
-| `05-Decision-Trees-and-Rule-Extraction.md` | day-05 `决策树.md` | 重构 + 强调可导出 if-else |
-| `06-Ensemble-and-Financial-Risk.md` | day-06 `集成学习.md` | 重构 + 锚定金融风控场景 |
-| `07-PCA-Bayes-and-LLM-Prelude.md` | day-07 `朴素贝叶斯.md` + day-08 `特征降维.md` | **合并**（两份原文件） |
-| `08-Clustering-and-Time-Series-Project.md` | day-09 `聚类算法.md` + day-10/11 `时序预测项目` | **合并**（两份原文件） |
+| 仓库章节 | 对应原 day | 性质 | 当前位置 |
+|---|---|---|---|
+| `00-Orientation.md` | ❌ 无 | **新增**——工程师转型导引，原课程没有 | `01-Machine-Learning-Foundation/` |
+| `01-Overview-for-Developers.md` | day-01 `机器学习概述.md` | 重构（视角换成全栈工程师） | `01-Machine-Learning-Foundation/` |
+| 第 1 节 线性回归（LESSON-PLAN + demo-01） | day-03 `线性回归.md` | **已进化为 demo 备课**（原 `03-Linear-Regression-Engineering.md` 删除，内容迁移） | `demos/demo-01-house-price/LESSON-PLAN.md` |
+| 第 2 节 逻辑回归（LESSON-PLAN + demo-02） | day-04 `逻辑回归.md` | **已进化为 demo 备课**（原 `04-Logistic-Regression-and-Classification-Metrics.md` 删除，内容迁移） | `demos/demo-02-breast-cancer/LESSON-PLAN.md` |
+| 第 3 节 KNN（讲义待升级为 demo 备课） | day-02 `KNN算法.md` | 讲义已就位，demo 待做 | `demos/02-KNN-and-Vector-Search.md` |
+| 第 4 节 决策树（同上） | day-05 `决策树.md` | 讲义已就位，demo 待做 | `demos/05-Decision-Trees-and-Rule-Extraction.md` |
+| 第 5/6 节 随机森林/XGBoost（同上） | day-06 `集成学习.md` | 讲义已就位，demo 待做 | `demos/06-Ensemble-and-Financial-Risk.md` |
+| 第 7/8 节 朴素贝叶斯/PCA（同上） | day-07 + day-08 | 讲义已就位，合并版，demo 待做 | `demos/07-PCA-Bayes-and-LLM-Prelude.md` |
+| 第 9/10 节 K-Means/时序（同上） | day-09 + day-10/11 | 讲义已就位，合并版，demo 待做 | `demos/08-Clustering-and-Time-Series-Project.md` |
 
-**主题覆盖率：11 → 9（合并 2 处），无遗漏**。
+**主题覆盖率：11 → 10 节课（合并 2 处 demo），无遗漏**。
+
+### 2.1 结构演进说明（2026-04-19）
+
+阶段一的组织方式从"8 章讲义"重构为"10 节算法实操课"：
+- 每节课 = 一个 demo（`demos/demo-NN-<topic>/`）+ 一份 `LESSON-PLAN.md` 备课
+- 备课文件覆盖：讲义集成 + demo 代码拆解 + 知识点清单 + 教学节奏 + 检测方案 + 附录
+- 讲义原文（03、04）**已删除**——内容迁移到对应 demo 的备课里
+- 其他算法讲义（02、05-08）迁到 `demos/` 根目录，作为"待做 demo 时的资料库"——做那一节课时再按 01/02 的模式集成成 `LESSON-PLAN.md`
 
 ---
 

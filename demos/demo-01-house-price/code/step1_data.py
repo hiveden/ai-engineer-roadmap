@@ -59,6 +59,7 @@ len(df)
   Longitude  — 经度
   Price      — 房价中位数（×10万美元）← 这是要预测的目标
 """
+
 import pandas as pd
 from sklearn.datasets import fetch_california_housing
 
@@ -72,6 +73,6 @@ print("=== 前 5 行 ===")
 print(df.head())
 
 print(f"\n总共 {len(df)} 行，{len(df.columns)} 列")
-print(f"\n=== 列名 ===")
+print("\n=== 列名 ===")
 for col in df.columns:
     print(f"  {col}")

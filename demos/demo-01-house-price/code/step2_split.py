@@ -37,6 +37,7 @@ X_train.head(3)
 y_train.head(3)
   — 看这 3 行对应的真实房价
 """
+
 import pandas as pd
 from sklearn.datasets import fetch_california_housing
 from sklearn.model_selection import train_test_split
@@ -56,7 +57,7 @@ print(f"全部数据：{len(df)} 条")
 print(f"训练集：  {len(X_train)} 条（拿来学规律）")
 print(f"测试集：  {len(X_test)} 条（拿来验证学得好不好）")
 
-print(f"\n=== 训练集前 3 行（输入）===")
+print("\n=== 训练集前 3 行（输入）===")
 print(X_train.head(3))
-print(f"\n=== 对应的房价（输出）===")
+print("\n=== 对应的房价（输出）===")
 print(y_train.head(3))

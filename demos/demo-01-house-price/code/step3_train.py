@@ -36,10 +36,11 @@ zip(X.columns, model.coef_)
 f"{weight:+.4f}"
   — 格式化输出：+ 强制显示正负号，.4f 保留 4 位小数
 """
+
 import pandas as pd
 from sklearn.datasets import fetch_california_housing
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
 
 raw = fetch_california_housing()
 df = pd.DataFrame(raw.data, columns=raw.feature_names)

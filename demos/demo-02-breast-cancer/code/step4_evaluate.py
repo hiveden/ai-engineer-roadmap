@@ -19,11 +19,12 @@ from sklearn.metrics import classification_report
   — 类比：precision = 宁可放过不要错杀，recall = 宁可错杀不要放过
   — 医疗场景下 recall 更重要——漏掉一个恶性比误判一个良性后果严重得多
 """
+
 import pandas as pd
 from sklearn.datasets import load_breast_cancer
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.model_selection import train_test_split
 
 raw = load_breast_cancer()
 df = pd.DataFrame(raw.data, columns=raw.feature_names)
@@ -43,3 +44,17 @@ print(f"准确率：{acc:.1%}（{int(acc * len(y_test))}/{len(y_test)} 判对了
 
 print("=== 详细报告 ===")
 print(classification_report(y_test, y_pred, target_names=["恶性(0)", "良性(1)"]))
+
+# ── 混淆矩阵 ──────────────────────────────────────────────
+# confusion_matrix(y_true, y_pred) 返回一个 2x2 矩阵（二分类时）
+#   — 行 = 真实类别，列 = 预测类别
+#   — 行列顺序按 model.classes_ 升序排列（这里是 [0, 1]，即 0=恶性在前）
+#   — cm[i][j] = "真实类别 i 被预测成类别 j" 的数量
+#
+# 把"判对"和"两种判错"分别数出来，这是 accuracy 一个数字看不到的东西。
+cm = confusion_matrix(y_test, y_pred)
+
+print("=== 混淆矩阵 ===")
+print("                预测恶性(0)    预测良性(1)")
+print(f"真实恶性(0)     {cm[0][0]:>4} ✓         {cm[0][1]:>4} ✗ 漏诊")
+print(f"真实良性(1)     {cm[1][0]:>4} ✗ 误诊     {cm[1][1]:>4} ✓")

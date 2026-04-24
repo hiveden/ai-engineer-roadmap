@@ -8,8 +8,8 @@
 
 第一次打开这个仓库：
 
-1. 👉 [00 - 起点定向](./01-Machine-Learning-Foundation/00-Orientation.md) — 动手学 ML 之前的元学习指南
-2. [01 - 机器学习概述](./01-Machine-Learning-Foundation/01-Overview-for-Developers.md) — 开发者视角的 ML 定义与工程落地路径
+1. 👉 [阶段一 LESSON-PLAN](./01-ML/00-mental-model/01-LESSON-PLAN.md) — 教学大纲（为什么学 / 怎么学 / 学什么 / 怎么验证）
+2. [阶段一 心智模型蒸馏](./01-ML/00-mental-model/99-DISTILL.md) — 已通关的核心心智沉淀
 3. 进 [`demos/`](./demos/) 做 10 节算法实操课（每节一个 demo + 一份 `LESSON-PLAN.md`）
 
 ---
@@ -38,8 +38,8 @@
 
 核心目标：理解模型 = 黑盒函数；掌握特征工程与列式数据流转；学会跨语言模型导出（ONNX）与服务加载。
 
-* 👉 [00 - 起点定向](./01-Machine-Learning-Foundation/00-Orientation.md)
-* [x] [01 - 机器学习概述](./01-Machine-Learning-Foundation/01-Overview-for-Developers.md)
+* 👉 [阶段一 LESSON-PLAN](./01-ML/00-mental-model/01-LESSON-PLAN.md)
+* [x] [阶段一 心智模型蒸馏](./01-ML/00-mental-model/99-DISTILL.md)
 
 **10 节算法实操课**（[详见 `demos/`](./demos/README.md)）：
 
@@ -96,10 +96,10 @@ ai-engineer-roadmap/
 ├── CLAUDE.md                          # 给 Claude Code 的项目指令
 ├── GEMINI.md                          # 给 Gemini CLI 的项目指令
 │
-├── 01-Machine-Learning-Foundation/    # 阶段一主线（元指南 + 总览）
-│   ├── 00-Orientation.md              #   起点定向（必先读）
-│   ├── 01-Overview-for-Developers.md  #   开发者视角总览
-│   └── COURSE-MAPPING.md              #   直播课 ↔ 仓库双时间线
+├── 01-ML/                              # 阶段一主线
+│   └── 00-mental-model/                #   元层（学习方法 + 心智模型）
+│       ├── 01-LESSON-PLAN.md           #     教学大纲（合并自原 Orientation + Overview）
+│       └── 99-DISTILL.md               #     心智模型蒸馏（已通关心智）
 │
 ├── demos/                             # 10 节算法实操课
 │   ├── README.md                      #   L3 定义 + 10 算法清单

@@ -114,7 +114,7 @@
 
 > **情境锚句**：这一节是**下限答案**——学员追问时才展开，不主动讲。
 >
-> 原则：保留公式但不放主线。参考 `00-Orientation.md` 的"数学层放最后"。
+> 原则：保留公式但不放主线。参考 `01-LESSON-PLAN.md` 的"数学层放最后"。
 
 - 数学式：
 - 符号约定：
@@ -164,7 +164,7 @@
 
 > **情境锚句**：这一章是**闭卷题库**，按 Bloom 认知分层。Claude 上课时按学员节奏随机抽题。
 >
-> 评分标准见 [`00-Orientation.md`](../01-Machine-Learning-Foundation/00-Orientation.md) 自评表。
+> 评分标准见 [`01-LESSON-PLAN.md`](../00-mental-model/01-LESSON-PLAN.md) 自评表。
 
 ### 5.1 记忆层（能复述）
 

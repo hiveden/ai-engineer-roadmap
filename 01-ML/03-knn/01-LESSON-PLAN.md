@@ -333,7 +333,7 @@ public String predict(float[] query, List<Sample> trainingData, int K) {
 
 ### 2.3 再拆一层 · 数学附录（下限答案层）
 
-> **情境锚句**：这一章是**下限答案**——学员追问时才展开，不主动讲。原则遵循 [`00-Orientation.md`](../../01-Machine-Learning-Foundation/00-Orientation.md) 的"数学层放最后"。
+> **情境锚句**：这一章是**下限答案**——学员追问时才展开，不主动讲。原则遵循 [`01-LESSON-PLAN.md`](../00-mental-model/01-LESSON-PLAN.md) 的"数学层放最后"。
 
 #### 2.3.1 欧氏距离 Euclidean Distance（默认）
 
@@ -575,7 +575,7 @@ $$d(p, q) = \left(\sum_{i=1}^{n} |p_i - q_i|^r\right)^{1/r}$$
 
 ## §5 · Questionnaire · 显式 active recall（fast.ai 风格）
 
-> **情境锚句**：这一章是**闭卷题库**，按 Bloom 认知分层。Claude 上课时按 Alex 节奏随机抽题。评分标准见 [`00-Orientation.md`](../../01-Machine-Learning-Foundation/00-Orientation.md)。
+> **情境锚句**：这一章是**闭卷题库**，按 Bloom 认知分层。Claude 上课时按 Alex 节奏随机抽题。评分标准见 [`01-LESSON-PLAN.md`](../00-mental-model/01-LESSON-PLAN.md)。
 
 ### 5.1 记忆层（能复述 · 5 题）
 

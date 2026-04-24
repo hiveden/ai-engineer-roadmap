@@ -297,7 +297,7 @@ proba = [[0.12, 0.88], ...]
 - 二分类下 argmax 等价于 "> 0.5"；多分类失效，argmax 永远成立
 - ⚠️ **坑点**：置信度**不是偏移量**（0.88 - 0.5 = 0.38）——session-07 用户推错过
 
-**学生可能问**（和置信度相关的深度讨论见 [`NOTES.md`](./NOTES.md)）：
+**学生可能问**（和置信度相关的深度讨论见 [`02-NOTES.md`](./02-NOTES.md)）：
 - "列顺序怎么定的" → 按 classes_ 升序，用 `print(model.classes_)` 验证
 - "> 0.5 就是 1 吗" → 二分类对，多分类要用 argmax
 - "置信度是 0.88 - 0.5 吗" → 不是。置信度就是 0.88 本身
@@ -511,9 +511,8 @@ print(classification_report(y_test, y_pred, target_names=["恶性(0)", "良性(1
 ### 7.3 项目内相关文档
 
 - 上节课：[`demos/demo-01-house-price/LESSON-PLAN.md`](../demo-01-house-price/LESSON-PLAN.md)
-- 置信度专题：[`NOTES.md`](./NOTES.md)（session-07 产出）
-- 开发者视角总览：[`01-Overview-for-Developers.md`](../../01-Machine-Learning-Foundation/01-Overview-for-Developers.md)
-- Orientation 学习方法总纲：[`00-Orientation.md`](../../01-Machine-Learning-Foundation/00-Orientation.md)
+- 置信度专题：[`02-NOTES.md`](./02-NOTES.md)（session-07 产出）
+- 阶段一 LESSON-PLAN（学习方法总纲 + 开发者视角 · 合并自原 Orientation + Overview）：[`01-LESSON-PLAN.md`](../00-mental-model/01-LESSON-PLAN.md)
 - demos 总清单：[`demos/README.md`](../README.md)
 
 **已删除的讲义**：

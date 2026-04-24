@@ -378,8 +378,8 @@ print(f"误差占比：{mae / y_test.mean() * 100:.1f}%")
 
 - **已删除的原讲义**：`01-Machine-Learning-Foundation/03-Linear-Regression-Engineering.md` 的全部内容已迁入本文 §1（2026-04-19 重构）
 - 原培训班对照：`assets/source-materials/第4阶段-机器学习/线性回归.md`（gitignored，本地可访问）
-- Orientation（学习方法总纲）：[`00-Orientation.md`](../../01-Machine-Learning-Foundation/00-Orientation.md)
-- 开发者视角总览：[`01-Overview-for-Developers.md`](../../01-Machine-Learning-Foundation/01-Overview-for-Developers.md)
+- Orientation（学习方法总纲）：[`01-LESSON-PLAN.md`](../00-mental-model/01-LESSON-PLAN.md)
+- 开发者视角总览：[`01-LESSON-PLAN.md`](../00-mental-model/01-LESSON-PLAN.md)
 - demos 总清单：[`demos/README.md`](../README.md)
 - 下一节（逻辑回归）：[`demos/demo-02-breast-cancer/LESSON-PLAN.md`](../demo-02-breast-cancer/LESSON-PLAN.md)
 

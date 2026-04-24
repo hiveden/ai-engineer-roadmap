@@ -7,6 +7,13 @@
 >
 > 按模板 v0.2 填槽。LESSON-PLAN 给 Claude 查，不是给学员自读——数学、工程类比、反面教材一锅保留。
 
+> 📎 **大纲接收**（2026-04-24 决策 · 同日按 day-02 KNN 大纲调整）：
+> - **§6 特征选择 Feature Selection**——`feature_importances_` 天然就是选择工具
+> - **§6 特征组合 Feature Cross**——举"心跳次数/时间→心跳频率"插讲
+> - **§7 欠拟合 / 过拟合 / 泛化（加强）**——首讲在 [`03-knn`](../03-knn/)（K 值触发），本节用决策树深度 / 剪枝 换锚点再焊一次
+>
+> 详见 [`../00-mental-model/00-机器学习概述-学习安排.md`](../00-mental-model/00-机器学习概述-学习安排.md) + [`../00-mental-model/01-LESSON-PLAN.md` §8.4](../00-mental-model/01-LESSON-PLAN.md)。
+
 ---
 
 ## §0 · 课前须知

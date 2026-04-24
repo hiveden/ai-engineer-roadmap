@@ -5,6 +5,12 @@
 > 备课资料库，不是教案。给 Claude 上课时查，不是给学员自读。
 > 写作规则见模板 §8。
 
+> 📎 **大纲接收**（2026-04-24 决策 · 同日按 day-02 KNN 大纲补充）：
+> - **§6 归一化 Normalization / 标准化 Standardization**——Wine 数据集必做标准化，距离算法对量纲敏感
+> - **§7 欠拟合 / 过拟合 / 泛化（首讲）**——顺线下课 day-02 KNN 大纲 §5，K 值过小 → 过拟合 / K 值过大 → 欠拟合
+>
+> 详见 [`../00-mental-model/00-机器学习概述-学习安排.md`](../00-mental-model/00-机器学习概述-学习安排.md) + [`../00-mental-model/01-LESSON-PLAN.md` §8.4](../00-mental-model/01-LESSON-PLAN.md)。
+
 ---
 
 ## §0 · 课前须知

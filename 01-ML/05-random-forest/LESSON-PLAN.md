@@ -6,6 +6,12 @@
 >
 > **三源基础**：详见 §8.9 定位表 + [`05-random-forest-digest.md`](./05-random-forest-digest.md)（L1 素材包，45+ URL 已落地）。
 
+> 📎 **大纲接收**（2026-04-24 决策）：本 demo 就地呼应课件大纲 §6 + §7：
+> - **§6 特征重要性延续**——RF 的 feature importance 比单树更稳（多树平均）
+> - **§7 偏差 Bias / 方差 Variance 权衡**——bagging 降方差，呼应决策树章的过拟合治理
+>
+> 详见 [`../00-mental-model/01-LESSON-PLAN.md` §8.4](../00-mental-model/01-LESSON-PLAN.md)。
+
 ---
 
 ## §0 · 课前须知

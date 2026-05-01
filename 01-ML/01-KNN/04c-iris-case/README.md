@@ -1,0 +1,64 @@
+# 第 4 章 c · 鸢尾花分类案例
+
+> 本文件 = 章 PPT 完整底稿（复习记忆页）
+> 维度：**代码**
+>
+> **按知识点拆分的讲解版**：
+>
+> 1. [`01-鸢尾花案例.md`](./01-鸢尾花案例.md) — ★ 掌握：KNN + 标准化完整 6 步实战
+
+## 底稿
+
+> 04 · 【实操】利用 KNN 算法进行鸢尾花分类
+
+鸢尾花 Iris Dataset 数据集是机器学习领域经典数据集，包含 150 条鸢尾花信息，每 50 条取自三个鸢尾花中之一：Versicolour、Setosa 和 Virginica。每个花用 4 个属性描述。
+
+代码实现：
+
+```python
+'''
+鸢尾花数据集的 KNN 模型训练 以及 评估
+步骤:
+1 加载数据
+2 数据预处理（清洗）
+3 特征工程（提取，归一化标准化）
+4 模型训练
+5 模型评估
+6 模型预测
+'''
+
+from sklearn.datasets import load_iris
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+mydataset = load_iris()
+
+x_train, x_test, y_train, y_test = train_test_split(
+    mydataset.data, mydataset.target,
+    test_size=0.3, random_state=22, stratify=mydataset.target
+)
+
+transfer = StandardScaler()
+x_train = transfer.fit_transform(x_train)
+x_test = transfer.transform(x_test)
+
+model = KNeighborsClassifier(n_neighbors=3)
+model.fit(x_train, y_train)
+
+y_predict = model.predict(x_test)
+myscore1 = accuracy_score(y_test, y_predict)
+myscore2 = model.score(x_test, y_test)
+print('准确率 1：', myscore1)
+print('准确率 2：', myscore2)
+
+x_ceshi = [[3, 5, 4, 2]]
+x_ceshi = transfer.transform(x_ceshi)
+y_predict = model.predict(x_ceshi)
+y_predict_probability = model.predict_proba(x_ceshi)
+print('预测结果：', y_predict)
+print('预测结果的概率分布：', y_predict_probability)
+```
+
+→ 完整含原版注释见 [`01-鸢尾花案例.md`](./01-鸢尾花案例.md#底稿)。

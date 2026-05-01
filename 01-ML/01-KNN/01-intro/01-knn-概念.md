@@ -1,6 +1,6 @@
 # KNN 概念
 
-## 课程原文
+## 底稿
 
 K-近邻算法（K Nearest Neighbor，简称 KNN）。
 

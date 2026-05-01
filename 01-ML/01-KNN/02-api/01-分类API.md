@@ -1,12 +1,59 @@
 # 分类 API：KNeighborsClassifier
 
-## 课程原文
+## 底稿
+
+> 【实操】分类 API
+
+KNN 分类 API：
 
 ```python
 sklearn.neighbors.KNeighborsClassifier(n_neighbors=5)
 ```
 
-n_neighbors : int, 可选（默认 = 5）
+```python
+"""
+函数功能：创建一个 KNN 分类器，用简单数据训练，并对新样本进行预测。
+
+KNN（K-近邻算法）
+    概述：
+        专业：找离测试集最近的哪 K 个样本，然后投票。哪个标签值多，
+        就用它作为测试集的最终结果。
+    KNN 算法实现思路：
+        思路 1：分类思路    投票，选票数最多的
+        思路 2：回归思路    求平均值
+
+KNN（K-近邻算法）：分类（多数表决）
+    1. 计算未知样本到每一个训练样本的距离
+    2. 将训练样本根据距离大小升序排列
+    3. 取出距离最近的 K 个训练样本
+    4. 进行多数表决，统计 K 个样本中哪个类别的样本个数最多
+    5. 将未知的样本归属到出现次数最多的类别
+
+关键参数：n_neighbors=1 表示使用 1 个最近邻进行预测。
+"""
+
+# 导包
+from sklearn.neighbors import KNeighborsClassifier
+
+# 定义模型   参数 1 为 KNN 的 K 值（最近邻的 K 个样本作为调查对象）
+model = KNeighborsClassifier(n_neighbors=1)
+
+# 定义训练集
+X = [[0], [1], [2], [3]]   # 特征必须是二维结构 4 行 1 列（4 个样本，1 个特征）
+# y = [0, 1, 0, 1]         # 定义标签，4 个样本，有 4 个标签。必须是一维结构
+y = ['dog', 'cat', 'duck', 'xx']
+
+# 喂入数据，训练模型
+# 将样本数据信息存储起来，用于在推理时刻计算距离
+model.fit(X, y)
+
+# 模型推理   参数为待预测的样本（必须也是二维结构，此刻是 1 行 1 列，代表 1 个样本，一个特征）
+# 如果平票，哪个样本的索引较小，就用哪个样本的标签
+result = model.predict([[2.5]])
+print(result)
+```
+
+n_neighbors : int，可选（默认 = 5），k_neighbors 查询默认使用的邻居数。
 
 ---
 

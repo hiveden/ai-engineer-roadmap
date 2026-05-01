@@ -112,8 +112,7 @@ ai-engineer-roadmap/
 │   └── grading-rules.md           #   L0-L4 评分表（已被二元判停取代）
 │
 ├── scripts/                       # 工具脚本（pptx 提取 / session 导出）
-├── assets/                        # 原始素材（gitignored）
-└── highlights/                    # 触发到我的对话原文存档
+└── assets/                        # 原始素材（gitignored）
 ```
 
 文件命名约定：`NN-Kebab-Case-Title.md`（NN 为阶段内序号，从 01 起）。

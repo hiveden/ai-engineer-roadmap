@@ -1,6 +1,6 @@
 # AI Engineer Roadmap
 
-面向全栈开发与架构师的 AI 落地指南。受众、红线、协作约定见 [`CLAUDE.md`](./CLAUDE.md)。
+面向开发与架构师的 AI 落地指南。受众、红线、协作约定见 [`CLAUDE.md`](./CLAUDE.md)。
 
 ---
 

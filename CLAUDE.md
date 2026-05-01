@@ -11,7 +11,7 @@
 
 ## 受众
 
-Alex（全栈 7 年，转型 AI Agent 工程师 / 多 Agent 架构）。
+Alex（转型 AI Agent 工程师 / 多 Agent 架构）。
 
 - 工程师语言（微服务 / API / GC / 零拷贝 / ONNX）
 - 跨语言落地：Python 训练 → ONNX/PMML → Go/Java/Node 加载

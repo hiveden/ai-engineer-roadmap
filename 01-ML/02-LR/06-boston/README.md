@@ -13,6 +13,132 @@
 
 ## 底稿
 
+### PPT 原文（slide 91-98）
+
+#### Slide 91-92 · 案例背景 + 数据属性
+
+> 1 案例背景 – 数据来源：波士顿房价数据集（**已经因为抗议而下架**，需要手动加载）
+>
+> 2 案例背景 – 数据属性：13 特征 + 1 标签（房价中位数 MEDV）
+
+> PPT 原图：13 个字段说明表（CRIM / ZN / INDUS / CHAS / NOX / RM / AGE / DIS / RAD / TAX / PTRATIO / B / LSTAT / MEDV）
+
+#### Slide 93 · 案例分析
+
+**2 案例分析步骤**：
+
+1. 数据集的加载和数据分割
+2. **标准化处理**——数据大小不一致，是否会导致结果影响较大
+3. 回归预测
+4. 线性回归的算法效果评估
+
+**3 回归性能评估**：
+
+均方误差（Mean Squared Error, MSE）评价机制：
+
+```python
+sklearn.metrics.mean_squared_error(y_true, y_pred)
+```
+
+- 均方误差回归损失
+- y_true：真实值；y_pred：预测值；return：浮点数结果
+
+#### Slide 94 · 导入库
+
+```python
+from sklearn.datasets import load_boston           # 数据
+from sklearn.preprocessing import StandardScaler   # 特征标准化
+from sklearn.model_selection import train_test_split  # 数据集划分
+from sklearn.linear_model import LinearRegression  # 正规方程的回归模型
+from sklearn.linear_model import SGDRegressor      # 梯度下降的回归模型
+from sklearn.metrics import mean_squared_error     # 均方误差评估
+```
+
+> ⚠️ `load_boston` 在 sklearn 1.2+ 已移除。完整代替方案见笔记部分（用 `fetch_california_housing`）。
+
+#### Slide 95 · 正规方程方式实现
+
+```python
+def linear_model1():
+    # 1 获取数据
+    data = load_boston()  # 无法下载，需手动加载
+
+    # 2 数据集划分
+    x_train, x_test, y_train, y_test = train_test_split(
+        data.data, data.target, random_state=22)
+
+    # 3 特征工程-标准化
+    transfer = StandardScaler()
+    x_train = transfer.fit_transform(x_train)
+    x_test = transfer.transform(x_test)
+
+    # 4 机器学习-线性回归（正规方程）
+    estimator = LinearRegression()
+    estimator.fit(x_train, y_train)
+
+    # 5 模型评估
+    y_predict = estimator.predict(x_test)
+    print("预测值为:\n", y_predict)
+    print("模型的权重系数为:\n", estimator.coef_)
+    print("模型的偏置为:\n", estimator.intercept_)
+
+    # 5.2 评价 均方误差
+    error = mean_squared_error(y_test, y_predict)
+    print("误差为:\n", error)
+    # 思考：为啥正规方程法的预测误差小？
+```
+
+#### Slide 96 · 梯度下降方式实现
+
+```python
+def linear_model2():
+    # 1 获取数据
+    data = load_boston()
+
+    # 2 数据集划分
+    x_train, x_test, y_train, y_test = train_test_split(
+        data.data, data.target, random_state=22)
+
+    # 3 特征工程-标准化
+    transfer = StandardScaler()
+    x_train = transfer.fit_transform(x_train)
+    x_test = transfer.transform(x_test)
+
+    # 4 机器学习-线性回归（梯度下降）
+    estimator = SGDRegressor()
+    # estimator = SGDRegressor(max_iter=1000, learning_rate="constant", eta0=0.001)
+    estimator.fit(x_train, y_train)
+
+    # 5 模型评估
+    y_predict = estimator.predict(x_test)
+    print("预测值为:\n", y_predict)
+    print("模型的权重系数为:\n", estimator.coef_)
+    print("模型的偏置为:\n", estimator.intercept_)
+    error = mean_squared_error(y_test, y_predict)
+    print("误差为:\n", error)
+```
+
+#### Slide 97 · 本节小结
+
+- 1 正规方程：`sklearn.linear_model.LinearRegression()`
+- 2 梯度下降：`sklearn.linear_model.SGDRegressor()`
+- 3 线性回归性能评估：`sklearn.metrics.mean_squared_error`
+
+#### Slide 98 · 自检题
+
+> 1. 本案例中，以下哪个选项是用来评估线性回归模型的方法？
+>
+> A）最小二乘法
+> B）均方误差
+> C）平均绝对误差
+> D）决定性系数
+>
+> **答案：B**
+
+---
+
+### 笔记（已整理）
+
 > 06 · 【实操】波士顿房价预测案例
 
 > 【知道】线性回归 API

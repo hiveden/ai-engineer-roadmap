@@ -9,6 +9,68 @@
 
 ## 底稿
 
+### PPT 原文（slide 15-17）
+
+#### Slide 15 · 一元线性回归案例
+
+> 预测小明身高。需求：小明身高是 176，请预测体重？
+
+| 编号 | 身高 | 体重 |
+|---|---|---|
+| 1 | 160 | 56.3 |
+| 2 | 166 | 60.6 |
+| 3 | 172 | 65.1 |
+| 4 | 174 | 68.5 |
+| 5 | 180 | 75 |
+| 6 | 176 | ？ |
+
+> 对于这个回归案例如何利用 API 快速求解呢？
+
+#### Slide 16 · 线性回归 API 介绍（5 步流程图）
+
+PPT 原图把流程拆成 5 步：
+
+1. **导入**：`from sklearn.linear_model import LinearRegression`
+2. **准备数据**：x = [[160], [166], …]（X 必须 2D），y = [56.3, 60.6, …]
+3. **实例化**：`estimator = LinearRegression()`
+4. **训练**：`estimator.fit(x, y)` 从数据中获取规律
+5. **预测**：`estimator.predict([[176]])`
+
+查看模型参数：
+- 斜率 `estimator.coef_`
+- 截距 `estimator.intercept_`
+
+> **思考**：这里要不要标准化？（一元、量纲单一可不做；多元量纲悬殊必须做，详见 04b-scaling）
+
+#### Slide 17 · 线性回归 API 介绍（完整代码）
+
+```python
+from sklearn.linear_model import LinearRegression
+
+def dm01_lr预测小明身高():
+    # 1 准备数据 身高和体重
+    x = [[160], [166], [172], [174], [180]]
+    y = [56.3, 60.6, 65.1, 68.5, 75]
+
+    # 2 实例化 线性回归模型 estimator
+    estimator = LinearRegression()
+
+    # 3 训练 线性回归模型 fit()  h(w) = w1·x1 + w2·x2 + b
+    estimator.fit(x, y)
+
+    # 4 打印 线性回归模型参数 coef_ intercept_
+    print('estimator.coef_-->', estimator.coef_)
+    print('estimator.intercept_-->', estimator.intercept_)
+
+    # 5 模型预测 predict()
+    myres = estimator.predict([[176]])
+    print('myres-->', myres)
+```
+
+---
+
+### 笔记（已整理）
+
 > 02 · 线性回归问题的求解
 
 **学习目标**：
@@ -21,7 +83,7 @@
 
 > 【实操】线性回归 API 的应用
 
-预测播仔身高。
+预测小明身高。
 
 已知数据（5 个样本，见下方代码 `x` / `y`）：
 
@@ -33,7 +95,7 @@
 | 174 | 68.5 |
 | 180 | 75.0 |
 
-需求：播仔身高是 176，请预测体重？
+需求：小明身高是 176，请预测体重？
 
 ```python
 from sklearn.linear_model import LinearRegression

@@ -12,6 +12,96 @@
 
 ## 底稿
 
+### PPT 原文（slide 82-90）
+
+#### Slide 82 · 学习目标
+
+- 掌握常用的回归评估方法
+- 了解不同评估方法的特点
+
+#### Slide 83 · MAE / MSE / RMSE 三种
+
+- 我们希望衡量预测值和真实值之间的差距，会用到 MAE、MSE、RMSE 多种测评函数进行评价
+- **平均绝对误差** Mean Absolute Error (MAE)
+- **均方误差** Mean Squared Error (MSE)
+- **均方根误差** Root Mean Squared Error (RMSE)
+
+> **RMSE 不适合当 loss 函数 —— 求导难！**
+
+#### Slide 84 · 评估函数 vs loss 函数
+
+- 一些函数被被拿来用作模型评估函数，也同时可以被当做 loss 函数
+
+#### Slide 85 · 三种指标对比（场景 1：噪声小）
+
+- RMSE 的计算公式中有一个平方项，因此大的误差将被平方，会增加 RMSE 的值，**大多数情况下 RMSE > MAE**
+- 在数据点弥散度小时，**MAE 和 RMSE 非常接近**
+- 对误差的**平方级惩罚**
+
+> 用直线 y = 2x + 5 拟合数据时观察。
+
+#### Slide 86 · 三种指标对比（场景 2：含异常点）
+
+- 对比第一张图，数据点弥散度变大，**所有指标都变大了**
+- **RMSE 几乎达到 MAE 值的两倍**——RMSE 对异常点更为敏感
+- **MSE 对异常点特别敏感**，几乎爆炸（正常数据和异常数据的误差共同决定了该误差，但**异常数据的贡献占了大头**！！！）
+
+#### Slide 87 · 异常点存在时为何推荐 MAE
+
+> 当数据存在大量异常点，相较于 MAE，使用 **MSE 损失函数**异常点对 loss 值的贡献过大。
+>
+> 在梯度下降的优化过程中，为了让 loss 降得更低（即避免异常值产生很大的 loss），训练结束后即使 MSE loss 降到最低，**模型的拟合会偏向异常值**，从而降低对正常数据分布的拟合精度。
+>
+> 此时推荐 **MAE**，模型失真不严重。
+
+> **补充说明**：作为 loss 函数，MAE 和 MSE 对模型优化的差异显著。
+
+#### Slide 88 · 综合结论
+
+> 一般使用 **MAE 和 RMSE** 这两个指标。
+
+| 指标 | 反映 | 对大误差 | 对异常点 |
+|---|---|---|---|
+| **MAE** | "真实"的平均误差 | 不敏感 | 不敏感 |
+| **RMSE** | 放大大误差点的影响 | 敏感 | 敏感 |
+
+> 两者都能反映出预测值和真实值之间的误差。
+
+#### Slide 90 · 线性回归 API 对比
+
+```python
+sklearn.linear_model.LinearRegression(fit_intercept=True)
+```
+
+- **参数**：`fit_intercept`（是否计算偏置）
+- **属性**：`coef_`（回归系数）、`intercept_`（偏置）
+
+```python
+sklearn.linear_model.SGDRegressor(
+    loss="squared_error",       # 注：原 PPT 写 "squared_loss"，sklearn 1.0+ 已改为 "squared_error"
+    fit_intercept=True,
+    learning_rate='constant',
+    eta0=0.01,
+)
+```
+
+`SGDRegressor` 实现了随机梯度下降学习，支持不同的损失函数和正则化惩罚项来拟合线性回归模型。
+
+- **参数**：
+  - `loss`（损失函数类型）
+  - `fit_intercept`（是否计算偏置）
+  - `learning_rate`（学习率策略）：可配置随迭代次数减小，例如 `'invscaling 逆缩放'`：eta = eta0 / pow(t, power_t=0.25)
+  - `eta0=0.01`（学习率的初值）
+- **属性**：`coef_`、`intercept_`
+
+> sklearn 提供两种实现的 API，根据需要选择使用。
+>
+> **备注**：LinearRegression 是正规方程法，但**不求逆矩阵**，而是用 **奇异值分解（SVD）**。
+
+---
+
+### 笔记（已整理）
+
 > 05 · 回归评估方法
 
 **学习目标**：

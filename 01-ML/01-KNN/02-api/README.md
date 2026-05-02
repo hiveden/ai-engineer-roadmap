@@ -5,6 +5,16 @@
 > 1. [`01-分类API.md`](./01-分类API.md) — `KNeighborsClassifier` + 豆瓣分类 demo
 > 2. [`02-回归API.md`](./02-回归API.md) — `KNeighborsRegressor` + 豆瓣回归 demo
 
+> ℹ️ 本章无独立 marimo demo——文档已含完整可运行代码片段。算法原理交互体验见
+> [`../01-intro/demos/`](../01-intro/demos/)（KNN 投票/k 调优/回归三件套）。
+
+## 学完掌握
+
+- `KNeighborsClassifier(n_neighbors=k)` 与 `KNeighborsRegressor(n_neighbors=k)` 的 API 对称
+- 输入约束：X 必须是 **2D**（n_samples × n_features）；y 是 1D
+- `model.fit(X, y)` 实际只是把数据存起来——KNN 是 lazy learner
+- `model.predict(X_new)` 返回类别 / 数值；`predict_proba(X_new)` 返回类别概率分布
+
 ## 底稿
 
 > 02 · API 介绍

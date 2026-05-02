@@ -10,6 +10,20 @@
 > 3. [`03-标准化.md`](./03-标准化.md) — ★ 掌握：StandardScaler + 应用场景
 > 4. [`04-高斯分布.md`](./04-高斯分布.md) — ★ 掌握：标准化理论基础（N(μ,σ) / 3σ 法则 / 68-95-99.7）
 
+## 互动 demo
+
+| demo | 内容 | 启动 |
+|---|---|---|
+| [`demos/02-knn-scaling.py`](./demos/02-knn-scaling.py) | 量纲悬殊数据 vs 标准化后对 KNN 决策边界的影响 | `marimo run demos/02-knn-scaling.py --port 2723` |
+
+## 学完掌握
+
+- KNN / 梯度类算法对**量纲**敏感，未标准化会让某一维特征支配距离
+- MinMaxScaler 适合分布稳定无离群值；StandardScaler 适合任何分布（先用这个）
+- `fit_transform(Xtr)` + `transform(Xte)`——**测试集只 transform**，防数据泄漏
+- 标准化后均值 ≈ 0、标准差 ≈ 1，3σ 法则覆盖 99.7% 数据
+- 树模型不需要标准化（按值切分而非距离）
+
 ## 底稿
 
 > 04 · 特征预处理

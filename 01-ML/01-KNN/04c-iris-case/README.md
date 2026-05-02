@@ -7,6 +7,20 @@
 >
 > 1. [`01-鸢尾花案例.md`](./01-鸢尾花案例.md) — ★ 掌握：KNN + 标准化完整 6 步实战
 
+## 互动 demo
+
+| demo | 内容 | 启动 |
+|---|---|---|
+| [`demos/01-iris-pipeline.py`](./demos/01-iris-pipeline.py) | 6 步 pipeline 拖参（test_size/k/seed/标准化）+ 4D vs 2D 准确率对比 + 决策边界 + 混淆矩阵 + 分类报告 | `marimo run demos/01-iris-pipeline.py --port 2725` |
+
+## 学完掌握
+
+- 标准 ML pipeline 6 步：load → split[stratify] → scale → fit → eval → predict
+- `train_test_split(stratify=y)` 保证类别比例平衡，类不平衡时**必做**
+- 4 维全特征 vs 2 维投影准确率差距体现"维度信息量"
+- 混淆矩阵的 TP/FN/FP/TN 4 格 + classification_report 的 precision/recall/f1
+- KNN 在 iris 上的局限：花瓣长×花瓣宽几乎线性可分，KNN 优势不显著（树模型也行）
+
 ## 底稿
 
 > 04 · 【实操】利用 KNN 算法进行鸢尾花分类

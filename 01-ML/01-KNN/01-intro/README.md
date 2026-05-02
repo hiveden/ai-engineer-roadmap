@@ -11,6 +11,22 @@
 > 7. [`04-平票加权投票.md`](./04-平票加权投票.md) — 平票情况
 > 8. [`05-工作流程.md`](./05-工作流程.md) — 分类 / 回归 5 步流程
 
+## 互动 demo
+
+| demo | 内容 | 启动 |
+|---|---|---|
+| [`demos/02-proximity.py`](./demos/02-proximity.py) | 拖动新电影坐标看 9 部历史电影距离重排 + KNN 投票 | `marimo run demos/02-proximity.py --port 2718` |
+| [`demos/03-k-tuning.py`](./demos/03-k-tuning.py) | 126 部合成电影 + 6 个高分烂片噪声，拖 k=1→125 看决策边界 + LOOCV U 形 + 距离加权开关 | `marimo run demos/03-k-tuning.py --port 2719` |
+| [`demos/04-regression.py`](./demos/04-regression.py) | KNN 回归预测观看完成度（连续值），viridis 色阶决策面 + MAE/RMSE/R² + 残差图 | `marimo run demos/04-regression.py --port 2720` |
+
+## 学完掌握
+
+- 把分类问题翻译成"特征空间里给查询点找邻居投票"
+- 手算 KNN 流程：算距离 → 排序 → 取 top-k → 投票
+- 分类（多数票）与回归（求平均）的统一性
+- bias-variance 谱：k=1 过拟合 → k=√N 适中 → k=N 退化
+- 距离加权（按 1/d）何时比简单多数票更稳
+
 K-近邻算法（K Nearest Neighbor，简称 KNN）。
 
 ## 算法思想

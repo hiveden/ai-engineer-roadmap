@@ -70,7 +70,7 @@ def _(mo):
         "border-left:2px solid #6366f1;padding:1px 8px;"
         "font-weight:600;font-size:12px;color:#475569;margin-bottom:2px;"
     )
-    k_slider = mo.ui.slider(1, 50, value=7, step=1, label="k 邻居数")
+    k_slider = mo.ui.slider(1, 80, value=7, step=1, label="k 邻居数")
     weighted_switch = mo.ui.switch(value=False, label="距离加权（关=简单平均）")
     new_rating = mo.ui.slider(3.0, 11.0, value=7.5, step=0.1, label="新电影评分")
     new_lead = mo.ui.slider(3.0, 12.0, value=8.0, step=0.1, label="主演吸引度")
@@ -290,7 +290,7 @@ def _(mo):
 | **k=1** | 决策面斑驳，每格颜色 = 最近训练点的完成度 | 高方差：预测完全跟着噪声 |
 | **k=7** ≈√80 | 决策面平滑，仍保留局部结构（左下偏冷 / 右上偏暖） | bias-variance 拐点 |
 | **k=20** | 决策面进一步光滑，渐变更柔 | 偏差略增、方差大降 |
-| **k=80** | 决策面变成**单一颜色 = 全局均值**（≈50%） | 极端欠拟合：完全忽略特征 |
+| **k=80** | 决策面变成**单一颜色 = 全局均值**（≈42%） | 极端欠拟合：完全忽略特征 |
 
 **回归 vs 分类的 k 影响**：分类靠投票（离散），多数决一旦稳定就稳定；
 回归靠**平均**（连续），**每个邻居都贡献数值**——所以 k 一变化预测立刻有连续位移，

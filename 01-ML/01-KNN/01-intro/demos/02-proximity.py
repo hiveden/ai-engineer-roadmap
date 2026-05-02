@@ -40,15 +40,15 @@ def _(mo):
 def _(np):
     # 9 部历史电影 (rating, lead_actor) + 喜好标签 (1=喜欢, 0=不喜欢)
     movies = [
-        ("流浪地球2", 8.3, 9.0, 1),
-        ("阿凡达",   7.8, 8.5, 1),
-        ("泰坦尼克", 8.0, 9.5, 1),
-        ("复联4",    8.4, 9.2, 1),
-        ("沙丘2",    8.5, 8.0, 1),
+        ("流浪地球2", 8.4, 9.0, 1),
+        ("阿凡达",   8.7, 8.5, 1),
+        ("泰坦尼克", 9.5, 9.5, 1),
+        ("复联4",    8.5, 9.2, 1),
+        ("沙丘2",    8.0, 8.0, 1),
         ("哥斯拉",   6.4, 7.0, 0),
         ("长津湖",   7.4, 8.0, 0),
-        ("寒战",     7.2, 6.5, 0),
-        ("喜羊羊",   5.5, 4.0, 0),
+        ("寒战",     7.5, 6.5, 0),
+        ("上海堡垒", 2.9, 3.5, 0),
     ]
     names = [m[0] for m in movies]
     X = np.array([[m[1], m[2]] for m in movies])
@@ -58,8 +58,8 @@ def _(np):
 
 @app.cell
 def _(mo):
-    new_rating = mo.ui.slider(4.0, 10.0, value=8.5, step=0.1, label="评分")
-    new_lead = mo.ui.slider(4.0, 10.0, value=9.5, step=0.1, label="主演吸引度")
+    new_rating = mo.ui.slider(2.0, 10.0, value=8.5, step=0.1, label="评分")
+    new_lead = mo.ui.slider(2.0, 10.0, value=9.5, step=0.1, label="主演吸引度")
     k_slider = mo.ui.slider(1, 9, value=3, step=1, label="k 邻居数")
 
     mo.hstack(
@@ -126,8 +126,8 @@ def _(
     df_lines = pd.DataFrame(line_rows)
     df_query = pd.DataFrame({"rating": [new_rating.value], "lead": [new_lead.value]})
 
-    base_x = alt.Scale(domain=[4, 10.5])
-    base_y = alt.Scale(domain=[3, 11])
+    base_x = alt.Scale(domain=[2, 10.5])
+    base_y = alt.Scale(domain=[2, 11])
 
     lines_chart = alt.Chart(df_lines).mark_rule(strokeDash=[3, 2]).encode(
         x=alt.X("x0:Q", scale=base_x, title="评分"),
@@ -225,7 +225,7 @@ def _(mo):
                 "1. **基线**：新电影 (8.5, 9.5)，k=3 → 看 3 部最近邻全是「喜欢」\n\n"
                 "2. **拖到分歧区**：把评分调到 7.5 附近，主演 7.5 → 邻居开始混杂\n\n"
                 "3. **k 影响**：k=1 单点决定 → k=9 全员投票\n\n"
-                "4. **喜羊羊角落**：新电影拉到 (5.5, 4.0) 附近 → 全是不喜欢\n\n"
+                "4. **上海堡垒角落**：新电影拉到 (2.9, 3.5) 附近 → 全是不喜欢\n\n"
                 "5. **公式验算**：随便挑一行，距离 = √[(评分差)² + (主演差)²]"
             ),
             "数学": mo.md(

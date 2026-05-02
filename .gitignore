@@ -42,6 +42,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# === Marimo 自动生成（session 状态 + 布局元数据）===
+**/__marimo__/
+**/demos/layouts/
+
 # === 模型文件（大文件，应走 git-lfs 或外部存储） ===
 *.onnx
 *.pmml

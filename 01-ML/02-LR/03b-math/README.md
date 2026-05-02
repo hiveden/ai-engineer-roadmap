@@ -58,44 +58,59 @@
 
 函数在某一点的导数就是该函数所代表的曲线在这一点上的切线斜率。
 
-**常见函数的导数**：
+**LR 用得到的两条**：
+- 幂函数：$(x^\alpha)^\prime = \alpha x^{\alpha-1}$（求 MSE 关于 w 的导数靠它）
+- 链式法则：$\{g[h(x)]\}^\prime = g^\prime(h) \cdot h^\prime(x)$（嵌套函数求导）
 
-| 公式 | 例子 |
-|---|---|
-| $(C)^\prime = 0$ | $(5)^\prime = 0$，$(10)^\prime = 0$ |
-| $(x^\alpha)^\prime = \alpha x^{\alpha-1}$ | $(x^3)^\prime = 3x^2$，$(x^5)^\prime = 5x^4$ |
-| $(a^x)^\prime = a^x \ln a$ | $(2^x)^\prime = 2^x \ln 2$，$(7^x)^\prime = 7^x \ln 7$ |
-| $(e^x)^\prime = e^x$ | $(e^x)^\prime = e^x$ |
-| $(\log_a x)^\prime = \frac{1}{x \ln a}$ | $(\log_{10} x)^\prime = \frac{1}{x \ln 10}$ |
-| $(\ln x)^\prime = \frac{1}{x}$ | — |
-| $(\sin x)^\prime = \cos x$ | — |
-| $(\cos x)^\prime = -\sin x$ | — |
+**导数求极值**：导数为 0 的位置是函数的极值点（LR 闭式解的核心思路）。
 
-**导数的四则运算**：
-
-| 公式 | 例子 |
-|---|---|
-| $[u(x) \pm v(x)]^\prime = u^\prime(x) \pm v^\prime(x)$ | $(e^x + 4\ln x)^\prime = e^x + \frac{4}{x}$ |
-| $[u(x) \cdot v(x)]^\prime = u^\prime(x) v(x) + u(x) v^\prime(x)$ | $(\sin x \cdot \ln x)^\prime = \cos x \ln x + \frac{\sin x}{x}$ |
-| $\left[\frac{u(x)}{v(x)}\right]^\prime = \frac{u^\prime(x) v(x) - u(x) v^\prime(x)}{v^2(x)}$ | $\left(\frac{e^x}{\cos x}\right)^\prime = \frac{e^x \cos x + e^x \sin x}{\cos^2 x}$ |
-| $\{g[h(x)]\}^\prime = g^\prime(h) \cdot h^\prime(x)$ | $(\sin 2x)^\prime = \cos 2x \cdot (2x)^\prime = 2\cos 2x$ |
-
-**复合函数求导**：g(h) 是外函数，h(x) 是内函数。先对外函数求导，再对内函数求导。
-
-**导数求极值**：导数为 0 的位置是函数的极值点。
+> 完整导数公式表 / 四则运算法则不展开——遇到具体函数查表即可。
 
 > 【知道】偏导
 
-⚠️ 待补充
+**多变量函数对其中一个变量求导**，把其它变量当常数。
+
+设 $f(x, y) = x^2 + 3xy + y^2$：
+
+- 对 x 偏导：$\frac{\partial f}{\partial x} = 2x + 3y$（y 当常数 → $3xy \to 3y$，$y^2 \to 0$）
+- 对 y 偏导：$\frac{\partial f}{\partial y} = 3x + 2y$
+
+**线性回归用偏导做什么**：MSE 损失 $L(w, b) = \sum (y - wx - b)^2$ 是 w 和 b 的二元函数，
+分别对 w、b 求偏导，令偏导 = 0，就得到正规方程的解析解（见 04a）。
+
+**梯度**：所有偏导组成的向量，记作 $\nabla L = \left[\frac{\partial L}{\partial w_1}, \frac{\partial L}{\partial w_2}, \ldots\right]^T$。
+梯度方向 = 函数上升最快的方向，**反方向**就是梯度下降的方向（见 04b）。
 
 > 【知道】向量
 
-向量运算。
+**向量加法 / 减法**（同维度逐元素）：
 
-⚠️ 待补充
+$$\mathbf{a} + \mathbf{b} = [a_1 + b_1, a_2 + b_2, \ldots, a_n + b_n]^T$$
+
+**点积 / 内积**（结果是标量）：
+
+$$\mathbf{a} \cdot \mathbf{b} = \mathbf{a}^T \mathbf{b} = \sum_{i=1}^{n} a_i b_i$$
+
+**向量 L2 范数**（向量长度）：
+
+$$\lVert \mathbf{a} \rVert_2 = \sqrt{\sum a_i^2} = \sqrt{\mathbf{a}^T \mathbf{a}}$$
+
+**线性回归用向量做什么**：把 n 个特征 $x_1, x_2, \ldots, x_n$ 写成列向量 $\mathbf{x}$，
+权重 $\mathbf{w}$ 同维列向量，预测值就是 $\hat{y} = \mathbf{w}^T \mathbf{x} + b$，一行公式覆盖所有维度。
 
 > 【知道】矩阵
 
-矩阵运算。
+**矩阵乘法**（A: m×k, B: k×n → C: m×n）：
 
-⚠️ 待补充
+$$C_{ij} = \sum_{p=1}^{k} A_{ip} B_{pj}$$
+
+**转置**：$(A^T)_{ij} = A_{ji}$，行变列、列变行。
+
+**逆矩阵**：仅方阵且满秩可逆，满足 $A A^{-1} = I$（单位阵）。
+
+**线性回归用矩阵做什么**：把 m 个样本叠成矩阵 X (m×n)，标签叠成向量 y (m×1)，
+则模型变成 $\hat{\mathbf{y}} = X \mathbf{w}$。MSE 损失展开后求导得正规方程：
+
+$$\mathbf{w} = (X^T X)^{-1} X^T \mathbf{y}$$
+
+这个公式是 04a 的核心——**所有训练计算用一个矩阵公式搞定**，是 LR 解析解的精华。

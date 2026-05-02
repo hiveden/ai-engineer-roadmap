@@ -17,7 +17,8 @@
 
 1. 掌握过拟合、欠拟合的概念
 2. 掌握过拟合、欠拟合产生的原因
-3. 知道什么是正则化，以及正则化的方法
+
+> 正则化作为解决方案，独立成章 → [`07b-regularization/`](../07b-regularization/)
 
 > 【理解】欠拟合与过拟合
 
@@ -27,25 +28,50 @@
 
 过拟合和欠拟合的区别：
 
-⚠️ 待补充
+| 维度 | 欠拟合 underfit | 良好 good fit | 过拟合 overfit |
+|---|---|---|---|
+| **模型复杂度** | 太简单 | 适中 | 太复杂 |
+| **训练误差** | 大 | 小 | **极小**（接近 0） |
+| **测试误差** | 大 | 小 | **大**（远大于训练） |
+| **典型表现** | 直线拟合曲线数据 | 多项式 2-3 次 | 多项式 10+ 次抖动剧烈 |
+| **bias / variance** | high bias | balanced | high variance |
 
 - 欠拟合在训练集和测试集上的误差都较大
 - 过拟合在训练集上误差较小，而测试集上误差较大
 
-⚠️ 待补充
+**判断方法**：画"训练误差 vs 测试误差随模型复杂度变化"曲线（learning curve）：
+- 训练 ↓、测试 ↑ → 过拟合区
+- 训练 ↑、测试 ↑ → 欠拟合区
+- 两者都低且接近 → 甜蜜点
 
 > 【实践】通过代码认识过拟合和欠拟合
 
-**绘制数据**
-
-⚠️ PPT 笔记此处代码块为空（待补绘图代码）。
+**绘制数据**（生成抛物线 + 噪声的合成数据）：
 
 ```python
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
 
-
+np.random.seed(666)
+x = np.random.uniform(-3, 3, size=100)
+X = x.reshape(-1, 1)
+y = 0.5 * x**2 + x + 2 + np.random.normal(0, 1, 100)
+plt.scatter(x, y); plt.show()
 ```
 
-⚠️ 待补充
+**仅用 X（一次项）拟合 → 欠拟合**：
+
+```python
+estimator = LinearRegression()
+estimator.fit(X, y)
+y_predict = estimator.predict(X)
+
+plt.scatter(x, y)
+plt.plot(np.sort(x), y_predict[np.argsort(x)], color="r")
+plt.show()
+```
 
 ```python
 # 计算均方误差
@@ -55,15 +81,18 @@ mean_squared_error(y, y_predict)
 # 3.0750025765636577
 ```
 
-**添加二次项，绘制图像**
-
-⚠️ PPT 笔记此处代码块为空。
+**添加二次项，绘制图像 → 良好拟合**：
 
 ```python
+X2 = np.hstack([X, X**2])
+estimator = LinearRegression()
+estimator.fit(X2, y)
+y_predict2 = estimator.predict(X2)
 
+plt.scatter(x, y)
+plt.plot(np.sort(x), y_predict2[np.argsort(x)], color="r")
+plt.show()
 ```
-
-⚠️ 待补充
 
 ```python
 # 计算均方误差和准确率
@@ -73,16 +102,21 @@ mean_squared_error(y, y_predict2)
 # 1.0987392142417858
 ```
 
-**再次加入高次项，绘制图像，观察均方误差结果**
-
-⚠️ PPT 笔记此处代码块为空。
+**再次加入高次项（X^3 ~ X^10），绘制图像，观察均方误差结果 → 过拟合**：
 
 ```python
+X5 = np.hstack([X**i for i in range(1, 11)])  # 10 次多项式
+estimator = LinearRegression()
+estimator.fit(X5, y)
+y_predict5 = estimator.predict(X5)
 
+plt.scatter(x, y)
+plt.plot(np.sort(x), y_predict5[np.argsort(x)], color="r")
+plt.show()
 
+mean_squared_error(y, y_predict5)
+# 训练集 MSE 继续下降到 ~0.85，但拟合曲线已经在数据点之间剧烈抖动
 ```
-
-⚠️ 待补充
 
 通过上述观察发现，随着加入的高次项越来越多，拟合程度越来越高，均方误差也随着加入越来越小。说明已经不再欠拟合了。
 

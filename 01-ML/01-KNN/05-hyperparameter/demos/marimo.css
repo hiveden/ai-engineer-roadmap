@@ -1,0 +1,10 @@
+/* Marimo 全局样式 · 只用 3 个公共 CSS 变量（跨版本稳定）
+ * 字体取自 astral-video tech-brief tokens
+ * 文档：https://docs.marimo.io/guides/configuration/theming/
+ */
+
+:root {
+  --marimo-text-font: 'PingFang SC', 'Noto Sans SC', 'Inter', sans-serif;
+  --marimo-monospace-font: 'Geist Mono', 'SF Mono', 'JetBrains Mono', monospace;
+  --marimo-heading-font: 'Geist', 'Inter', sans-serif;
+}

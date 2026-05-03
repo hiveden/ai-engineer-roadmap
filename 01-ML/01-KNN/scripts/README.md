@@ -1,6 +1,8 @@
 # KNN 视频脚本
 
-> AI 老师讲解 + Demo 录屏拼接，11 期覆盖整个 KNN 章。
+> AI 老师讲解 + Demo 录屏拼接，12 期覆盖整个 KNN 章。
+>
+> **写新期前必读**：[`../../_script-guide.md`](../../_script-guide.md) + [`../../_recording-guide.md`](../../_recording-guide.md) + [`../../_workflow.md`](../../_workflow.md) — e01-e03 实战经验沉淀，含立场 / 双源拼接 / 概念引入原则 / CTA 结构 / 跨集钩 / 数据一致性 / TTS 友好 / 审稿流程。
 >
 > 立场：AI 老师做分享，第一人称用"我们"，每期结尾"如果有不对欢迎指正"。
 
@@ -42,21 +44,22 @@ states:
 
 **关键约束**：每个 state 必须给 `expect`（稳定后画面应有什么）—— Playwright 用来判断"渲染稳定"，剪辑时拿这个对齐口播锚点。
 
-## 11 期索引
+## 12 期索引
 
 | 期 | 章节 | 覆盖 md | Demo | 时长 | 状态 |
 |---|---|---|---|---|---|
 | **e01-概念距离** | 01-intro | 01-概念 / 02-接近程度 / 02a-豆瓣手算 | `01-intro/demos/02-proximity.py` | ~18 min | 正稿 |
 | **e02-k值加权** | 01-intro | 03a / 03b / 03c / 04-加权 | `01-intro/demos/03-k-tuning.py` | ~22 min | 占位 |
 | **e03-工作流回归** | 01-intro | 05-工作流程 | `01-intro/demos/04-regression.py` | ~12 min | 占位 |
-| e04-分类API | 02-api | 01-分类API | — | ~12 min | 待规划 |
-| e05-回归API | 02-api | 02-回归API | — | ~10 min | 待规划 |
-| e06-距离族 | 03-distance | 全章（4 种距离） | `03-distance/demos/01-distance-zoo.py` | ~22 min | 待规划 |
-| e07-缩放动机 | 04b-scaling | 01-为什么预处理 | — | ~18 min | 待规划 |
-| e08-归一化 | 04b-scaling | 02-归一化 | `04b-scaling/demos/02-knn-scaling.py`（部分） | ~22 min | 待规划 |
-| e09-标准化高斯 | 04b-scaling | 03-标准化 / 04-高斯分布 | `04b-scaling/demos/02-knn-scaling.py`（部分） | ~25 min | 待规划 |
-| e10-鸢尾花实战 | 04c-iris-case | 全章 | `04c-iris-case/demos/01-iris-pipeline.py` | ~15 min | 待规划 |
-| e11-超参数搜索 | 05-hyperparameter | 01-CV / 02-网格搜索 / 03-手写数字 | `05-hyperparameter/demos/01-cv-gridsearch.py` | ~45 min（建议拆 2 段） | 待规划 |
+| **e04-分类API** | 02-api | 01-分类API | Jupyter 录屏 | ~12 min | 正稿 |
+| **e05-回归API** | 02-api | 02-回归API | Jupyter 录屏 | ~10 min | 正稿 |
+| **e06-距离族** | 03-distance | 全章（4 种距离） | `03-distance/demos/01-distance-zoo.py` | ~22 min | 正稿 |
+| **e07-缩放动机** | 04b-scaling | 01-为什么预处理 | — | ~18 min | 正稿 |
+| **e08-归一化** | 04b-scaling | 02-归一化 | `04b-scaling/demos/02-knn-scaling.py`（部分） | ~22 min | 正稿 |
+| **e09-标准化高斯** | 04b-scaling | 03-标准化 / 04-高斯分布 | `04b-scaling/demos/02-knn-scaling.py`（部分） | ~25 min | 正稿 |
+| **e10-鸢尾花实战** | 04c-iris-case | 全章 | `04c-iris-case/demos/01-iris-pipeline.py` | ~15 min | 正稿 |
+| **e11a-交叉验证** | 05-hyperparameter | 01-CV | `05-hyperparameter/demos/01-cv-gridsearch.py` | ~18 min | 正稿 |
+| **e11b-网格搜索数字识别** | 05-hyperparameter | 02-网格搜索 / 03-手写数字 | `05-hyperparameter/demos/01-cv-gridsearch.py` | ~22 min | 正稿 |
 
 ## 目录约定
 

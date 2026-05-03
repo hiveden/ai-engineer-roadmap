@@ -37,6 +37,48 @@ def _(mo):
 
 
 @app.cell
+def _(mo):
+    mo.md("""
+    ## 📹 录屏脚本 · E01 shot05
+
+    > TTS 时长 **78s** · Playwright 按 cue 词触发 state 切换 · ffmpeg 用 TTS 时间戳拉伸静帧
+
+    ### States 操作清单
+
+    | # | state | rating | lead | k | expect |
+    |---|---|---|---|---|---|
+    | 1 | **intro** | 默认 8.5 | 默认 9.5 | 默认 5 | 静帧介绍 UI（不操作，hover 蓝菱形 1s 强调） |
+    | 2 | **baseline** | **8.5** | **9.5** | **5** | 5 喜欢 / 0 不喜欢；前 5 距离 0.30/0.51/1.00/1.02/1.58 |
+    | 3 | **dislike** | **2.9** | **3.5** | **5** | 1 喜欢 / 4 不喜欢；上海堡垒 0.00 / 哥斯拉 4.95 / 寒战 5.49 / 长津湖 6.36 / 沙丘2 6.80 |
+    | 4 | **single** | 2.9 | 3.5 | **1** | 只剩 1 条黄虚线指向上海堡垒（重合） |
+
+    ### Cue 词 → state 切换
+
+    | 口播触发句 | → state | Playwright 动作 |
+    |---|---|---|
+    | "屏幕上是一张二维散点图" | 1 intro | 静帧 |
+    | "我们把评分调到 8.5" | 2 baseline | 拖 rating + lead 滑块 |
+    | "现在把新电影拖到上海堡垒那个角落" | 3 dislike | 拖到 (2.9, 3.5) |
+    | "再把 k 调到 1" | 4 single | 拖 k 到 1 |
+
+    ### 口播稿（cue 词加粗）
+
+    公式讲完，我们打开一个 marimo 互动 demo 把它玩起来。**屏幕上是一张二维散点图**，横轴是评分，纵轴是主演吸引度。9 部历史电影散落其中——绿点是你喜欢过的，红点是你不喜欢的。蓝色菱形点就是要预测的新电影。它的坐标由下面三个滑块控制：评分、主演吸引度，还有 k 邻居数。从蓝菱形出发的黄色虚线，连到的就是离它最近的 k 个邻居，灰色虚线是其他更远的。下面那张距离明细表按距离从小到大排序，前 k 行黄色高亮。最上面的色条实时显示预测结果。
+
+    **我们把评分调到 8.5**，主演调到 9.5——这正是上一节豆瓣手算的题目。k 取 5，看：5 个最近邻全是绿点，距离从 0.30 到 1.58，5 票全喜欢，预测会喜欢。
+
+    **现在把新电影拖到上海堡垒那个角落**，评分 2.9、主演 3.5，颜色立刻翻红——5 个邻居里 4 个是不喜欢，足够把预测压成不喜欢。
+
+    **再把 k 调到 1**，整张图就只听最近那一个邻居的——稳定性完全依赖那一个点。
+
+    这就是 KNN 在二维空间最直观的样子。
+
+    > **避开**：folded accordion（玩法建议 / 数学公式）— demo 本地阅读用，视频不展开
+    """)
+    return
+
+
+@app.cell
 def _(np):
     # 9 部历史电影 (rating, lead_actor) + 喜好标签 (1=喜欢, 0=不喜欢)
     movies = [
@@ -155,8 +197,10 @@ def _(
         shape="diamond", size=400, color="#1f77b4", filled=True, stroke="black", strokeWidth=1.5
     ).encode(x="rating:Q", y="lead:Q")
 
-    chart = (lines_chart + pts_chart + text_chart + query_chart).properties(
-        width=600, height=320
+    chart = (lines_chart + pts_chart + text_chart + query_chart).resolve_scale(
+        color="independent"
+    ).properties(
+        width=580, height=320
     )
     chart_section_style = (
         "border-left:3px solid #6366f1;padding:2px 10px;"

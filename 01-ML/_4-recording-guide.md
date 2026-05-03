@@ -18,12 +18,19 @@ browser = p.chromium.launch(args=["--no-proxy-server"])
 ```
 不要用 `curl localhost` 验存活（curl 走代理）→ 用 `lsof -i :PORT`。
 
-### 2.2 marimo slider DOM
+### 2.2 marimo slider / switch DOM
+
+slider 和 switch 是**两个独立的 web component**，索引互不重叠：`mo.ui.slider` → `<marimo-slider>` 集合；`mo.ui.switch` → `<marimo-switch>` 集合。**不要**假设 `marimo-slider` 含所有控件。
+
 ```html
 <marimo-slider data-step="0.1" data-start="2" data-stop="10">
   <span role="slider" aria-valuenow="8.5">
+
+<marimo-switch>
+  <button role="switch" aria-checked="false">
 ```
-**不是** `input[type="range"]`，**不能** `fill()`。用 focus + 键盘箭头：
+
+**slider** 不是 `input[type="range"]`，**不能** `fill()`。用 focus + 键盘箭头：
 ```python
 def set_slider(page, idx, target, step_delay_ms=30):
     sliders = page.locator('marimo-slider')
@@ -31,11 +38,23 @@ def set_slider(page, idx, target, step_delay_ms=30):
     current = float(aria.get_attribute('aria-valuenow'))
     step = float(sliders.nth(idx).get_attribute('data-step'))
     presses = round((target - current) / step)
+    if presses == 0: return
     aria.focus()
     key = "ArrowRight" if presses > 0 else "ArrowLeft"
     for _ in range(abs(presses)):
         aria.press(key)
         page.wait_for_timeout(step_delay_ms)
+```
+
+**switch** 用 `click()` 切换 + 等渲染稳定（k 网格随开关重算耗时不定，800ms 经验值稳）：
+```python
+def set_switch(page, idx, target_value: bool):
+    switches = page.locator('marimo-switch')
+    btn = switches.nth(idx).locator('[role="switch"]').first
+    current = btn.get_attribute('aria-checked') == 'true'
+    if current != target_value:
+        btn.click()
+        page.wait_for_timeout(800)  # 渲染稳定
 ```
 
 ### 2.3 端口分离
@@ -52,11 +71,32 @@ def set_slider(page, idx, target, step_delay_ms=30):
 
 新 demo 首次录屏前用 Playwright `boundingBox` 实测确认。**不要改 grid 布局**（比例手调）。
 
-### 2.5 ffmpeg 倒切
-webm 加载头长度不确定 → 从尾倒切：
-```bash
-ffmpeg -sseof -78 -i raw.webm -vf "crop=1198:600:362:34" \
-       -c:v libx264 -crf 18 -preset fast -y out.mp4
+### 2.5 ffmpeg 倒切（精度敏感）
+
+webm 加载头长度不确定 → 从尾倒切。**不要**用 `int(T_END)`，T_END=45.3 会被截成 45，丢 300ms。
+
+**推荐方案 B · ffprobe 取总长 + `-ss`/`-t`**（精度毫秒级，e03 实战已验证）：
+```python
+result = subprocess.run([
+    "ffprobe", "-v", "error", "-show_entries", "format=duration",
+    "-of", "default=noprint_wrappers=1:nokey=1", str(raw),
+], capture_output=True, text=True)
+total = float(result.stdout.strip())
+
+subprocess.run([
+    "ffmpeg",
+    "-ss", str(total - T_END),
+    "-t", str(T_END),
+    "-i", str(raw),
+    "-vf", f"crop={CROP}",
+    "-c:v", "libx264", "-crf", "18", "-preset", "fast",
+    "-y", str(out_mp4),
+], check=True, capture_output=True)
+```
+
+**备选方案 A · 浮点 -sseof**（一行简洁，但有些 ffmpeg 旧版本对 `-sseof` 浮点支持不稳）：
+```python
+"-sseof", f"-{T_END}",  # 注意：不是 f"-{int(T_END)}"
 ```
 
 ### 2.6 Altair 多层颜色冲突
@@ -130,6 +170,15 @@ def set_slider(page, idx, target, step_delay_ms=30):
         page.wait_for_timeout(step_delay_ms)
 
 
+def set_switch(page, idx, target_value: bool):
+    switches = page.locator('marimo-switch')
+    btn = switches.nth(idx).locator('[role="switch"]').first
+    current = btn.get_attribute('aria-checked') == 'true'
+    if current != target_value:
+        btn.click()
+        page.wait_for_timeout(800)  # 渲染稳定
+
+
 def record():
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True, args=["--no-proxy-server"])
@@ -174,8 +223,17 @@ def record():
         webm.rename(raw)
 
         out = OUTPUT_DIR / "eXX_shotYY_cropped.mp4"
+        # 方案 B：ffprobe 拿总长，-ss/-t 精确倒切（毫秒级）
+        probe = subprocess.run([
+            "ffprobe", "-v", "error", "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1", str(raw),
+        ], capture_output=True, text=True)
+        total = float(probe.stdout.strip())
         subprocess.run([
-            "ffmpeg", "-sseof", f"-{int(T_END)}", "-i", str(raw),
+            "ffmpeg",
+            "-ss", str(total - T_END),
+            "-t", str(T_END),
+            "-i", str(raw),
             "-vf", "crop=1198:600:362:34",
             "-c:v", "libx264", "-crf", "18", "-preset", "fast",
             "-y", str(out),
@@ -239,8 +297,10 @@ python3 eXX_shotYY.py
 | `ERR_PROXY_CONNECTION_FAILED` | chromium 继承代理，必须 `--no-proxy-server` |
 | `input[type="range"]` 找不到 | marimo 是 web component，用 `marimo-slider` + `[role="slider"]` |
 | `slider.fill("8.5")` 没反应 | ARIA slider 不接 fill，必须 focus + 键盘 |
+| switch 控件被 `marimo-slider` locator 漏掉 | switch 是独立 `<marimo-switch>`，索引单独数；不在 marimo-slider 集合里 |
 | 散点图变橙色 | Altair 多层冲突，加 `.resolve_scale(color='independent')` |
 | `-ss N` 切多/少 | webm 加载头长度不定，用 `-sseof -N` 倒切 |
+| `-sseof -{int(T_END)}` 丢小数（45.3 → 45） | 用 `-sseof -<float>` 或 ffprobe + `-ss / -t`（推荐） |
 | 录屏比 TTS 长 1-2s | 同上 |
 | 拖滑块"瞬移" | step_delay_ms 太小，30 ms 体验最佳 |
 | 视频拉伸变形 | crop 宽高必须偶数（H.264 编码要求） |

@@ -130,10 +130,18 @@ def record_e01_shot05():
 
         print(f"\n→ ffmpeg 切前 {LOAD_WAIT_S}s + crop 1198×600 + 转 mp4")
         out_mp4 = OUTPUT_DIR / "e01_shot05_cropped.mp4"
-        # 用 -sseof 从尾部倒切 78s（自动避开 webm 加载头不确定长度的问题）
+        # 方案 B：ffprobe 拿 webm 总长，再 -ss/-t 精确倒切 T_END 秒（避开 -sseof int() 丢小数）
+        probe = subprocess.run([
+            "ffprobe", "-v", "error",
+            "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1",
+            str(raw),
+        ], capture_output=True, text=True)
+        total = float(probe.stdout.strip())
         subprocess.run([
             "ffmpeg",
-            "-sseof", f"-{int(T_END)}",
+            "-ss", str(total - T_END),
+            "-t", str(T_END),
             "-i", str(raw),
             "-vf", "crop=1198:600:362:34",
             "-c:v", "libx264", "-crf", "18", "-preset", "fast",

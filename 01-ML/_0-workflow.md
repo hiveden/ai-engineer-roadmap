@@ -11,6 +11,17 @@
 
 ---
 
+## Step 1 · 底稿 + Demo 制作
+
+两个并行子项：
+
+- **讲解段写作**：按 [`_1-explanation-guide.md`](./_1-explanation-guide.md)（教材 md 三段式讲解：场景→机制→命名）
+- **Demo 制作**：按 [`_2-demo-guide.md`](./_2-demo-guide.md)（marimo demo grid 友好原则，**一个 cell = grid 最小可摆放单元**）
+
+写完各自按指南末尾的验证清单过一遍。
+
+---
+
 ## Step 2 · 拆分依据（5 条）
 
 1. **教材章节边界**：1 md 通常 1 期，太短合（KNN 03-distance 4 md 合 e06）/ 太长拆（KNN 05-hyperparameter 拆 e11a + e11b）
@@ -25,7 +36,7 @@
 
 ## Step 3 · 写脚本
 
-按 [`_1-script-guide.md`](./_1-script-guide.md)。输出 `eXX/plan.md` + `script.json`。
+按 [`_3-script-guide.md`](./_3-script-guide.md)。输出 `eXX/plan.md` + `script.json`。
 
 ---
 
@@ -50,7 +61,7 @@ marimo edit XX-name.py --port 2718
 
 ## Step 6 · 录屏
 
-按 [`_2-recording-guide.md`](./_2-recording-guide.md)。输出 `_recording/output/eXX_shotYY_cropped.mp4`。
+按 [`_4-recording-guide.md`](./_4-recording-guide.md)。输出 `_recording/output/eXX_shotYY_cropped.mp4`。
 
 ---
 
@@ -79,8 +90,10 @@ scripts/eXX-期名/recording/
 ```
 01-ML/
 ├── _0-workflow.md          ← 入口（本文）
-├── _1-script-guide.md      ← Step 3 细则
-├── _2-recording-guide.md   ← Step 6 细则
+├── _1-explanation-guide.md ← Step 1 讲解段写作
+├── _2-demo-guide.md        ← Step 1 demo 制作
+├── _3-script-guide.md      ← Step 3 写脚本
+├── _4-recording-guide.md   ← Step 6 录屏
 ├── _marimo-guide.md            marimo 用法
 ├── _marimo-math-guide.md       marimo 数学动画
 ├── _架构规则.md                教材组织
@@ -106,14 +119,14 @@ scripts/eXX-期名/recording/
 ### Step 3 写脚本
 
 ```
-读 01-ML/_1-script-guide.md（严格遵守）+ 已有正稿样本（KNN scripts/e01-e11）+ 教材 + demo 代码 + TTS subtitles（如有）。
+读 01-ML/_3-script-guide.md（严格遵守）+ 已有正稿样本（KNN scripts/e01-e11）+ 教材 + demo 代码 + TTS subtitles（如有）。
 输出 scripts/eXX-期名/plan.md + script.json。
 ```
 
 ### Step 6 录屏
 
 ```
-读 01-ML/_2-recording-guide.md（严格遵守）+ scripts/eXX/script.json segment {YY} text + notes + astral-pipeline/mlXX/tts/subtitles.json。
+读 01-ML/_4-recording-guide.md（严格遵守）+ scripts/eXX/script.json segment {YY} text + notes + astral-pipeline/mlXX/tts/subtitles.json。
 输出 scripts/_recording/eXX_shotYY.py + scripts/eXX-期名/recording/shotYY.mp4 + README.md。
 ```
 

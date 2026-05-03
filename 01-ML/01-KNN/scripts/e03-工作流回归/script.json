@@ -38,21 +38,21 @@
       "type": "content",
       "topic": "Demo · 回归基线",
       "text": "打开新的 demo——这次数据集还是电影，但目标值变了：不再是喜欢或不喜欢的标签，而是观看完成度，0 到 100% 的连续值。这次用新生成的 80 部电影，目标值大致由评分和主演吸引度决定。打开 demo，K 取 7。看决策面——它不再是分类那种淡绿淡红的双色块，而是一个连续色阶，从冷色到暖色。每一格的颜色对应这一格的预测完成度。下方有一个新指标：MAE，平均绝对误差，每部电影预测值和真实值取差的绝对值，再求平均——避免正负误差相互抵消。意思就是预测和真实平均差几个百分点。MAE 越小越准。回归还有 RMSE 和 R² 两个常用指标，但这一期先用 MAE 一个就够了，后面 sklearn 章节再展开。",
-      "notes": "~290字。\nB demo 录屏段。\n[src: 01-intro/demos/04-regression.py]\n\ndemo: 01-intro/demos/04-regression.py\nstates: intro → k7\nexpect (intro): UI 总览，强调 viridis 连续色阶（区别于分类双色块）\nexpect (k7):   k=7, rating=7.5, lead=8.0 · 决策面平滑 · MAE 适中\n\ncue 词:\n  \"打开新的 demo\"  → 进入 state intro\n  \"K 取 7\"        → 进入 state k7\n\ntitle \"回归 demo：观看完成度 0-100%\"[切换]\nfigure \"viridis 色阶 vs 分类双色块对比帧\"\nbody \"MAE：预测和真实平均差几个百分点\"[评估指标]\nbody \"RMSE / R² 留给 sklearn 章节\""
+      "notes": "~290字。\nB demo 录屏段。\n[src: 01-intro/demos/04-regression.py]\n\ndemo: 01-intro/demos/04-regression.py\nstates: intro → k7\nexpect (intro): UI 总览，强调 viridis 连续色阶（区别于分类双色块）\nexpect (k7):   k=7, rating=7.5, lead=8.0 · 决策面平滑 · MAE 适中\n\ncue 词:\n  \"打开新的 demo\"  → 进入 state intro\n  \"K 取 7\"        → 进入 state k7\n\ntitle \"回归 demo：观看完成度 0-100%\"[切换]\nfigure \"viridis 色阶 vs 分类双色块对比帧\"\nbody \"MAE：预测和真实平均差几个百分点\"[评估指标]\nbody \"RMSE / R² 留给 sklearn 章节\"\n\n视觉强化（后处理建议）:\n- 0-16s 介绍数据集期（demo 静帧）：箭头依次指 viridis 色条 → 训练点 → 红菱形 → MAE 浮窗\n- 16.26s \"K 取 7\"：滑块或数字浮窗高亮 K=7\n- 25-53s 介绍 viridis 色阶 / MAE：浮窗动画 \"MAE = mean(|预测-真实|)\" 公式定格\n- 关键对比浮窗：左屏分类双色块（来自 e01 shot05 截图）+ 右屏 viridis 色阶（演示\"分类→回归\"视觉切换）\n- Ken Burns：从全景慢推到决策面色阶区\n"
     },
     {
       "id": 6,
       "type": "content",
       "topic": "Demo · K=1 vs K=80 极端",
       "text": "现在拖 K，看回归在两端会怎样。K=1，决策面变得斑驳，每一格的颜色就是离它最近那一个训练点的完成度——预测跟着噪声跑。中段我们就不重看了，跟分类一样有平台期。直接跳到极端，K=80，已经等于样本数。看决策面：变成了单一颜色，对应训练集所有完成度的平均值——这个数据集均值大约 41%。无论新电影落哪儿，预测都是这个数——模型完全忽略了特征。这就是回归版的极端欠拟合，回归这边连多数类偏向都没有，直接变成全局均值。顺便一提：加权投票在回归里也能用，逻辑同理，离得近的邻居数值贡献大，这一期就不演了。",
-      "notes": "~245字。\nB demo 录屏段。\n[src: 01-intro/demos/04-regression.py]\n\ndemo: 01-intro/demos/04-regression.py\nstates: k1 → k80\nexpect (k1):  决策面斑驳 · MAE 飙升 · 高方差\nexpect (k80): 决策面单一颜色 ≈ 全局均值 ~41% · R² 接近 0（不是 50%！实测 target.mean() ≈ 41.6）\n\ncue 词:\n  \"K=1\"   → 进入 state k1\n  \"K=80\"  → 进入 state k80\n\ntitle \"回归极端：K=1 斑驳 / K=80 全局均值\"[对比]\nbody \"中段平台期 — 跟分类同理，不重演\"\nquote \"回归比分类更彻底 — 直接退化成全局均值\"[金句]\nbody \"加权在回归里同理（不演）\""
+      "notes": "~245字。\nB demo 录屏段。\n[src: 01-intro/demos/04-regression.py]\n\ndemo: 01-intro/demos/04-regression.py\nstates: k1 → k80\nexpect (k1):  决策面斑驳 · MAE 飙升 · 高方差\nexpect (k80): 决策面单一颜色 ≈ 全局均值 ~41% · R² 接近 0（不是 50%！实测 target.mean() ≈ 41.6）\n\ncue 词:\n  \"K=1\"   → 进入 state k1\n  \"K=80\"  → 进入 state k80\n\ntitle \"回归极端：K=1 斑驳 / K=80 全局均值\"[对比]\nbody \"中段平台期 — 跟分类同理，不重演\"\nquote \"回归比分类更彻底 — 直接退化成全局均值\"[金句]\nbody \"加权在回归里同理（不演）\"\n\n视觉强化（后处理建议）:\n- 0-3s（K=7 状态）：保持上 shot 末态\n- 3.16s \"K=1\"：决策面斑驳化动画 + 浮窗 \"K=1 · 高方差\"\n- 4-16s K=1 静帧期：高亮 4-5 个明显斑驳区，每个轮流脉冲\n- 16.22s \"K=80\"：决策面快速变成单色 viridis（约 41% 黄绿）+ 浮窗 \"K=80 · 全局均值\"\n- 19-45s K=80 静帧期：浮窗大字 \"≈ 41%\" + 强调 \"无论新电影落哪儿\"\n- Ken Burns：K=80 时拉远看全平面单色塌陷\n"
     },
     {
       "id": 7,
       "type": "content",
       "topic": "Demo · 残差图",
       "text": "再看右边一张图叫残差图，英文 residual plot。横轴是真实完成度，纵轴是预测完成度。如果预测完美，所有点应该落在对角虚线上。点越偏离对角线，误差越大。点的颜色表示残差方向——残差等于预测减真实，红色表示残差为正、预测偏高；蓝色表示残差为负、预测偏低。残差图是回归任务最有用的诊断工具之一：模型在哪个区间预测准、在哪儿系统性偏差，一眼能看出来。",
-      "notes": "~155字。\nB demo 录屏段。\n[src: 01-intro/demos/04-regression.py]\n\ndemo: 01-intro/demos/04-regression.py\nstate: residual\nexpect: 滚动到残差散点图 · hover 几个偏离对角线远的点显示残差值\n\ncue 词:\n  \"再看右边一张图叫残差图\"  → 滚动到 residual 区域\n\ntitle \"残差图 residual plot\"[术语]\nfigure \"对角线 = 完美预测 · 偏离 = 误差\"\nquote \"模型在哪准、在哪偏，一眼看出\""
+      "notes": "~155字。\nB demo 录屏段。\n[src: 01-intro/demos/04-regression.py]\n\ndemo: 01-intro/demos/04-regression.py\nstate: residual\nexpect: 滚动到残差散点图 · hover 几个偏离对角线远的点显示残差值\n\ncue 词:\n  \"再看右边一张图叫残差图\"  → 滚动到 residual 区域\n\ntitle \"残差图 residual plot\"[术语]\nfigure \"对角线 = 完美预测 · 偏离 = 误差\"\nquote \"模型在哪准、在哪偏，一眼看出\"\n\n视觉强化（后处理建议）:\n- 0s \"再看右边一张图叫残差图\"：箭头从决策面滑到右侧残差散点图\n- 5-15s 介绍残差图：高亮对角虚线（动画）+ 浮窗 \"贴对角线 = 准\"\n- 15-25s 残差颜色：循环高亮 3 个偏离对角线远的点（红 vs 蓝），浮窗 \"红=偏高 / 蓝=偏低\"\n- 25-29.5s 收束：缩放残差图全景\n- Ken Burns：从决策面平滑切到残差图（pan）\n- 备注：本 shot 无 slider 操作，纯静帧需要更密集视觉指引\n"
     },
     {
       "id": 8,

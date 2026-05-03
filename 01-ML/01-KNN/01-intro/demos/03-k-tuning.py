@@ -9,7 +9,11 @@ KNN K 值调优演示 · 决策边界可视化
 import marimo
 
 __generated_with = "0.23.4"
-app = marimo.App(width="medium", css_file="marimo.css")
+app = marimo.App(
+    width="medium",
+    layout_file="layouts/03-k-tuning.grid.json",
+    css_file="marimo.css",
+)
 
 
 @app.cell
@@ -82,28 +86,13 @@ def _(X, mo, y):
 
 @app.cell
 def _(mo):
-    section_style = (
-        "border-left:2px solid #6366f1;padding:1px 8px;"
-        "font-weight:600;font-size:12px;color:#475569;margin-bottom:2px;"
-    )
     k_slider = mo.ui.slider(1, 125, value=11, step=2, label="k 邻居数")
-    weighted_switch = mo.ui.switch(value=False, label="距离加权投票（关=多数票）")
+    weighted_switch = mo.ui.switch(value=False, label="距离加权（关=多数票）")
     new_rating = mo.ui.slider(3.0, 11.5, value=7.5, step=0.1, label="新电影评分")
     new_lead = mo.ui.slider(3.0, 12.5, value=8.0, step=0.1, label="主演吸引度")
     mo.hstack(
-        [
-            mo.vstack([
-                mo.md(f'<div style="{section_style}">KNN 参数</div>'),
-                k_slider,
-                weighted_switch,
-            ]),
-            mo.vstack([
-                mo.md(f'<div style="{section_style}">新电影查询 🔷</div>'),
-                new_rating,
-                new_lead,
-            ]),
-        ],
-        widths=[1, 1],
+        [k_slider, weighted_switch, new_rating, new_lead],
+        widths=[1, 1, 1, 1],
         justify="space-around",
     )
     return k_slider, new_lead, new_rating, weighted_switch
@@ -181,7 +170,7 @@ def _(X, k_slider, np, weighted_switch, y):
             preds[_i] = 1 if _likes > k_slider.value / 2 else 0
         nearest_idx[_i] = _top[0]
     accuracy = float((preds == y).mean())
-    return accuracy, nearest_idx, preds, score_dislike, score_like, vote_likes
+    return accuracy, preds, score_dislike, score_like, vote_likes
 
 
 @app.cell
@@ -308,16 +297,37 @@ def _(X, alt, k_slider, np, pd, q_top_k, query, weighted_switch, y):
     )
 
     chart = (region + pts_normal + pts_neighbor + radius_circle + query_pt).properties(
-        width=620, height=440,
-        title=f"k={k_slider.value} · 模式={'距离加权' if weighted_switch.value else '多数票'} · 半径={k_radius:.2f} · 金边=top-k 邻居 · 蓝菱形=新电影"
+        width=580, height=440,
     )
     chart
+    return (k_radius,)
+
+
+@app.cell
+def _(k_radius, k_slider, mo, weighted_switch):
+    # 图说明（独立 cell · grid 友好）
+    mo.md(
+        f"**k={k_slider.value}** · 模式={'距离加权' if weighted_switch.value else '多数票'}"
+        f" · 半径={k_radius:.2f} · 金边=top-k 邻居 · 蓝菱形=新电影"
+    )
     return
 
 
 @app.cell
-def _(X, accuracy, k_slider, mo, nearest_idx, np, pd, preds, score_dislike, score_like, vote_likes, weighted_switch, y):
-    # 实时数据表：混淆矩阵 + 错分样本明细（随 k 变化）
+def _(
+    X,
+    k_slider,
+    mo,
+    np,
+    pd,
+    preds,
+    score_dislike,
+    score_like,
+    vote_likes,
+    weighted_switch,
+    y,
+):
+    # 计算混淆矩阵 + 错分样本表（不输出，return 给下游 cell 用）
     real_like = y == 1
     pred_like = preds == 1
     tp = int((real_like & pred_like).sum())
@@ -330,57 +340,77 @@ def _(X, accuracy, k_slider, mo, nearest_idx, np, pd, preds, score_dislike, scor
 
     wrong_indices = np.where(wrong_mask)[0]
     if n_wrong > 0:
-        # 最近邻列：显示 top-1 邻居的索引、坐标、标签、距离
-        nearest_strs = []
-        for _idx in wrong_indices:
-            _ni = int(nearest_idx[_idx])
-            _dist = float(np.linalg.norm(X[_idx] - X[_ni]))
-            _label = "喜欢" if y[_ni] == 1 else "不喜欢"
-            nearest_strs.append(f"#{_ni + 1} ({X[_ni, 0]:.2f}, {X[_ni, 1]:.2f}) {_label} · d={_dist:.2f}")
-
         if weighted_switch.value:
-            vote_col_name = f"k={k_slider.value} 加权得分"
+            vote_col_name = "票 / 加权"
             vote_col_data = [
-                f"喜欢 {score_like[i]:.2f} / 不喜欢 {score_dislike[i]:.2f}"
-                f" · 票 {int(vote_likes[i])}/{k_slider.value - int(vote_likes[i])}"
+                f"{int(vote_likes[i])}/{k_slider.value - int(vote_likes[i])} · {score_like[i]:.1f}/{score_dislike[i]:.1f}"
                 for i in wrong_indices
             ]
         else:
-            vote_col_name = f"k={k_slider.value} 邻居票"
+            vote_col_name = f"k={k_slider.value} 票"
             vote_col_data = [
-                f"{int(vote_likes[i])} 喜欢 / {k_slider.value - int(vote_likes[i])} 不喜欢"
+                f"{int(vote_likes[i])}/{k_slider.value - int(vote_likes[i])}"
                 for i in wrong_indices
             ]
 
         wrong_df = pd.DataFrame({
             "#": wrong_indices + 1,
-            "rating": np.round(X[wrong_mask, 0], 2),
-            "lead": np.round(X[wrong_mask, 1], 2),
+            "rating": np.round(X[wrong_mask, 0], 1),
+            "lead": np.round(X[wrong_mask, 1], 1),
             "真实": ["喜欢" if v == 1 else "不喜欢" for v in y[wrong_mask]],
             "预测": ["喜欢" if v == 1 else "不喜欢" for v in preds[wrong_mask]],
-            "最近邻 (top-1)": nearest_strs,
             vote_col_name: vote_col_data,
         }).sort_values("rating").reset_index(drop=True)
-        wrong_table = mo.ui.table(wrong_df, page_size=15, selection=None)
+        wrong_table = mo.ui.table(wrong_df, page_size=5, selection=None, show_column_summaries=False)
     else:
-        wrong_table = mo.md("🎉 **全部分类正确**（这种情况罕见，通常 k 偏小或数据无噪声）")
+        wrong_df = pd.DataFrame()
+        vote_col_name = ""
+        wrong_table = mo.md("🎉 **全部分类正确**")
+    return fn, fp, n_wrong, tn, tp, vote_col_name, wrong_df, wrong_table
 
-    mo.vstack([
-        mo.md(f"""
-    ### 实时分类数据（k={k_slider.value}, LOOCV 准确率 {accuracy:.1%}）
 
-    **混淆矩阵**
+@app.cell
+def _(fn, fp, k_slider, mo, n_wrong, tn, tp, y):
+    # 混淆矩阵（独立 cell · grid 友好）
+    mo.md(f"""
+    **混淆矩阵**（k={k_slider.value} · 错分 {n_wrong} 个）
 
     | 真实 \\\\ 预测 | 喜欢 | 不喜欢 | 合计 |
     |---|---|---|---|
     | **喜欢** | <span style="color:#16a34a;font-weight:600;">{tp}</span> ✓ | <span style="color:#dc2626;">{fn}</span> ✗ | {tp + fn} |
     | **不喜欢** | <span style="color:#dc2626;">{fp}</span> ✗ | <span style="color:#16a34a;font-weight:600;">{tn}</span> ✓ | {fp + tn} |
     | **合计** | {tp + fp} | {fn + tn} | {len(y)} |
+    """)
+    return
 
-    **错分样本 {n_wrong} 个**（拖 k 看哪些样本"摇摆"——k 小时孤岛/边界点错，k 大时多数类样本错）
-        """),
-        wrong_table,
-    ])
+
+@app.cell
+def _(wrong_table):
+    # 错分样本明细表 - 完整版（mo.ui.table，互动用）
+    wrong_table
+    return
+
+
+@app.cell
+def _(mo, n_wrong, vote_col_name, wrong_df):
+    # 错分样本明细表 - 紧凑版（mo.md，视频友好，最多 8 行无翻页）
+    if n_wrong == 0:
+        _compact = mo.md("🎉 **全部分类正确**")
+    else:
+        _visible = wrong_df.head(8)
+        _rows = "\n".join(
+            f"| {r['#']} | {r['rating']:.1f} | {r['lead']:.1f} | "
+            f"{r['真实']} | {r['预测']} | {r[vote_col_name]} |"
+            for _, r in _visible.iterrows()
+        )
+        _more = f"\n\n_前 8 个，共 {n_wrong} 个错分_" if n_wrong > 8 else ""
+        _compact = mo.md(
+            f"**错分样本（紧凑版）**\n\n"
+            f"| # | rating | lead | 真实 | 预测 | {vote_col_name} |\n"
+            f"|---|---|---|---|---|---|\n"
+            + _rows + _more
+        )
+    _compact
     return
 
 

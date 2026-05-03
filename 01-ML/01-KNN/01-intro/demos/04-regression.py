@@ -8,7 +8,11 @@ KNN 回归演示 · 预测连续值
 import marimo
 
 __generated_with = "0.23.4"
-app = marimo.App(width="medium", css_file="marimo.css")
+app = marimo.App(
+    width="medium",
+    layout_file="layouts/04-regression.grid.json",
+    css_file="marimo.css",
+)
 
 
 @app.cell
@@ -51,43 +55,26 @@ def _(np):
 
 @app.cell
 def _(X, mo, target):
-    mo.md(
-        f"""
-<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;font-size:13px;line-height:1.7;">
-<strong>数据集</strong>（连续目标值）<br>
-• 样本量 <code>N={len(X)}</code> · 目标 = 观看完成度（0-100%）<br>
-• 真实关系：完成度 ≈ <code>5·rating + 5·lead − 30 + N(0, 8)</code>，clip 到 [0, 100]<br>
-• 训练数据完成度：min <code>{target.min():.1f}</code> / max <code>{target.max():.1f}</code> / 均值 <code>{target.mean():.1f}</code>
-</div>
-        """
-    )
+    mo.md(f"""
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;font-size:13px;line-height:1.7;">
+    <strong>数据集</strong>（连续目标值）<br>
+    • 样本量 <code>N={len(X)}</code> · 目标 = 观看完成度（0-100%）<br>
+    • 真实关系：完成度 ≈ <code>5·rating + 5·lead − 30 + N(0, 8)</code>，clip 到 [0, 100]<br>
+    • 训练数据完成度：min <code>{target.min():.1f}</code> / max <code>{target.max():.1f}</code> / 均值 <code>{target.mean():.1f}</code>
+    </div>
+    """)
     return
 
 
 @app.cell
 def _(mo):
-    section_style = (
-        "border-left:2px solid #6366f1;padding:1px 8px;"
-        "font-weight:600;font-size:12px;color:#475569;margin-bottom:2px;"
-    )
     k_slider = mo.ui.slider(1, 80, value=7, step=1, label="k 邻居数")
     weighted_switch = mo.ui.switch(value=False, label="距离加权（关=简单平均）")
     new_rating = mo.ui.slider(3.0, 11.0, value=7.5, step=0.1, label="新电影评分")
     new_lead = mo.ui.slider(3.0, 12.0, value=8.0, step=0.1, label="主演吸引度")
     mo.hstack(
-        [
-            mo.vstack([
-                mo.md(f'<div style="{section_style}">KNN 参数</div>'),
-                k_slider,
-                weighted_switch,
-            ]),
-            mo.vstack([
-                mo.md(f'<div style="{section_style}">新电影查询 🔷</div>'),
-                new_rating,
-                new_lead,
-            ]),
-        ],
-        widths=[1, 1],
+        [k_slider, weighted_switch, new_rating, new_lead],
+        widths=[1, 1, 1, 1],
         justify="space-around",
     )
     return k_slider, new_lead, new_rating, weighted_switch
@@ -269,39 +256,43 @@ def _(X, alt, k_slider, np, pd, q_top_k, query, target, weighted_switch):
 
     chart = (region + pts_normal + pts_neighbor + radius_circle + query_pt).properties(
         width=620, height=440,
-        title=(
-            f"KNN 回归预测面（k={k_slider.value}, "
-            f"{'加权' if weighted_switch.value else '平均'}, "
-            f"半径={k_radius:.2f}）· 红菱形=新电影 · 金边=top-k 邻居"
-        ),
     )
     chart
+    return (k_radius,)
+
+
+@app.cell
+def _(k_radius, k_slider, mo, weighted_switch):
+    # 图说明（独立 cell · grid 友好）
+    mo.md(
+        f"**KNN 回归预测面**（k={k_slider.value} · "
+        f"{'加权' if weighted_switch.value else '平均'} · "
+        f"半径={k_radius:.2f}）· 红菱形=新电影 · 金边=top-k 邻居"
+    )
     return
 
 
 @app.cell
 def _(mo):
-    mo.md(
-        """
-### 拖动 k 看回归的 bias-variance
+    mo.md("""
+    ### 拖动 k 看回归的 bias-variance
 
-| k | 现象 | 教学要点 |
-|---|---|---|
-| **k=1** | 决策面斑驳，每格颜色 = 最近训练点的完成度 | 高方差：预测完全跟着噪声 |
-| **k=7** ≈√80 | 决策面平滑，仍保留局部结构（左下偏冷 / 右上偏暖） | bias-variance 拐点 |
-| **k=20** | 决策面进一步光滑，渐变更柔 | 偏差略增、方差大降 |
-| **k=80** | 决策面变成**单一颜色 = 全局均值**（≈42%） | 极端欠拟合：完全忽略特征 |
+    | k | 现象 | 教学要点 |
+    |---|---|---|
+    | **k=1** | 决策面斑驳，每格颜色 = 最近训练点的完成度 | 高方差：预测完全跟着噪声 |
+    | **k=7** ≈√80 | 决策面平滑，仍保留局部结构（左下偏冷 / 右上偏暖） | bias-variance 拐点 |
+    | **k=20** | 决策面进一步光滑，渐变更柔 | 偏差略增、方差大降 |
+    | **k=80** | 决策面变成**单一颜色 = 全局均值**（≈42%） | 极端欠拟合：完全忽略特征 |
 
-**回归 vs 分类的 k 影响**：分类靠投票（离散），多数决一旦稳定就稳定；
-回归靠**平均**（连续），**每个邻居都贡献数值**——所以 k 一变化预测立刻有连续位移，
-决策面比分类敏感得多。
-        """
-    )
+    **回归 vs 分类的 k 影响**：分类靠投票（离散），多数决一旦稳定就稳定；
+    回归靠**平均**（连续），**每个邻居都贡献数值**——所以 k 一变化预测立刻有连续位移，
+    决策面比分类敏感得多。
+    """)
     return
 
 
 @app.cell
-def _(mo, preds_reg, target):
+def _(preds_reg, target):
     import altair as _alt
     import pandas as _pd
     # 残差散点图：真实 vs 预测，越贴对角线越准
@@ -323,12 +314,59 @@ def _(mo, preds_reg, target):
     )
     resid_chart = (diag + pred_pts).properties(
         width=420, height=380,
-        title="LOOCV 残差图：贴对角线 = 预测准 · 离对角线越远误差越大",
     )
-    mo.vstack([
-        mo.md("### LOOCV 预测 vs 真实（拖 k 看点云形态变化）"),
-        resid_chart,
-    ])
+    resid_chart
+    return
+
+
+@app.cell
+def _(mo):
+    # 残差图说明（独立 cell · grid 友好）
+    mo.md("""
+    **LOOCV 残差图**：贴对角线 = 预测准 · 离对角线越远误差越大（拖 k 看点云形态）
+    """)
+    return
+
+
+@app.cell
+def _(mo):
+    # 📐 Grid 布局参考（16:9 · 视频录屏推荐）
+    mo.md("""
+    ## 📐 Grid 布局参考（16:9 · 录屏推荐）
+
+    ```
+       0           14          24
+       │            │           │
+       0   ┌────────────────────────┐
+       │ [1] 标题（全宽 · 3 行） │
+       3   ├────────────────────────┤
+       │ [3] 数据信息卡（3 行）  │
+       6   ├────────────────────────┤
+       │ [4] 4 控件（3 行）      │
+       9   ├────────────────────┬───┤
+       │ [5] 预测卡 (左 70%) │[7]│  ← 状态卡 (右 30%)
+      12   ├────────────────────┴───┤
+       │ [9] 图说明（全宽 · 2 行）│
+      14   ├────────────────────┬───┤
+       │                    │[12│  ← 残差图说明 (右 2 行)
+      16   │                    ├───┤
+       │  [8] 决策面 chart   │   │
+       │      viridis 色阶    │[11│
+       │      (左 60%)       │   │  ← 残差散点图 (右 40%)
+       │                    │   │
+       │                    │   │
+      36   └────────────────────┴───┘
+
+       ← ~58% (14列) →   ← ~42% (10列) →
+
+      总高 36 行 × 20px = 720px · maxWidth ~1280 → 接近 16:9
+    ```
+
+    隐藏（position = null）：
+    - `[0] imports` `[2] 数据生成` `[6] LOOCV 计算`（无 UI）
+    - `[10] 玩法指南` `[13] accordion`（视频不展开）
+    - `[14] 本布局参考`（仅开发用，录屏隐藏）
+    """)
     return
 
 

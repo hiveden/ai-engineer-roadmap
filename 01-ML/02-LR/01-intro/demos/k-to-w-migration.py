@@ -14,7 +14,10 @@ k → w 迁移 · 一元 LR ↔ 二元 LR · 直觉对照
 import marimo
 
 __generated_with = "0.23.4"
-app = marimo.App(width="medium")
+app = marimo.App(
+    width="medium",
+    layout_file="layouts/k-to-w-migration.grid.json",
+)
 
 
 @app.cell
@@ -29,17 +32,15 @@ def _():
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""
-        # k → w 迁移 · 一元 LR ↔ 二元 LR
+    mo.md(r"""
+    # k → w 迁移 · 一元 LR ↔ 二元 LR
 
-        **目标**：从初中 $y = kx + b$ 的「1 个旋钮 + 1 个偏置」，过渡到 ML 多元 $y = w_1 x_1 + w_2 x_2 + b$ 的「向量旋钮 + 1 个偏置」。
+    **目标**：从初中 $y = kx + b$ 的「1 个旋钮 + 1 个偏置」，过渡到 ML 多元 $y = w_1 x_1 + w_2 x_2 + b$ 的「向量旋钮 + 1 个偏置」。
 
-        - 左图 · 一元：身高（相对 160 的差值）→ 体重，1 个特征 → 1 根斜率 k
-        - 右图 · 二元：身高 + 工龄 → 体重，2 个特征 → 2 根斜率 w₁, w₂（拟合的是平面）
-        - 勾选 **「锁定 w₂=0」** → 右图退化为只有 w₁·x₁ + b，**和左图同构**
-        """
-    )
+    - 左图 · 一元：身高（相对 160 的差值）→ 体重，1 个特征 → 1 根斜率 k
+    - 右图 · 二元：身高 + 工龄 → 体重，2 个特征 → 2 根斜率 w₁, w₂（拟合的是平面）
+    - 勾选 **「锁定 w₂=0」** → 右图退化为只有 w₁·x₁ + b，**和左图同构**
+    """)
     return
 
 
@@ -63,7 +64,6 @@ def _(np):
     _x_w = _rng.uniform(0, 20, 15)  # 工龄 0-20
     X_2d = np.column_stack([_x_h, _x_w])
     y_2d = X_2d @ W_TRUE + B_TRUE + _rng.normal(0, 2, 15)
-
     return B_TRUE, W_TRUE, X_2d, x_1d, y_1d, y_2d
 
 
@@ -82,20 +82,23 @@ def _(mo):
 
 
 @app.cell
+def _(mo):
+    mo.md("""
+    ## 控件
+    """)
+    return
+
+
+@app.cell
 def _(b_1d, b_2d, k_1d, lock_w2, mo, w1_2d, w2_2d):
-    mo.vstack(
+    # 控件组合排版（一行 hstack 是合理颗粒度，每组带独立小标题）
+    mo.hstack(
         [
-            mo.md("## 控件"),
-            mo.hstack(
-                [
-                    mo.vstack([mo.md("**左 · 一元**"), k_1d, b_1d]),
-                    mo.vstack([mo.md("**右 · 二元**"), w1_2d, w2_2d, b_2d, lock_w2]),
-                ],
-                gap=2,
-                justify="start",
-            ),
+            mo.vstack([mo.md("**左 · 一元**"), k_1d, b_1d]),
+            mo.vstack([mo.md("**右 · 二元**"), w1_2d, w2_2d, b_2d, lock_w2]),
         ],
-        gap=1,
+        gap=2,
+        justify="start",
     )
     return
 
@@ -255,36 +258,36 @@ def _(b_1d, b_2d, k_1d, lock_w2, mo, mse_1d, mse_2d, w1_2d, w2_eff):
         )
 
     _panel_md = f"""
-<div style="font-family:ui-monospace,monospace; font-size:14px; line-height:1.7;
+    <div style="font-family:ui-monospace,monospace; font-size:14px; line-height:1.7;
             background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px;
             padding:14px 18px; margin-top:8px;">
 
-<div style="margin-bottom:8px;">{_badge}</div>
+    <div style="margin-bottom:8px;">{_badge}</div>
 
-<b>左图 · 一元</b>：y = k·x + b<br>
-&nbsp;&nbsp;当前 <b>k = {k_1d.value:.2f}</b>,&nbsp; <b>b = {b_1d.value:.2f}</b>
-&nbsp;&nbsp;<span style="color:#6b7280">MSE = {mse_1d:.3f}</span><br>
-&nbsp;&nbsp;→ <b>1 个权重 (k)</b> + <b>1 个偏置 (b)</b> = <b>2 个参数</b>
+    <b>左图 · 一元</b>：y = k·x + b<br>
+    &nbsp;&nbsp;当前 <b>k = {k_1d.value:.2f}</b>,&nbsp; <b>b = {b_1d.value:.2f}</b>
+    &nbsp;&nbsp;<span style="color:#6b7280">MSE = {mse_1d:.3f}</span><br>
+    &nbsp;&nbsp;→ <b>1 个权重 (k)</b> + <b>1 个偏置 (b)</b> = <b>2 个参数</b>
 
-<div style="height:8px;"></div>
+    <div style="height:8px;"></div>
 
-<b>右图 · 二元</b>：y = w₁·x₁ + w₂·x₂ + b<br>
-&nbsp;&nbsp;当前 <b>w₁ = {w1_2d.value:.2f}</b>,&nbsp; <b>w₂ = {w2_eff:.2f}</b>{"&nbsp;<i style='color:#16a34a'>(已锁定)</i>" if lock_w2.value else ""},&nbsp;
-<b>b = {b_2d.value:.2f}</b>
-&nbsp;&nbsp;<span style="color:#6b7280">MSE = {mse_2d:.3f}</span><br>
-&nbsp;&nbsp;→ <b>2 个权重 (w₁, w₂)</b> + <b>1 个偏置 (b)</b> = <b>3 个参数</b>
+    <b>右图 · 二元</b>：y = w₁·x₁ + w₂·x₂ + b<br>
+    &nbsp;&nbsp;当前 <b>w₁ = {w1_2d.value:.2f}</b>,&nbsp; <b>w₂ = {w2_eff:.2f}</b>{"&nbsp;<i style='color:#16a34a'>(已锁定)</i>" if lock_w2.value else ""},&nbsp;
+    <b>b = {b_2d.value:.2f}</b>
+    &nbsp;&nbsp;<span style="color:#6b7280">MSE = {mse_2d:.3f}</span><br>
+    &nbsp;&nbsp;→ <b>2 个权重 (w₁, w₂)</b> + <b>1 个偏置 (b)</b> = <b>3 个参数</b>
 
-<div style="height:10px;border-top:1px dashed #d1d5db;margin:10px 0 8px 0;"></div>
+    <div style="height:10px;border-top:1px dashed #d1d5db;margin:10px 0 8px 0;"></div>
 
-<b>关键观察</b>：
-<ul style="margin:4px 0 0 18px; padding:0;">
-  <li><b>k 是单个数</b> → <b>w 是向量 [w₁, w₂]</b>（特征加 1 个，w 就多一维）</li>
-  <li><b>b 永远只有 1 个</b>，无论几个特征——它和具体 x 无关，所有样本共享</li>
-  <li><b>w₂ = 0 时右图退化为左图</b>（试试勾选「锁定 w₂=0」感受同构）</li>
-</ul>
+    <b>关键观察</b>：
+    <ul style="margin:4px 0 0 18px; padding:0;">
+      <li><b>k 是单个数</b> → <b>w 是向量 [w₁, w₂]</b>（特征加 1 个，w 就多一维）</li>
+      <li><b>b 永远只有 1 个</b>，无论几个特征——它和具体 x 无关，所有样本共享</li>
+      <li><b>w₂ = 0 时右图退化为左图</b>（试试勾选「锁定 w₂=0」感受同构）</li>
+    </ul>
 
-</div>
-"""
+    </div>
+    """
     panel = mo.md(_panel_md)
     return (panel,)
 
@@ -295,10 +298,10 @@ def _(B_TRUE, W_TRUE, mo):
     mo.callout(
         mo.md(
             f"""
-**真实参数（数据生成时用的）**：w₁ = {W_TRUE[0]}, w₂ = {W_TRUE[1]}, b = {B_TRUE}
+    **真实参数（数据生成时用的）**：w₁ = {W_TRUE[0]}, w₂ = {W_TRUE[1]}, b = {B_TRUE}
 
-把滑块调到这组值附近，应该能看到：左图 k = {W_TRUE[0]} 时直线最贴；右图 w₁={W_TRUE[0]}, w₂={W_TRUE[1]} 时背景色和散点色最融合。
-"""
+    把滑块调到这组值附近，应该能看到：左图 k = {W_TRUE[0]} 时直线最贴；右图 w₁={W_TRUE[0]}, w₂={W_TRUE[1]} 时背景色和散点色最融合。
+    """
         ),
         kind="info",
     )
@@ -306,59 +309,57 @@ def _(B_TRUE, W_TRUE, mo):
 
 
 @app.cell
-def _(chart_1d, chart_2d, mo, panel):
-    mo.vstack(
-        [
-            mo.hstack(
-                [mo.ui.altair_chart(chart_1d), mo.ui.altair_chart(chart_2d)],
-                gap=1,
-                widths=[1, 1],
-            ),
-            panel,
-        ],
-        gap=1,
-    )
+def _(chart_1d, mo):
+    mo.ui.altair_chart(chart_1d)
+    return
+
+
+@app.cell
+def _(chart_2d, mo):
+    mo.ui.altair_chart(chart_2d)
+    return
+
+
+@app.cell
+def _(panel):
+    panel
     return
 
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""
-        ---
-        ### 玩法
+    mo.md(r"""
+    ---
+    ### 玩法
 
-        1. **左图独立玩**：拖 k、b 让红线穿过 5 个蓝点，红方块越小越好（方块大小 = 误差²）
-        2. **右图独立玩**：拖 w₁、w₂、b 让背景色阶和散点颜色"融合不见"（说明 ŷ ≈ y）
-        3. **同构验证（核心）**：勾选「锁定 w₂=0」→ 右图就只剩 x₁ 在影响 y，背景色变成「只沿 x₁ 方向渐变的竖条纹」——**这就是左图的样子**
-        4. **真实参数对照**：把所有权重都调到 0.5 / 0.3 / 50，看左右两图的 MSE 都接近 0
+    1. **左图独立玩**：拖 k、b 让红线穿过 5 个蓝点，红方块越小越好（方块大小 = 误差²）
+    2. **右图独立玩**：拖 w₁、w₂、b 让背景色阶和散点颜色"融合不见"（说明 ŷ ≈ y）
+    3. **同构验证（核心）**：勾选「锁定 w₂=0」→ 右图就只剩 x₁ 在影响 y，背景色变成「只沿 x₁ 方向渐变的竖条纹」——**这就是左图的样子**
+    4. **真实参数对照**：把所有权重都调到 0.5 / 0.3 / 50，看左右两图的 MSE 都接近 0
 
-        ### 一句话总结
+    ### 一句话总结
 
-        > **一元 → 多元的唯一变化**：k（标量）变成 w（向量），每多一个特征就多一根独立的"斜率"。b 始终是 1 个标量，含义不变。
-        """
-    )
+    > **一元 → 多元的唯一变化**：k（标量）变成 w（向量），每多一个特征就多一根独立的"斜率"。b 始终是 1 个标量，含义不变。
+    """)
     return
 
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""
-        ---
-        ## 立体视角：把二元的「色阶平面」撑起来看
+    mo.md(r"""
+    ---
+    ## 立体视角：把二元的「色阶平面」撑起来看
 
-        2D 俯视只能看「色阶」，看不到平面的"陡度"。3D 视图能让你拖拽旋转：
+    2D 俯视只能看「色阶」，看不到平面的"陡度"。3D 视图能让你拖拽旋转：
 
-        - 平面的 **x₁ 方向坡度** = w₁（拖滑块看平面绕 x₁ 轴倾斜）
-        - 平面的 **x₂ 方向坡度** = w₂（拖滑块看平面绕 x₂ 轴倾斜）
-        - **整体上下平移** = b（抬高/压低整个平面）
+    - 平面的 **x₁ 方向坡度** = w₁（拖滑块看平面绕 x₁ 轴倾斜）
+    - 平面的 **x₂ 方向坡度** = w₂（拖滑块看平面绕 x₂ 轴倾斜）
+    - **整体上下平移** = b（抬高/压低整个平面）
 
-        勾选「锁定 w₂=0」时，平面变成"沿 x₁ 方向倾斜、沿 x₂ 方向完全平"——这就是退化为一元的几何意义（一根斜率方向 + 一根方向永远水平）。
+    勾选「锁定 w₂=0」时，平面变成"沿 x₁ 方向倾斜、沿 x₂ 方向完全平"——这就是退化为一元的几何意义（一根斜率方向 + 一根方向永远水平）。
 
-        红色虚线是每个真实点到平面的**垂直距离**（残差）。
-        """
-    )
+    红色虚线是每个真实点到平面的**垂直距离**（残差）。
+    """)
     return
 
 
@@ -448,6 +449,65 @@ def _(X_2d, b_2d, mo, np, w1_2d, w2_eff, y_2d):
         showlegend=False,
     )
     mo.ui.plotly(fig_3d)
+    return
+
+
+@app.cell
+def _(mo):
+    # ===== 📐 录屏 grid 布局参考（Step 5 调 layouts.json 时看这里）=====
+    mo.accordion(
+        {
+            "📐 录屏布局参考（grid 设计意图）": mo.md(
+                r"""
+    **目标 viewport**：1920 × 1080（16:9 横屏，**单屏不滚动**）。
+    左控件 + 中主图 + 底部参数面板 三段式。镜头切换 = 换中央主图，左右两栏不动。
+
+    ### 通用横屏骨架（所有镜头共享）
+
+    ```
+       ┌─────────────────────────────────────────────────────────────────────┐
+       │  标题 + 玩法引导（mo.md，跨 3 列）                       高 ~80px   │
+       ├──────────────────┬──────────────────────────────────────────────────┤
+       │                  │                                                  │
+       │  控件区          │   主图区（按镜头切换内容）                       │
+       │  width 360px     │   width 1500px,  height ~760px                   │
+       │                  │                                                  │
+       │  · 一元 k_1d/b_1d│   ┌──────────────────────────────────────────┐  │
+       │  · 二元 w1/w2/b  │   │ 镜头 A: chart_1d                         │  │
+       │  · lock_w2 开关  │   │ 镜头 B: chart_2d                         │  │
+       │  · 帧 frame      │   │ 镜头 C: fig_3d                           │  │
+       │                  │   │ 镜头 D: chart_1d │ chart_2d 双图并排    │  │
+       │  ⚠ 锁定徽章      │   └──────────────────────────────────────────┘  │
+       │                  │                                                  │
+       ├──────────────────┴──────────────────────────────────────────────────┤
+       │  panel 参数面板（mo.md，跨 3 列）              高 ~140px            │
+       │  k=___  b=___  w₁=___  w₂=___ | MSE_1D | MSE_2D | 模式徽章          │
+       └─────────────────────────────────────────────────────────────────────┘
+
+       ←─── 360px ───→← ─────────────── 1500px ──────────────────────────→
+                                    1920 总宽
+    ```
+
+    ### 镜头脚本（横屏切镜头 = 中央主图换）
+
+    | # | 时长 | 中央主图 | 教学焦点 |
+    |---|---|---|---|
+    | **A** | 0-30s | `chart_1d` 单图独占 | 一元 y=kx+b 起步：拖 k/b 看红方块缩小 |
+    | **B** | 30-90s | `chart_2d` 单图独占 | 升级到 2 个特征：拖 w₁/w₂ 看决策面色阶 |
+    | **C** | 90-150s | `fig_3d` 单图独占 | 立体视角：旋转看 w₁/w₂ 怎么撑起平面 |
+    | **D** | 150-200s | `chart_1d` ｜ `chart_2d` 并排 | 勾「锁 w₂=0」→ 看 2D 退化成 1D 同构 |
+
+    ### 关键录屏提示
+
+    1. **三段式不变**：标题（顶）/ 控件+主图（中）/ panel（底）—— 全程视口内
+    2. **左控件栏 360px 是上限**：再宽就抢主图风头
+    3. **中央主图按镜头独占** —— 不要硬塞两个图共享中央区，除非镜头 D
+    4. **panel 永远在底部** —— 数字变化是 5 秒理解的锚点
+                """
+            )
+        },
+        multiple=False,
+    )
     return
 
 

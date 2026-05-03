@@ -22,7 +22,10 @@
 import marimo
 
 __generated_with = "0.23.4"
-app = marimo.App(width="medium")
+app = marimo.App(
+    width="medium",
+    layout_file="layouts/gd-landscape.grid.json",
+)
 
 
 @app.cell
@@ -542,23 +545,32 @@ def _(
 
 
 @app.cell
-def _(chart_data, chart_loss_curve, chart_terrain, chart_w_slice, fig3d, mo):
-    mo.vstack(
-        [
-            mo.hstack(
-                [mo.ui.altair_chart(chart_data), chart_terrain],
-                gap=1,
-                widths=[1, 1],
-            ),
-            mo.hstack(
-                [mo.ui.altair_chart(chart_w_slice), mo.ui.altair_chart(chart_loss_curve)],
-                gap=1,
-                widths=[1, 1],
-            ),
-            fig3d,
-        ],
-        gap=1,
-    )
+def _(chart_data, mo):
+    mo.ui.altair_chart(chart_data)
+    return
+
+
+@app.cell
+def _(chart_terrain):
+    chart_terrain
+    return
+
+
+@app.cell
+def _(chart_w_slice, mo):
+    mo.ui.altair_chart(chart_w_slice)
+    return
+
+
+@app.cell
+def _(chart_loss_curve, mo):
+    mo.ui.altair_chart(chart_loss_curve)
+    return
+
+
+@app.cell
+def _(fig3d):
+    fig3d
     return
 
 
@@ -577,6 +589,77 @@ def _(mo):
 
     **看 C 图黄色箭头**：那是「负梯度方向」 = GD 下一步要走的方向。在最优点附近箭头会变短、消失。
     """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    # ===== 📐 录屏 grid 布局参考（开发用 · 录屏隐藏）=====
+    mo.accordion(
+        {
+            "📐 Grid 布局参考（gd-landscape · 24×20 · maxWidth 1400）": mo.md(
+                r"""
+## 📐 Grid 布局（5 视图 · 16:9 友好）
+
+```
+        0                  12                  24
+y=0   ┌──────── 标题 mo.md（h=3）──────────────────┐
+y=3   ├──────── 控件区 hstack（h=4）───────────────┤
+      │  preset · frame · w · b · lr               │
+y=7   ├──────── 状态徽章 mo.md（h=2）──────────────┤
+      │  模式徽章 · 收敛徽章 · w/b · loss · 最优    │
+y=9   ├──────── A 业务图 ─────┬──── C 等高线 ──────┤
+      │  数据点 + 残差方块     │  matplotlib 地形图 │
+      │  当前/最优拟合线       │  白线 GD 脚印       │
+      │  (h=18, w=12)          │  黄箭头 负梯度      │
+y=27  ├──────── B1 抛物线 ────┬──── B2 loss/step ──┤
+      │  固定 b 扫 w           │  loss vs step       │
+      │  红球往谷底滚          │  log scale + 红点   │
+      │  (h=14, w=12)          │  (h=14, w=12)       │
+y=41  ├──────── D · 3D loss 曲面（plotly） ─────────┤
+      │  拖拽旋转 / 滚轮缩放 / 双击复位             │
+      │  (h=24 ≈ 480px, w=24 整行)                  │
+y=65  ├──────── 玩法 5 步 mo.md（h=8）─────────────┤
+y=73  └────────────────────────────────────────────┘
+```
+
+### Cell → grid 映射（19 业务 cell + 1 本参考 cell）
+
+| Idx | 内容 | position |
+|---|---|---|
+| 0  | imports                  | null（隐藏）|
+| 1  | 标题 mo.md               | [0, 0, 24, 3] |
+| 2  | 数据生成                 | null |
+| 3  | 滑块定义                 | null |
+| 4  | 控件 vstack/hstack       | [0, 3, 24, 4] |
+| 5  | GD 计算                  | null |
+| 6  | loss / 最优解            | null |
+| 7  | 状态徽章 mo.md           | [0, 7, 24, 2] |
+| 8  | chart_data 定义          | null |
+| 9  | chart_terrain 定义       | null |
+| 10 | chart_w_slice 定义       | null |
+| 11 | chart_loss_curve 定义    | null |
+| 12 | fig3d 定义               | null |
+| 13 | A · chart_data 渲染      | [0, 9, 12, 18] |
+| 14 | C · chart_terrain 渲染   | [12, 9, 12, 18] |
+| 15 | B1 · chart_w_slice 渲染  | [0, 27, 12, 14] |
+| 16 | B2 · chart_loss_curve 渲染 | [12, 27, 12, 14] |
+| 17 | D · fig3d 渲染           | [0, 41, 24, 24] |
+| 18 | 玩法 5 步 mo.md          | [0, 65, 24, 8] |
+| 19 | 本 ASCII 参考 cell       | null（隐藏）|
+
+### 设计意图
+
+- **第一行 A + C**：业务图（直观看拟合）+ 地形图（看 GD 路径）= 「现实↔参数空间」对照
+- **第二行 B1 + B2**：抛物线切片 + loss 曲线 = 「单维直觉」+「时间维收敛」
+- **第三行 D 整行**：3D 曲面留足旋转空间（480px ≈ rowHeight 20 × 24）
+- **maxWidth 1400**：5 视图信息密度高，比 1280 多 9% 横向空间
+- **录屏切镜头**：A→C→B1→B2→D 五段，每段聚焦一个视图
+                """
+            )
+        },
+        multiple=False,
     )
     return
 

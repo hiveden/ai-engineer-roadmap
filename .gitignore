@@ -42,9 +42,11 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# === Marimo 自动生成（session 状态 + 布局元数据）===
+# === Marimo 自动生成（session 状态）===
 **/__marimo__/
-**/demos/layouts/
+
+# 注：grid layouts（layouts/*.grid.json）入库——是录屏 / 视频 pipeline 的关键产物（见 _0-workflow.md §5）
+# **/demos/layouts/   ← 已注释，恢复入库
 
 # === 模型文件（大文件，应走 git-lfs 或外部存储） ===
 *.onnx

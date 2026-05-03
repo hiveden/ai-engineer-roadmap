@@ -26,7 +26,10 @@ MSE 残差方块 · k/b 怎么影响拟合 · 03b-math 配套 demo
 import marimo
 
 __generated_with = "0.23.4"
-app = marimo.App(width="medium")
+app = marimo.App(
+    width="medium",
+    layout_file="layouts/mse-residual-squares.grid.json",
+)
 
 
 @app.cell
@@ -403,22 +406,23 @@ def _(alt, b_opt, cur_b, cur_k, np, pd, x_data, y_data):
 
 
 @app.cell
-def _(chart_b_slice, chart_data, chart_k_slice, mo):
-    # 主面板：A（上）+ B1/B2（下并排）
-    mo.vstack(
-        [
-            mo.ui.altair_chart(chart_data),
-            mo.hstack(
-                [
-                    mo.ui.altair_chart(chart_k_slice),
-                    mo.ui.altair_chart(chart_b_slice),
-                ],
-                gap=1,
-                widths=[1, 1],
-            ),
-        ],
-        gap=1,
-    )
+def _(chart_data, mo):
+    # A 视图：散点 + 拟合线 + 残差方块（独占 cell · grid 友好）
+    mo.ui.altair_chart(chart_data)
+    return
+
+
+@app.cell
+def _(chart_k_slice, mo):
+    # B1 视图：loss vs k 抛物线
+    mo.ui.altair_chart(chart_k_slice)
+    return
+
+
+@app.cell
+def _(chart_b_slice, mo):
+    # B2 视图：loss vs b 抛物线
+    mo.ui.altair_chart(chart_b_slice)
     return
 
 
@@ -436,6 +440,67 @@ def _(mo):
            $$k^* = \frac{\sum (x_i - \bar{x})(y_i - \bar{y})}{\sum (x_i - \bar{x})^2}, \quad b^* = \bar{y} - k^* \bar{x}$$
         5. **下一站**（04a/04b）：把 1D 抛物线升维到 2D 等高线/3D 曲面，再讲梯度下降迭代逼近
         """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    # ===== 录屏 grid 布局参考（grid 中 position=null 隐藏）=====
+    mo.accordion(
+        {
+            "Grid 布局参考（开发用 · 录屏隐藏）": mo.md(
+                r"""
+## Grid 布局（16:9 · 24 列 × rowHeight 20 · maxWidth 1280）
+
+```
+   0           7                              24
+0  ┌────────────── 标题（h=3）──────────────────┐
+3  ├──────── 指标面板：当前/最优/比值（h=3）──────┤
+6  ├─控件─┬──────── A 视图（h=18）──────────────┤
+   │preset│  散点 + 拟合直线 + 残差红方块        │
+   │k 滑块│  绿虚 = 最优拟合                    │
+   │b 滑块│                                    │
+24 ├──────┴──────────┬─────────────────────────┤
+   │ B1: loss vs k   │   B2: loss vs b         │
+   │   抛物线（蓝）   │   抛物线（紫）          │
+   │ 红=当前 绿钻=最优│   红=当前 绿钻=最优     │
+39 ├─────────────────┴─────────────────────────┤
+   │            教学要点（h=8）                 │
+47 └───────────────────────────────────────────┘
+```
+
+### Cell 顺序 → grid 映射
+
+| # | cell | position |
+|---|---|---|
+| 0 | imports | null |
+| 1 | 标题 mo.md | [0,0,24,3] |
+| 2 | 数据生成 | null |
+| 3 | 闭式解 | null |
+| 4 | PRESETS + 滑块定义 | null |
+| 5 | 控件区（preset + 滑块） | [0,6,7,18] |
+| 6 | cur_k/cur_b 解析 | null |
+| 7 | y_pred_cur/cur_loss | null |
+| 8 | 指标面板 mo.md | [0,3,24,3] |
+| 9 | chart_data 定义 | null |
+| 10 | chart_k_slice 定义 | null |
+| 11 | chart_b_slice 定义 | null |
+| 12 | A 视图显示 | [7,6,17,18] |
+| 13 | B1 视图显示 | [0,24,12,15] |
+| 14 | B2 视图显示 | [12,24,12,15] |
+| 15 | 教学要点 mo.md | [0,39,24,8] |
+| 16 | 本 accordion | null |
+
+### 录屏要点
+
+1. 三段式：标题 + 指标面板（顶 6 行）/ 控件 + A 主图（中 18 行）/ B1+B2 双抛物线 + 教学要点（底）
+2. 控件栏左侧 7 列，A 主图 17 列 ≈ 30/70 切分
+3. B1/B2 抛物线左右对半（12+12=24），方便对比 k/b 两个方向
+                """
+            )
+        },
+        multiple=False,
     )
     return
 

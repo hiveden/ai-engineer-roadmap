@@ -10,7 +10,10 @@ MAE / MSE / RMSE 对异常点敏感度 · 拖红星看爆炸
 import marimo
 
 __generated_with = "0.23.4"
-app = marimo.App(width="medium")
+app = marimo.App(
+    width="medium",
+    layout_file="layouts/metric-vs-outlier.grid.json",
+)
 
 
 @app.cell
@@ -411,15 +414,16 @@ def _(
 
 
 @app.cell
-def _(chart_bars, chart_scatter, mo):
-    # ============ 布局：两行垂直 · 散点上 / 柱图下 · 各占满宽度 ============
-    mo.vstack(
-        [
-            mo.ui.altair_chart(chart_scatter),
-            mo.ui.altair_chart(chart_bars),
-        ],
-        gap=1,
-    )
+def _(chart_scatter, mo):
+    # 散点图 · 拟合线 + 残差方块（独占 cell · grid 友好）
+    mo.ui.altair_chart(chart_scatter)
+    return
+
+
+@app.cell
+def _(chart_bars, mo):
+    # 柱图 · MAE/MSE/RMSE 共享 y 轴对比
+    mo.ui.altair_chart(chart_bars)
     return
 
 
@@ -468,6 +472,56 @@ def _(mo):
         3. **拟合线被拽**：散点图里蓝色实线（当前）和灰色虚线（baseline）的夹角 = 异常点对模型的破坏力
         4. **结论**：「数据有异常点 + 来不及清洗」→ MAE 比 MSE 鲁棒；其余情况 MSE 仍是默认选择（可微 + 凸优化友好）
         """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    # ===== 📐 录屏 grid 布局参考（开发用 · 录屏 position=null 隐藏）=====
+    mo.accordion(
+        {
+            "📐 录屏布局参考（grid 设计意图）": mo.md(
+                r"""
+**目标 viewport**：1280 宽 · 16:9 录屏 · 单屏不滚动。
+四段式：标题 / 控件 / 状态徽章 / 散点 + 柱图 双图 / 信息面板 callout。
+
+### Grid 骨架（24 列 × rowHeight 20px）
+
+```
+   0           14          24
+0  ┌────────── 标题 + 引导（h=4）────────────┐
+4  ├────── 控件区：preset + x_out + y_out ───┤  h=4
+8  ├────── 状态徽章 + 三个放大倍数 ─────────┤  h=3
+11 ├──── 散点 + 拟合线 ────┬── 三柱图 ─────┤
+   │  chart_scatter        │  chart_bars   │
+   │  width≈14col          │  width≈10col  │  h=19
+30 ├──────── 信息面板（叙事归因 callout）───┤  h=9
+39 └─────────────────────────────────────────┘
+
+   ←─── 14col ───→← ──── 10col ────→
+              maxWidth 1280px
+```
+
+### 镜头脚本（5 秒测试 → 叙事下钻）
+
+| # | 时长 | 焦点 | 教学动作 |
+|---|---|---|---|
+| **A** | 0-5s | 首屏柱图 MSE 顶天 | 不看文字也能秒懂 |
+| **B** | 5-30s | 散点图红方块膨胀 | 拖 y_outlier 看平方放大可视化 |
+| **C** | 30-60s | 预设序列依次切换 | 1x → 3x → 8x → 25x 指数感 |
+| **D** | 60-90s | 信息面板归因 | 叙事 + 何时改用 MAE |
+
+### 关键录屏提示
+
+1. **散点 + 柱图左右并排**（grid 14:10）→ 视线扫一眼即覆盖两个核心证据
+2. **状态徽章窄条**贴在控件下方，三个放大倍数实时跳动（颜色编码：绿/橙/红）
+3. **信息面板用 callout** 而非纯 md → kind 切换给视觉信号（success/info/warn）
+4. **玩法 mo.md** 录屏 null（位于 callout 之后用作教师参考，非镜头内容）
+                """
+            )
+        },
+        multiple=False,
     )
     return
 

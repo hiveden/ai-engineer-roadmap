@@ -10,7 +10,10 @@
 import marimo
 
 __generated_with = "0.23.4"
-app = marimo.App(width="medium")
+app = marimo.App(
+    width="medium",
+    layout_file="layouts/poly-degree-overfit.grid.json",
+)
 
 
 @app.cell
@@ -333,13 +336,16 @@ def _(
 
 
 @app.cell
-def _(chart_left, chart_right, mo):
-    # review 必修 4：左右图在同一 cell hstack 输出，避免渲染撕裂
-    mo.hstack(
-        [mo.ui.altair_chart(chart_left), mo.ui.altair_chart(chart_right)],
-        gap=1,
-        widths=[1, 1],
-    )
+def _(chart_left, mo):
+    # 左图：散点 + 当前 degree 拟合曲线（独占 cell · grid 友好）
+    mo.ui.altair_chart(chart_left)
+    return
+
+
+@app.cell
+def _(chart_right, mo):
+    # 右图：训练/测试 MSE vs degree 双折线 + U 形
+    mo.ui.altair_chart(chart_right)
     return
 
 
@@ -359,6 +365,66 @@ def _(mo):
 
         **教学锚点**：红点和绿钻石的相对位置就是「调参方向」—— 红点在绿钻石左边 = 复杂度不够；右边 = 复杂度过头。
         """
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    # ===== Grid 布局参考（开发用 · 录屏隐藏 position=null）=====
+    mo.accordion(
+        {
+            "Grid 布局参考（24 列 × rowHeight 20 · maxWidth 1280）": mo.md(
+                r"""
+**目标 viewport**：16:9 横屏，单屏不滚动。三段式：标题 / 控件 / 双图并排 / 状态徽章。
+
+```
+   0                          12                          24    列
+0  ┌──────────────── 标题 mo.md（h=3）──────────────────────┐
+3  │                                                        │
+   ├──────── 控件区 vstack：4 预设按钮 + degree 滑块（h=4）──┤
+7  │                                                        │
+   │                                                        │
+   │                                                        │
+   │       chart_left          │       chart_right          │
+   │   散点 + 拟合曲线         │   train/test MSE U 形     │
+   │   （红=拟合 绿=真实）     │   红点=当前 绿钻=甜蜜点    │
+   │       (12 × 19)           │       (12 × 19)            │
+   │                                                        │
+   │                                                        │
+26 ├──────── 状态徽章：degree / train MSE / test MSE / gap ─┤
+30 └────────────────────────────────────────────────────────┘
+```
+
+### Cell 索引 → grid 映射
+
+| idx | cell 内容 | position |
+|---|---|---|
+| 0 | imports | null |
+| 1 | 标题 md | [0, 0, 24, 3] |
+| 2 | 数据生成 | null |
+| 3 | degree_slider 定义 | null |
+| 4 | 4 个预设按钮定义 | null |
+| 5 | 控件 vstack（按钮+滑块） | [0, 3, 24, 4] |
+| 6 | 当前 degree 拟合 + MSE 计算 | null |
+| 7 | 全 degree=1..12 MSE 预计算 | null |
+| 8 | 状态徽章 md | [0, 26, 24, 4] |
+| 9 | chart_left 定义 | null |
+| 10 | chart_right 定义 | null |
+| 11 | 左图渲染 | [0, 7, 12, 19] |
+| 12 | 右图渲染 | [12, 7, 12, 19] |
+| 13 | 玩法 md | null |
+| 14 | 本 accordion | null |
+
+### 录屏要点
+
+1. 拖滑块从 1 → 12，红线在左图变抖；右图红点沿 U 形右移
+2. gap 三色：绿（<0.15 拟合良好）/ 黄（<0.4 微过拟合）/ 红（≥0.4 严重过拟合）
+3. 点 4 预设按钮 → 滑块同步 → 双图同步刷新
+"""
+            )
+        },
+        multiple=False,
     )
     return
 

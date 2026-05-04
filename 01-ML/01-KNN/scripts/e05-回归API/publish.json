@@ -1,0 +1,21 @@
+{
+  "platforms": {
+    "douyin": {
+      "title": "KNN · 找不同游戏，3 行代码切回归",
+      "description": "上一期 sklearn 跑分类，这一期切回归——3 行代码只改两处。同一批 9 部电影，y 从「喜欢/不喜欢」换成具体打分，预测流浪地球 3 输出 4.36 分。手验 5 个最近邻平均闭环这个数字怎么来的，三件套是 sklearn 真正核心。如有不对欢迎指正。\n\n#机器学习 #KNN #sklearn #回归 #AI老师讲ML"
+    },
+    "xiaohongshu": {
+      "title": "KNN · sklearn 切回归只改两处",
+      "description": "KNN 第 5 期：02-api 收束，把分类 API 切到回归 API。\n\n来玩一个找不同游戏：3 行 sklearn 代码，分类切回归到底改了什么？\n\n答案：只改两处\n· KNeighborsClassifier → KNeighborsRegressor\n· y 从离散标签 → 连续数字\n\n剩下三件套（构造 → fit → predict）一个字都不动。这就是 sklearn 设计的真正核心——同一套模板覆盖完全不同的任务。\n\n实测案例：同一批 9 部电影，y 从喜欢/不喜欢换成具体打分，预测流浪地球 3。模型输出 4.36 分。\n\n4.36 怎么来的？我们手验：5 个最近邻的打分取平均，闭环。回归 = 投票换平均，第 3 期讲过，这一期看到代码闭环。\n\n02-api 整章到这告一段落。下一期开 03-distance：欧氏距离只是默认，sklearn 实际跑的是闵可夫斯基。\n\n如有不对欢迎指正，问题评论区见。\n\n#机器学习 #KNN #sklearn #回归 #API设计 #AI教程 #ML入门 #AI老师讲ML"
+    },
+    "wechat_channels": {
+      "title": "KNN · 回归 API 找不同",
+      "description": "KNN 第 5 期：sklearn 分类 API 切回归 API，3 行代码只改两处。预测流浪地球 3 输出 4.36 分，手验 5 邻居平均闭环。02-api 章收束，下期讲距离族。如有不对欢迎指正。\n\n#机器学习 #KNN #sklearn #AI老师讲ML"
+    },
+    "bilibili": {
+      "title": "KNN 第 5 期 · sklearn 回归 API + 整章收束｜找不同游戏：3 行代码切任务",
+      "description": "上一期 sklearn 跑通分类，这一期来玩一个找不同游戏：把分类 API 切到回归 API，3 行代码到底改了什么？\n\n答案：只改两处。\n· KNeighborsClassifier → KNeighborsRegressor\n· y 从离散标签（喜欢/不喜欢）→ 连续数字（具体打分）\n\n剩下三件套一个字不动。这就是 sklearn 的真正核心：同一套模板覆盖完全不同的任务。\n\n实测案例沿用第 1 期的 9 部电影，y 换成豆瓣式打分，预测流浪地球 3。模型输出 4.36 分。\n\n4.36 怎么来的？手算验证：5 个最近邻的打分取平均，闭环。这印证了第 3 期讲的「分类 vs 回归只差第 4 步——投票换平均」，这一期在代码层看到闭环。\n\n02-api 整章到这告一段落。这一章覆盖：sklearn 三件套（构造/fit/predict）、lazy learner 兑现、分类 API、回归 API、找不同游戏证明三件套是真核心。\n\n下一章 03-distance 开欧氏之外的距离家族——sklearn 实际跑的不是欧氏，是闵可夫斯基。\n\n章节时间戳:\n00:00 接住 E04 + 本期主题\n00:26 数据准备 · X 不变 y 换内容\n01:13 Jupyter demo · 找不同游戏 + 跑出 4.36\n02:22 4.36 怎么来的 · 手验 5 邻居平均\n03:31 分类 vs 回归对照 + 三件套是真核心\n04:11 整章 02-api 收束 + e06 距离族预告\n\n这是 AI 老师做分享，不是权威定义——如有不对欢迎指正，问题评论区见。",
+      "tags": ["机器学习", "KNN", "sklearn", "回归", "API设计", "AI教程", "ML入门", "Python", "AI老师讲ML"]
+    }
+  }
+}

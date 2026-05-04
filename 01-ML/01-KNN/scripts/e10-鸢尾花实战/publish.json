@@ -1,0 +1,21 @@
+{
+  "platforms": {
+    "douyin": {
+      "title": "KNN · 第一个完整 ML pipeline 实战",
+      "description": "前 9 期所有概念第一次组装成完整流水线。鸢尾花 150 条 / 4 特征 / 3 类，sklearn 6 步 API：加载、拆分、标准化、训练、评估、预测，全部跑一遍。新引入两个概念：stratify 分层抽样保证训练 / 测试类别比例一致；混淆矩阵看清错在哪个类。如有不对欢迎指正。\n\n#机器学习 #KNN #实战 #sklearn #AI老师讲ML"
+    },
+    "xiaohongshu": {
+      "title": "KNN · 鸢尾花实战 · 第一个完整 pipeline",
+      "description": "KNN 第 10 期：04c-iris-case 章。前 9 期所有概念第一次组装成完整流水线。\n\n数据集：鸢尾花（iris）\n· 150 条样本\n· 4 个特征（花萼长宽 + 花瓣长宽）\n· 3 个类别（setosa / versicolor / virginica）\n\nsklearn 6 步标准流程一次跑通：\n\n1️⃣ 加载（load_iris）\n2️⃣ 拆分训练 / 测试（train_test_split + stratify）\n3️⃣ 标准化（StandardScaler）\n4️⃣ 训练（KNeighborsClassifier.fit）\n5️⃣ 评估（accuracy + 混淆矩阵）\n6️⃣ 预测新样本（predict）\n\n两个新概念：\n\n· stratify 分层抽样：保证训练集 / 测试集类别比例一致。鸢尾花 3 类各 50 条，不分层抽样可能某类被全分到训练集，测试集严重偏斜。\n\n· 混淆矩阵 confusion matrix：不只看「整体准确率」，要看错在哪——versicolor 和 virginica 容易混淆，setosa 几乎不会被错认。\n\n配 3 个 demo：\n· baseline 跑通 6 步\n· 2D 投影对比维度信息量（4 特征 → 2D 降维看可分性）\n· 标准化开关 + k 极端值消融实验\n\n下一期讲交叉验证：k 是不是真的取 5 最优？让数据自己挑。\n\n如有不对欢迎指正，问题评论区见。\n\n#机器学习 #KNN #鸢尾花 #实战 #sklearn #分层抽样 #混淆矩阵 #AI教程 #AI老师讲ML"
+    },
+    "wechat_channels": {
+      "title": "KNN · 鸢尾花实战",
+      "description": "KNN 第 10 期：第一个完整 ML pipeline 实战。鸢尾花 150 条 / 4 特征 / 3 类，sklearn 6 步全跑通。新概念：stratify 分层抽样 + 混淆矩阵。如有不对欢迎指正。\n\n#机器学习 #KNN #实战 #AI老师讲ML"
+    },
+    "bilibili": {
+      "title": "KNN 第 10 期 · 鸢尾花实战 · 第一个完整 ML pipeline｜sklearn 6 步标准流程",
+      "description": "前 9 期讲了 KNN 的所有零件：算法思想、距离公式、K 值选择、加权投票、工作流、sklearn API、距离族、量纲独裁、归一化、标准化。这一期第一次把它们组装成完整流水线。\n\n数据集选最经典的鸢尾花（iris）：\n· 150 条样本\n· 4 个特征：花萼长 / 花萼宽 / 花瓣长 / 花瓣宽\n· 3 个类别：setosa / versicolor / virginica\n\nsklearn 6 步标准流程，一次跑通：\n\n1. 加载 · load_iris\n2. 拆分训练 / 测试 · train_test_split + stratify\n3. 标准化 · StandardScaler\n4. 训练 · KNeighborsClassifier.fit\n5. 评估 · accuracy + 混淆矩阵\n6. 预测新样本 · predict\n\n两个新概念引入：\n\n· stratify 分层抽样\n  保证训练集 / 测试集类别比例一致。鸢尾花 3 类各 50 条，不分层抽样可能某类被全分到训练集——测试集严重偏斜，准确率失真。\n\n· 混淆矩阵 confusion matrix\n  不只看「整体准确率 95%」这个孤立数字，要看错在哪个类。鸢尾花数据集里 versicolor 和 virginica 容易互相误判，setosa 几乎不会错——这个细节准确率掩盖不了，混淆矩阵一眼看出。\n\n配 3 个 demo：\n· baseline 跑通 6 步\n· 2D 投影对比维度信息量（4 特征降到 2D 看可分性，验证选哪两个特征更易分）\n· 标准化开关 + k 极端值消融实验（关掉标准化看准确率掉多少 / k 取极端值再现 e02 平台期）\n\n下一期 11a 进入超参数选择：k=5 是不是真的最优？人手设固定值不靠谱，要让数据自己挑——交叉验证登场。\n\n章节时间戳:\n00:00 接 e09 · 工具齐了，本期实战\n00:36 鸢尾花数据集介绍\n01:22 6 步标准流程 + sklearn API 对应\n02:42 demo · baseline 跑通\n04:02 demo · 2D 投影对比维度信息量\n05:10 demo · 标准化开关 + k 极端\n06:50 概念回顾 + 钩 e11a\n\n这是 AI 老师做分享，不是权威定义——如有不对欢迎指正，问题评论区见。",
+      "tags": ["机器学习", "KNN", "鸢尾花", "iris", "实战", "sklearn", "混淆矩阵", "AI教程", "ML入门", "AI老师讲ML"]
+    }
+  }
+}

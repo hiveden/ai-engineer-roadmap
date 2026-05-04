@@ -1,6 +1,6 @@
 # ML 视频生产工作流
 
-> 教材 → 视频成片。任何 ML 章节（KNN / LR / LogReg / DT / ...）通用。
+> **总入口** · 教材 → 视频成片。任何 ML 章节（KNN / LR / LogReg / DT / ...）通用
 
 ```
 1.底稿+Demo → 2.拆分 → 3.写脚本 → 3.5.实测复核 → 4.TTS → 5.调布局 → 6.录屏 → 7.预览审核 → 8.产物
@@ -10,6 +10,24 @@
 人工 gate：**1 / 3 / 3.5 / 5 / 7**，不可跳过。
 
 > **铁律**：Step 4 TTS 一旦推出，脚本即冻结。任何 demo 没跑过就写进脚本的量化描述，必须在 3.5 复核中拦下，否则只能花钱重生成 wav。
+
+## 何时用
+
+- 启动新章节（先看这份定流程）
+- 卡在某一步不知道对应 skill 文档（用下表跳转）
+- 跨步骤问题（如 step 3 写脚本时怀疑 demo 数据错 → 回 step 1）
+
+## Step → Skill 映射（按需加载子文档）
+
+| Step | 子 skill | 何时读 |
+|---|---|---|
+| 1 底稿 + 讲解段 | [`_1-explanation-guide.md`](./_1-explanation-guide.md) | 写讲解段 |
+| 1 demo 制作 | [`_2-demo-guide.md`](./_2-demo-guide.md) + [`_marimo-guide.md`](./_marimo-guide.md) + [`_marimo-math-guide.md`](./_marimo-math-guide.md) | 写 marimo demo |
+| 3 写脚本 | [`_3-script-guide.md`](./_3-script-guide.md) | 写 plan.md / script.json |
+| 6 录屏 | [`_4-recording-guide.md`](./_4-recording-guide.md) | TTS 就绪后做 mp4 |
+| 8a 推下游 | [`_5-pipeline-sync-guide.md`](./_5-pipeline-sync-guide.md) | mp4 推 astral-pipeline |
+| 8b 发布 | [`_6-publish-guide.md`](./_6-publish-guide.md) | 写 publish.json |
+| 架构约束 | [`_架构规则.md`](./_架构规则.md) | 创建新章节文件结构 |
 
 ---
 
@@ -119,6 +137,30 @@ scripts/eXX-期名/
 
 - **8.1 推 recording 到 pipeline**：按 [`_5-pipeline-sync-guide.md`](./_5-pipeline-sync-guide.md)，跑 `bash scripts/_recording/sync-to-pipeline.sh <epXX> <mlXX>`，原子写 mp4 + manifest.json + .ready 到 `~/projects/astral-pipeline/<mlXX>/recording/`
 - **8.2 写 publish.json**：按 [`_6-publish-guide.md`](./_6-publish-guide.md)，4 平台文案（bilibili 走 tags 数组 + 章节时间戳，其他三平台 # 内联在 description 末尾），不写 cover
+
+---
+
+## Step 8+ · 隐形子任务（每章/每会话收尾自检）
+
+8 步主流程是**看得见的产出**（plan/script/recording/publish）。每章收尾时还有 4 类**隐形工作**经常被忽视——它们决定下一会话/下一开发者的接手成本：
+
+| 类型 | 例 | 工作特征 | 决定 |
+|---|---|---|---|
+| **新增** | 新 demo / 新章节 / 新 guide | 从 0 到 1 | 当期可见 |
+| **重构** | 字段契约演化 / 命名修正 / 文件重组 | 已有产物结构变更 | 下次扩展是否丝滑 |
+| **整理** | 字段顺序统一 / commit 分组 / 文档导航段 | 形态没变但更易用 | 下次接手成本 |
+| **沉淀** | 单次教训 → 通用规则（如 §3.5 "边界档位铁律"）| 抽象升级 | 下次会不会再踩同坑 |
+
+后两类（整理 + 沉淀）最易被低估但价值最高。
+
+收尾自检 4 问：
+
+- 这次的临时决策有哪些应该回写到 guide？（沉淀）
+- 字段 / 命名 / 路径有没有不一致需要批量修正？（整理）
+- 单次踩的坑能不能升成可推广的规则？（沿用 §3.5 / `_4 §7` / `_5 §6` / `_6 §9` 失败模式表格式）（沉淀）
+- commit 粒度是否按主题切、每个独立可回滚？（整理）
+
+KNN 章实战示例：本章在 12 期 publish.json 一致化（4 平台 → 删 youtube → 加 description_inline → wechat 字符合规）的过程中触发了 3 轮 publish 契约重构 + 1 轮工作流文档（_0 / _5 / _6）整理 + E11a LOO 边界踩坑沉淀成铁律。这些不在 8 步任何一步，但占了收尾会话约一半工作量。
 
 ---
 

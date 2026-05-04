@@ -6,16 +6,28 @@
     },
     "xiaohongshu": {
       "title": "KNN · 上手 sklearn 三件套",
-      "description": "KNN 第 4 期：从手算落到代码，正式认识 sklearn。\n\n这一期讲清楚三件事：\n\n1️⃣ sklearn 三件套 · 构造 → fit → predict\n2️⃣ 3 行 sklearn 替代 9 行手算 · 同一份预测结果\n3️⃣ lazy learner 兑现 · fit 几乎不做事，所有计算推迟到 predict\n\nlazy learner 是 KNN 的工程身份——和决策树、神经网络这些 eager learner 完全不同：\n· eager learner：fit 阶段做完所有学习，predict 是查表\n· lazy learner：fit 只存数据，predict 才算距离 + 投票\n\n这个区别决定了 KNN 在生产环境的行为：训练秒级、预测线性慢。\n\n三件套这套通用模板会贯穿整个 sklearn 全家桶——下一期换回归 API，你会看到只改两处就能切任务。\n\n如有不对欢迎指正，问题评论区见。\n\n#机器学习 #KNN #sklearn #lazy_learner #API设计 #AI教程 #ML入门 #AI老师讲ML"
+      "description": "KNN 第 4 期：从手算落到代码，正式认识 sklearn。\n\n这一期讲清楚三件事：\n\n1️⃣ sklearn 三件套 · 构造 → fit → predict\n2️⃣ 3 行 sklearn 替代 9 行手算 · 同一份预测结果\n3️⃣ lazy learner 兑现 · fit 几乎不做事，所有计算推迟到 predict\n\nlazy learner 是 KNN 的工程身份——和决策树、神经网络这些 eager learner 完全不同：\n· eager learner：fit 阶段做完所有学习，predict 是查表\n· lazy learner：fit 只存数据，predict 才算距离 + 投票\n\n这个区别决定了 KNN 在生产环境的行为：训练秒级、预测线性慢。\n\n三件套这套通用模板会贯穿整个 sklearn 全家桶——下一期换回归 API，你会看到只改两处就能切任务。\n\n如有不对欢迎指正，问题评论区见。\n\n#机器学习 #KNN #sklearn #lazy_learner #API设计 #AI教程 #ML入门 #AI老师讲ML",
+      "description_inline": "KNN 第 4 期：从手算落到代码，正式认识 sklearn。 这一期讲清楚三件事： 1️⃣ sklearn 三件套 · 构造 → fit → predict 2️⃣ 3 行 sklearn 替代 9 行手算 · 同一份预测结果 3️⃣ lazy learner 兑现 · fit 几乎不做事，所有计算推迟到 predict lazy learner 是 KNN 的工程身份——和决策树、神经网络这些 eager learner 完全不同： · eager learner：fit 阶段做完所有学习，predict 是查表 · lazy learner：fit 只存数据，predict 才算距离 + 投票 这个区别决定了 KNN 在生产环境的行为：训练秒级、预测线性慢。 三件套这套通用模板会贯穿整个 sklearn 全家桶——下一期换回归 API，你会看到只改两处就能切任务。 如有不对欢迎指正，问题评论区见。 #机器学习 #KNN #sklearn #lazy_learner #API设计 #AI教程 #ML入门 #AI老师讲ML"
     },
     "wechat_channels": {
-      "title": "KNN · sklearn 上手",
+      "title": "KNN：sklearn 上手",
       "description": "KNN 第 4 期：3 行 sklearn 替代 9 行手算。重点兑现 lazy learner——fit 几乎不做事，所有计算推迟到 predict。三件套是 sklearn 全家桶通用模板。如有不对欢迎指正。\n\n#机器学习 #KNN #sklearn #AI老师讲ML"
     },
     "bilibili": {
       "title": "KNN 第 4 期 · sklearn 分类 API + lazy learner 兑现｜三件套通用模板",
       "description": "前三期手算 KNN 把概念走透了。这一期落到代码：3 行 sklearn 替代 9 行公式，量级差距一眼看清。\n\n但这一期重点不是「省代码」，是兑现一个跨期伏笔——lazy learner 懒惰学习器。打开 Jupyter 实测：fit 几乎不做事，所有计算推迟到 predict。这是 KNN 的工程身份，和决策树、神经网络这些 eager learner 完全相反。\n\n顺带把 sklearn 三件套讲透：\n· 构造（设超参 K、距离）\n· fit（KNN 里几乎只是存数据）\n· predict（真正算距离 + 投票）\n\n这套三件套贯穿 sklearn 全家桶——所有模型都是这三步。下一期换回归 API，你会看到只改两处就能切任务，三件套是真正的核心。\n\n章节时间戳:\n00:00 接住 E03 + lazy learner 兑现预告\n00:27 sklearn 是什么 + 三件套总览\n01:23 Jupyter demo · 3 行 sklearn 跑通分类\n02:36 对照 E01 · 9 行手算 vs 3 行 sklearn\n03:32 lazy learner 兑现 · fit 几乎不做事\n04:21 lazy learner 概念定名 + eager learner 对比\n05:08 三件套是 sklearn 全家桶通用模板\n05:47 概念地图 + E05 伏笔\n\n下一期讲 sklearn 回归 API：找不同游戏，3 行代码只改两处。\n\n这是 AI 老师做分享，不是权威定义——如有不对欢迎指正，问题评论区见。",
-      "tags": ["机器学习", "KNN", "sklearn", "lazy learner", "API设计", "AI教程", "ML入门", "Python", "AI老师讲ML"]
+      "description_inline": "前三期手算 KNN 把概念走透了。这一期落到代码：3 行 sklearn 替代 9 行公式，量级差距一眼看清。 但这一期重点不是「省代码」，是兑现一个跨期伏笔——lazy learner 懒惰学习器。打开 Jupyter 实测：fit 几乎不做事，所有计算推迟到 predict。这是 KNN 的工程身份，和决策树、神经网络这些 eager learner 完全相反。 顺带把 sklearn 三件套讲透： · 构造（设超参 K、距离） · fit（KNN 里几乎只是存数据） · predict（真正算距离 + 投票） 这套三件套贯穿 sklearn 全家桶——所有模型都是这三步。下一期换回归 API，你会看到只改两处就能切任务，三件套是真正的核心。 章节时间戳: 00:00 接住 E03 + lazy learner 兑现预告 00:27 sklearn 是什么 + 三件套总览 01:23 Jupyter demo · 3 行 sklearn 跑通分类 02:36 对照 E01 · 9 行手算 vs 3 行 sklearn 03:32 lazy learner 兑现 · fit 几乎不做事 04:21 lazy learner 概念定名 + eager learner 对比 05:08 三件套是 sklearn 全家桶通用模板 05:47 概念地图 + E05 伏笔 下一期讲 sklearn 回归 API：找不同游戏，3 行代码只改两处。 这是 AI 老师做分享，不是权威定义——如有不对欢迎指正，问题评论区见。",
+      "tags": [
+        "机器学习",
+        "KNN",
+        "sklearn",
+        "lazy learner",
+        "API设计",
+        "AI教程",
+        "ML入门",
+        "Python",
+        "AI老师讲ML"
+      ]
     }
   }
 }

@@ -6,16 +6,29 @@
     },
     "xiaohongshu": {
       "title": "KNN 章总结 · 网格搜索 + 数字识别",
-      "description": "KNN 第 11b 期：05-hyperparameter 章压轴 + 整个 KNN 章节告别。\n\n核心概念：网格搜索 GridSearch\n上一期 CV 解决了「评分可信」，这一期解决「自动挑超参」。\n\n网格搜索本质：\n· 列出所有要搜的超参组合（k=[3,5,7] × weights=[uniform, distance] = 6 组）\n· 每一组用 CV 跑一遍拿评分\n· 选评分最高的那组\n\n两个工程考量：\n\n1️⃣ 维度爆炸\n训练次数公式 = 组数 × CV 折数。3 个超参各 5 个候选 + cv=10 = 1250 次训练。维度多 / 候选多时网格搜索很贵——后续会讲随机搜索（RandomizedSearchCV）和贝叶斯优化作为替代方案。\n\n2️⃣ Pipeline 防数据泄漏\nsklearn GridSearchCV + Pipeline 双下划线语法（如 knn__n_neighbors）。Pipeline 把预处理（StandardScaler）和模型（KNN）封装到一起，CV 拆分时预处理只在训练折 fit，避免验证折统计量泄漏到训练。这是工程纪律的硬要求。\n\n实战：手写数字识别\nsklearn 内置 load_digits（1797 张 8x8 灰度图，0-9 十类）\n· demo · GridSearchCV 热力图：k × weights 网格搜索结果一图看清\n· demo · 跑通完整识别 pipeline\n\n整章 KNN 收束（12 期回顾）：\n核心一个找邻居 / 变种四组距离 / 工程八种关键技巧（lazy learner、归一化、标准化、stratify、混淆矩阵、CV、GridSearch、Pipeline）。\n\n下一站：第 2 章逻辑回归（Logistic Regression）。从「找邻居」换成「学决策边界的方程」。\n\n感谢一路看到这里。如有不对欢迎指正，问题评论区见。\n\n#机器学习 #KNN #网格搜索 #GridSearch #手写数字 #sklearn #Pipeline #AI教程 #AI老师讲ML"
+      "description": "KNN 第 11b 期：05-hyperparameter 章压轴 + 整个 KNN 章节告别。\n\n核心概念：网格搜索 GridSearch\n上一期 CV 解决了「评分可信」，这一期解决「自动挑超参」。\n\n网格搜索本质：\n· 列出所有要搜的超参组合（k=[3,5,7] × weights=[uniform, distance] = 6 组）\n· 每一组用 CV 跑一遍拿评分\n· 选评分最高的那组\n\n两个工程考量：\n\n1️⃣ 维度爆炸\n训练次数公式 = 组数 × CV 折数。3 个超参各 5 个候选 + cv=10 = 1250 次训练。维度多 / 候选多时网格搜索很贵——后续会讲随机搜索（RandomizedSearchCV）和贝叶斯优化作为替代方案。\n\n2️⃣ Pipeline 防数据泄漏\nsklearn GridSearchCV + Pipeline 双下划线语法（如 knn__n_neighbors）。Pipeline 把预处理（StandardScaler）和模型（KNN）封装到一起，CV 拆分时预处理只在训练折 fit，避免验证折统计量泄漏到训练。这是工程纪律的硬要求。\n\n实战：手写数字识别\nsklearn 内置 load_digits（1797 张 8x8 灰度图，0-9 十类）\n· demo · GridSearchCV 热力图：k × weights 网格搜索结果一图看清\n· demo · 跑通完整识别 pipeline\n\n整章 KNN 收束（12 期回顾）：\n核心一个找邻居 / 变种四组距离 / 工程八种关键技巧（lazy learner、归一化、标准化、stratify、混淆矩阵、CV、GridSearch、Pipeline）。\n\n下一站：第 2 章逻辑回归（Logistic Regression）。从「找邻居」换成「学决策边界的方程」。\n\n感谢一路看到这里。如有不对欢迎指正，问题评论区见。\n\n#机器学习 #KNN #网格搜索 #GridSearch #手写数字 #sklearn #Pipeline #AI教程 #AI老师讲ML",
+      "description_inline": "KNN 第 11b 期：05-hyperparameter 章压轴 + 整个 KNN 章节告别。 核心概念：网格搜索 GridSearch 上一期 CV 解决了「评分可信」，这一期解决「自动挑超参」。 网格搜索本质： · 列出所有要搜的超参组合（k=[3,5,7] × weights=[uniform, distance] = 6 组） · 每一组用 CV 跑一遍拿评分 · 选评分最高的那组 两个工程考量： 1️⃣ 维度爆炸 训练次数公式 = 组数 × CV 折数。3 个超参各 5 个候选 + cv=10 = 1250 次训练。维度多 / 候选多时网格搜索很贵——后续会讲随机搜索（RandomizedSearchCV）和贝叶斯优化作为替代方案。 2️⃣ Pipeline 防数据泄漏 sklearn GridSearchCV + Pipeline 双下划线语法（如 knn__n_neighbors）。Pipeline 把预处理（StandardScaler）和模型（KNN）封装到一起，CV 拆分时预处理只在训练折 fit，避免验证折统计量泄漏到训练。这是工程纪律的硬要求。 实战：手写数字识别 sklearn 内置 load_digits（1797 张 8x8 灰度图，0-9 十类） · demo · GridSearchCV 热力图：k × weights 网格搜索结果一图看清 · demo · 跑通完整识别 pipeline 整章 KNN 收束（12 期回顾）： 核心一个找邻居 / 变种四组距离 / 工程八种关键技巧（lazy learner、归一化、标准化、stratify、混淆矩阵、CV、GridSearch、Pipeline）。 下一站：第 2 章逻辑回归（Logistic Regression）。从「找邻居」换成「学决策边界的方程」。 感谢一路看到这里。如有不对欢迎指正，问题评论区见。 #机器学习 #KNN #网格搜索 #GridSearch #手写数字 #sklearn #Pipeline #AI教程 #AI老师讲ML"
     },
     "wechat_channels": {
-      "title": "KNN · 网格搜索 + 章总结",
+      "title": "KNN：网格搜索 + 章总结",
       "description": "KNN 第 11b 期：网格搜索 + Pipeline 防泄漏 + 手写数字识别 + KNN 12 期整章收束。下一站第 2 章逻辑回归。如有不对欢迎指正。\n\n#机器学习 #KNN #网格搜索 #AI老师讲ML"
     },
     "bilibili": {
       "title": "KNN 第 11b 期 · 网格搜索 + 手写数字识别 + KNN 章总结｜12 期 KNN 完结",
       "description": "上一期讲完交叉验证，这一期把 CV 套外层循环——网格搜索 GridSearch 自动挑超参。同时是 KNN 整个章节的压轴，12 期到这告别。\n\n网格搜索本质：穷举 + 网格表\n· 列出所有要搜的超参组合（如 k=[3,5,7] × weights=[uniform, distance] = 6 组）\n· 每一组用 CV 跑一遍拿评分\n· 选评分最高的那组\n\n两个工程考量讲透：\n\n1. 维度爆炸 + 训练次数公式\n训练次数 = 超参组合数 × CV 折数\n3 个超参各 5 候选 + cv=10 = 1250 次训练\n超参多 / 候选多时网格搜索很贵。这就是为什么后续会有 RandomizedSearchCV（随机搜索）和贝叶斯优化等替代方案——本期不展开，留作后续推迟项。\n\n2. Pipeline 防数据泄漏（关键工程纪律）\nsklearn GridSearchCV + Pipeline 双下划线语法（如 knn__n_neighbors 用双下划线穿透 Pipeline 步骤）。\n\nPipeline 把预处理（StandardScaler）和模型（KNN）封装到一起。CV 拆分时，预处理只在训练折 fit、在验证折 transform——避免验证折统计量泄漏到训练。\n\n如果不用 Pipeline 直接 StandardScaler.fit(X_train_full) + GridSearchCV，预处理就在「全训练集」fit 了，验证折的 mean/std 已经被训练折看见——评分虚高，部署后翻车。这是新手最常见的坑之一。\n\n实战：手写数字识别\nsklearn 内置 load_digits 数据集（1797 张 8x8 灰度图，0-9 十类）\n· demo · GridSearchCV 热力图：k × weights 网格搜索结果可视化，一图看清最优区域\n· demo · 跑通完整识别 pipeline：从加载到预测，端到端一气呵成\n\n整章 KNN 12 期收束：\n· 核心：一个简单思想——找最像的邻居\n· 变种：四组距离公式（欧氏 / 曼哈顿 / 切比雪夫 / 闵可夫斯基）\n· 工程关键技巧：lazy learner、归一化、标准化、stratify 分层抽样、混淆矩阵、交叉验证、GridSearch、Pipeline\n\n下一站第 2 章：逻辑回归 Logistic Regression。\n从 KNN 的「找邻居」换成「学一条决策边界方程」——一个完全不同的模型族开启 ML 之旅的下一阶段。\n\n感谢一路看到这里。希望这 12 期能让 KNN 在你的脑子里从「黑盒」变成「直觉」。\n\n章节时间戳:\n00:00 接 e11a · CV 评分 + 外层循环自动化\n00:36 网格搜索本质 · 穷举 + 网格表\n01:33 维度爆炸 + 训练次数公式\n02:46 sklearn GridSearchCV 三件套 + Pipeline 双下划线\n03:49 Pipeline 防数据泄漏\n04:48 demo · GridSearchCV 热力图\n05:55 demo · 手写数字识别\n07:43 整章 KNN 收束\n09:14 下一站第 2 章 LR 预告 + 章节告别\n\n这是 AI 老师做分享，不是权威定义——如有不对欢迎指正，问题评论区见。",
-      "tags": ["机器学习", "KNN", "网格搜索", "GridSearch", "手写数字", "sklearn", "Pipeline", "数据泄漏", "AI教程", "AI老师讲ML"]
+      "description_inline": "上一期讲完交叉验证，这一期把 CV 套外层循环——网格搜索 GridSearch 自动挑超参。同时是 KNN 整个章节的压轴，12 期到这告别。 网格搜索本质：穷举 + 网格表 · 列出所有要搜的超参组合（如 k=[3,5,7] × weights=[uniform, distance] = 6 组） · 每一组用 CV 跑一遍拿评分 · 选评分最高的那组 两个工程考量讲透： 1. 维度爆炸 + 训练次数公式 训练次数 = 超参组合数 × CV 折数 3 个超参各 5 候选 + cv=10 = 1250 次训练 超参多 / 候选多时网格搜索很贵。这就是为什么后续会有 RandomizedSearchCV（随机搜索）和贝叶斯优化等替代方案——本期不展开，留作后续推迟项。 2. Pipeline 防数据泄漏（关键工程纪律） sklearn GridSearchCV + Pipeline 双下划线语法（如 knn__n_neighbors 用双下划线穿透 Pipeline 步骤）。 Pipeline 把预处理（StandardScaler）和模型（KNN）封装到一起。CV 拆分时，预处理只在训练折 fit、在验证折 transform——避免验证折统计量泄漏到训练。 如果不用 Pipeline 直接 StandardScaler.fit(X_train_full) + GridSearchCV，预处理就在「全训练集」fit 了，验证折的 mean/std 已经被训练折看见——评分虚高，部署后翻车。这是新手最常见的坑之一。 实战：手写数字识别 sklearn 内置 load_digits 数据集（1797 张 8x8 灰度图，0-9 十类） · demo · GridSearchCV 热力图：k × weights 网格搜索结果可视化，一图看清最优区域 · demo · 跑通完整识别 pipeline：从加载到预测，端到端一气呵成 整章 KNN 12 期收束： · 核心：一个简单思想——找最像的邻居 · 变种：四组距离公式（欧氏 / 曼哈顿 / 切比雪夫 / 闵可夫斯基） · 工程关键技巧：lazy learner、归一化、标准化、stratify 分层抽样、混淆矩阵、交叉验证、GridSearch、Pipeline 下一站第 2 章：逻辑回归 Logistic Regression。 从 KNN 的「找邻居」换成「学一条决策边界方程」——一个完全不同的模型族开启 ML 之旅的下一阶段。 感谢一路看到这里。希望这 12 期能让 KNN 在你的脑子里从「黑盒」变成「直觉」。 章节时间戳: 00:00 接 e11a · CV 评分 + 外层循环自动化 00:36 网格搜索本质 · 穷举 + 网格表 01:33 维度爆炸 + 训练次数公式 02:46 sklearn GridSearchCV 三件套 + Pipeline 双下划线 03:49 Pipeline 防数据泄漏 04:48 demo · GridSearchCV 热力图 05:55 demo · 手写数字识别 07:43 整章 KNN 收束 09:14 下一站第 2 章 LR 预告 + 章节告别 这是 AI 老师做分享，不是权威定义——如有不对欢迎指正，问题评论区见。",
+      "tags": [
+        "机器学习",
+        "KNN",
+        "网格搜索",
+        "GridSearch",
+        "手写数字",
+        "sklearn",
+        "Pipeline",
+        "数据泄漏",
+        "AI教程",
+        "AI老师讲ML"
+      ]
     }
   }
 }

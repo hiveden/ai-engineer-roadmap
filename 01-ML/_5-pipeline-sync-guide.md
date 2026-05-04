@@ -1,8 +1,29 @@
 # Pipeline 推送指南（skill）
 
-> Step 8 子任务 1。把本仓 demo 录屏 mp4 推到下游 `astral-pipeline/<id>/recording/`。
->
+> **Step 8a** · 把本仓 demo 录屏 mp4 推到下游 `astral-pipeline/<id>/recording/`
 > HANDSHAKE 第 4 方契约提案（recording/ 子目录），尚未入 HANDSHAKE 正文。先实跑稳定再走对齐流程。
+
+## 何时用
+
+- 录屏 mp4 已就绪（`01-KNN/03-distance/recording/shot06.mp4` 或类似）
+- 下游 pipeline 等待 `.ready` 触发合音 / 渲染
+- id 映射不确定（仓库期号 vs pipeline id）
+
+## 索引（按需取读）
+
+| § | 内容 | 何时读 |
+|---|---|---|
+| 1 | 前置 checklist | 启动前 |
+| 2 | 契约（pipeline 侧产物形态）| 第一次推 |
+| 3 | id 映射（仓库 ↔ pipeline）| 不确定下游目录名 |
+| 4 | 标准动作 3 步 | 流程速查 |
+| 5 | 验证清单 | 推完自检 |
+| 6 | 失败模式 | 遇到问题 |
+| 7 | 推送之后（下游会做什么）| 想了解管线全貌 |
+
+> 上游录屏 → [`_4-recording-guide.md`](./_4-recording-guide.md)；下游发布 → [`_6-publish-guide.md`](./_6-publish-guide.md)
+
+---
 
 ## 1. 前置 checklist
 

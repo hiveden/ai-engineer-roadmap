@@ -1,8 +1,31 @@
 # Publish 指南（skill）
 
-> Step 8 子任务 2。每期一份 `scripts/eXX-期名/publish.json`，覆盖 4 个发布平台文案。
->
-> 路径归口：本仓（不进 `script-agent-harness`）。下游 astral-video / 发布工具直接读本仓相对路径，或日后另起 sync 推到 `pipeline/<id>/publish/`。
+> **Step 8b** · 每期一份 `scripts/eXX-期名/publish.json`，覆盖 4 个发布平台文案
+> 路径归口：本仓（不进 `script-agent-harness`）。下游 astral-video / 发布工具直接读本仓相对路径
+
+## 何时用
+
+- 录屏推下游后写 `publish.json`（4 平台文案：标题 / 简介 / 标签 / 章节时间戳）
+- 平台文案差异化（B 站 / 小红书 / 微博 / Twitter / YouTube）
+- 多期系列 IP 标签统一
+
+## 索引（按需取读）
+
+| § | 内容 | 何时读 |
+|---|---|---|
+| 1 | 前置 checklist | 启动前 |
+| 2 | 立场（与 script.json 同源）| 起手定调 |
+| 3 | 契约（publish.json 字段结构）| 写 schema |
+| 4 | 章节时间戳（仅 bilibili）| 写 chapters |
+| 5 | 平台风格差异 | 文案适配 |
+| 6 | 系列 IP 标签 | 多期统一 |
+| 7 | 模板（e01 缩略版）| 文件骨架 |
+| 8 | 验证清单 | 写完自检 |
+| 9 | 失败模式 | 遇到问题 |
+
+> 推 mp4 → [`_5-pipeline-sync-guide.md`](./_5-pipeline-sync-guide.md)；脚本规则 → [`_3-script-guide.md`](./_3-script-guide.md)
+
+---
 
 ## 1. 前置 checklist
 

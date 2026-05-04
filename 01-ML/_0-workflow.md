@@ -3,8 +3,8 @@
 > **总入口** · 教材 → 视频成片。任何 ML 章节（KNN / LR / LogReg / DT / ...）通用
 
 ```
-1.底稿+Demo → 2.拆分 → 3.写脚本 → 3.5.实测复核 → 4.TTS → 5.调布局 → 6.录屏 → 7.预览审核 → 8.产物
-   人工        人工      Agent      人工+Agent      外部     人工        Agent     人工         Agent
+1.讲解+Demo → 2.拆分 → 3.写脚本 → 3.5.实测复核 → 4.TTS → 5.调布局 → 6.录屏 → 7.预览审核 → 8.产物
+  人工+Agent    人工     Agent      人工+Agent      外部     人工        Agent     人工         Agent
 ```
 
 人工 gate：**1 / 3 / 3.5 / 5 / 7**，不可跳过。
@@ -19,24 +19,33 @@
 
 ## Step → Skill 映射（按需加载子文档）
 
-| Step | 子 skill | 何时读 |
-|---|---|---|
-| 1 底稿 + 讲解段 | [`_1-explanation-guide.md`](./_1-explanation-guide.md) | 写讲解段 |
-| 1 demo 制作 | [`_2-demo-guide.md`](./_2-demo-guide.md) + [`_marimo-guide.md`](./_marimo-guide.md) + [`_marimo-math-guide.md`](./_marimo-math-guide.md) | 写 marimo demo |
-| 3 写脚本 | [`_3-script-guide.md`](./_3-script-guide.md) | 写 plan.md / script.json |
-| 6 录屏 | [`_4-recording-guide.md`](./_4-recording-guide.md) | TTS 就绪后做 mp4 |
-| 8a 推下游 | [`_5-pipeline-sync-guide.md`](./_5-pipeline-sync-guide.md) | mp4 推 astral-pipeline |
-| 8b 发布 | [`_6-publish-guide.md`](./_6-publish-guide.md) | 写 publish.json |
-| 架构约束 | [`_架构规则.md`](./_架构规则.md) | 创建新章节文件结构 |
+> **文件编号 = Step 编号**。Step 2 / 3.5 / 5 / 7 暂无独立 guide，规则散在 _0 / _2 节内（下表"位置"列指明）。
+
+| Step | 子 skill | 位置 | 何时读 |
+|---|---|---|---|
+| 1a 讲解段 | [`_1-explanation-guide.md`](./_1-explanation-guide.md) | 独立 guide | 写讲解段 |
+| 1b demo 制作 | [`_2-demo-guide.md`](./_2-demo-guide.md) + [`_marimo-guide.md`](./_marimo-guide.md) + [`_marimo-math-guide.md`](./_marimo-math-guide.md) | 独立 guide | 写 marimo demo |
+| 2 拆分 | — | 散 _0 §2（5 条依据）| 拆期 |
+| 3 写脚本 | [`_3-script-guide.md`](./_3-script-guide.md) | 独立 guide | 写 plan.md / script.json |
+| 3.5 实测复核 | — | 散 _0 §3.5（待抽出 _3.5-fact-check-guide.md）| TTS 前最后一关 |
+| 4 TTS | 外部（tts-agent-harness）| — | 推 script.json |
+| 5 调布局 | — | 散 _2 §4（grid layout）| marimo edit 调比例 |
+| 6 录屏 | [`_6-recording-guide.md`](./_6-recording-guide.md) | 独立 guide | TTS 就绪后做 mp4 |
+| 7 预览审核 | — | 散 _0 §7（6 项验证）| preview.html 同步播 |
+| 8a 推下游 | [`_8a-pipeline-sync-guide.md`](./_8a-pipeline-sync-guide.md) | 独立 guide | mp4 推 astral-pipeline |
+| 8b 发布 | [`_8b-publish-guide.md`](./_8b-publish-guide.md) | 独立 guide | 写 publish.json |
+| 横切 | [`_架构规则.md`](./_架构规则.md) | 宪法 | 创建新章节文件结构 |
 
 ---
 
-## Step 1 · 底稿 + Demo 制作
+## Step 1 · 讲解段 + Demo 制作
 
-两个并行子项：
+> **PPT/教材原话整理 ≠ 完成 Step 1**——必须按下面两份 guide 加工成讲解段 + 互动 demo。
 
-- **讲解段写作**：按 [`_1-explanation-guide.md`](./_1-explanation-guide.md)（教材 md 三段式讲解：场景→机制→命名）
-- **Demo 制作**：按 [`_2-demo-guide.md`](./_2-demo-guide.md)（marimo demo grid 友好原则，**一个 cell = grid 最小可摆放单元**）
+两个并行子项（`人工+Agent`）：
+
+- **1a 讲解段写作**：按 [`_1-explanation-guide.md`](./_1-explanation-guide.md)（三层结构：直觉锚 → 概念 → 推广 + 关键启示金句）
+- **1b Demo 制作**：按 [`_2-demo-guide.md`](./_2-demo-guide.md)（marimo demo grid 友好原则，**一个 cell = grid 最小可摆放单元**）
 
 写完各自按指南末尾的验证清单过一遍。
 
@@ -109,7 +118,7 @@ marimo edit XX-name.py --port 2718
 
 ## Step 6 · 录屏
 
-按 [`_4-recording-guide.md`](./_4-recording-guide.md)。输出 `_recording/output/eXX_shotYY_cropped.mp4`。
+按 [`_6-recording-guide.md`](./_6-recording-guide.md)。输出 `_recording/output/eXX_shotYY_cropped.mp4`。
 
 ---
 
@@ -135,8 +144,8 @@ scripts/eXX-期名/
 
 两个子任务：
 
-- **8.1 推 recording 到 pipeline**：按 [`_5-pipeline-sync-guide.md`](./_5-pipeline-sync-guide.md)，跑 `bash scripts/_recording/sync-to-pipeline.sh <epXX> <mlXX>`，原子写 mp4 + manifest.json + .ready 到 `~/projects/astral-pipeline/<mlXX>/recording/`
-- **8.2 写 publish.json**：按 [`_6-publish-guide.md`](./_6-publish-guide.md)，4 平台文案（bilibili 走 tags 数组 + 章节时间戳，其他三平台 # 内联在 description 末尾），不写 cover
+- **8.1 推 recording 到 pipeline**：按 [`_8a-pipeline-sync-guide.md`](./_8a-pipeline-sync-guide.md)，跑 `bash scripts/_recording/sync-to-pipeline.sh <epXX> <mlXX>`，原子写 mp4 + manifest.json + .ready 到 `~/projects/astral-pipeline/<mlXX>/recording/`
+- **8.2 写 publish.json**：按 [`_8b-publish-guide.md`](./_8b-publish-guide.md)，4 平台文案（bilibili 走 tags 数组 + 章节时间戳，其他三平台 # 内联在 description 末尾），不写 cover
 
 ---
 
@@ -172,9 +181,9 @@ KNN 章实战示例：本章在 12 期 publish.json 一致化（4 平台 → 删
 ├── _1-explanation-guide.md ← Step 1 讲解段写作
 ├── _2-demo-guide.md        ← Step 1 demo 制作
 ├── _3-script-guide.md      ← Step 3 写脚本
-├── _4-recording-guide.md   ← Step 6 录屏
-├── _5-pipeline-sync-guide.md ← Step 8.1 推 recording 到 pipeline
-├── _6-publish-guide.md     ← Step 8.2 写 publish.json
+├── _6-recording-guide.md   ← Step 6 录屏
+├── _8a-pipeline-sync-guide.md ← Step 8.1 推 recording 到 pipeline
+├── _8b-publish-guide.md     ← Step 8.2 写 publish.json
 ├── _marimo-guide.md            marimo 用法
 ├── _marimo-math-guide.md       marimo 数学动画
 ├── _架构规则.md                教材组织
@@ -216,7 +225,7 @@ KNN 章实战示例：本章在 12 期 publish.json 一致化（4 平台 → 删
 ### Step 6 录屏
 
 ```
-读 01-ML/_4-recording-guide.md（严格遵守）+ scripts/eXX/script.json segment {YY} text + notes + astral-pipeline/mlXX/tts/subtitles.json。
+读 01-ML/_6-recording-guide.md（严格遵守）+ scripts/eXX/script.json segment {YY} text + notes + astral-pipeline/mlXX/tts/subtitles.json。
 输出 scripts/_recording/eXX_shotYY.py + scripts/eXX-期名/recording/shotYY.mp4 + README.md。
 ```
 

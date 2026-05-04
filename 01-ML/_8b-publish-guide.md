@@ -23,7 +23,7 @@
 | 8 | 验证清单 | 写完自检 |
 | 9 | 失败模式 | 遇到问题 |
 
-> 推 mp4 → [`_5-pipeline-sync-guide.md`](./_5-pipeline-sync-guide.md)；脚本规则 → [`_3-script-guide.md`](./_3-script-guide.md)
+> 推 mp4 → [`_8a-pipeline-sync-guide.md`](./_8a-pipeline-sync-guide.md)；脚本规则 → [`_3-script-guide.md`](./_3-script-guide.md)
 
 ---
 

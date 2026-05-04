@@ -2,7 +2,7 @@
 
 > AI 老师讲解 + 后续补 demo 录屏拼接，7 期覆盖整个 LogReg 章。
 >
-> **写新期前必读**：[`../../_0-workflow.md`](../../_0-workflow.md) + [`../../_3-script-guide.md`](../../_3-script-guide.md) + [`../../_4-recording-guide.md`](../../_4-recording-guide.md) + KNN scripts e01-e11 正稿样本。
+> **写新期前必读**：[`../../_0-workflow.md`](../../_0-workflow.md) + [`../../_3-script-guide.md`](../../_3-script-guide.md) + [`../../_6-recording-guide.md`](../../_6-recording-guide.md) + KNN scripts e01-e11 正稿样本。
 >
 > 立场：AI 老师做分享，第一人称用"我们"，每期结尾"如果有不对欢迎指正"。
 

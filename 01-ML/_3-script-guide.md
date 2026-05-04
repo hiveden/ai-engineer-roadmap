@@ -1,6 +1,36 @@
 # 写脚本指南（skill）
 
-> Step 3 细则。写新期 attune 读一遍 + 参考已有正稿（KNN scripts/e01-e11）。
+> **Step 3** · 把讲解层 + demo 转成 TTS 可读的 `script.json`（写新期 attune 读一遍 + 参考已有正稿 KNN scripts/e01-e11）
+
+## 何时用
+
+- 写新期 `plan.md` / `script.json`
+- TTS 文案被退回（字段约束 / 段长 / 数据不一致）
+- 概念引入顺序混乱（先讲什么后讲什么）
+- 需要 Agent 审稿
+
+## 索引（按需取读）
+
+| § | 内容 | 何时读 |
+|---|---|---|
+| 1 | 立场 | 起手定调 |
+| 2 | 双源拼接（讲解层 + demo）| 信息源整合 |
+| 3 | 概念引入硬规则 | 排列顺序 |
+| 4 | CTA 三段结构 | 结尾 |
+| 5 | 跨期衔接钩 | 多期连续 |
+| 6 | 数据一致性 | 跨章节数字 |
+| 7 | TTS 字段约束（text）| 写 text 字段 |
+| 8 | 段长 | 控制时长 |
+| 9 | plan.md 模板 | 文件骨架 |
+| 10 | script.json schema | 字段 schema |
+| 11 | demo 段 notes 模板 | 写 demo segment |
+| 12 | 写新期 8 步动作 | 流程速查 |
+| 13 | 失败模式（已踩过的坑）| 遇到问题 |
+| 14 | Agent 审稿三视角 | 自动审稿 |
+
+> 讲解层写作 → [`_1-explanation-guide.md`](./_1-explanation-guide.md)；TTS 之后录屏 → [`_6-recording-guide.md`](./_6-recording-guide.md)
+
+---
 
 ## 1. 立场
 

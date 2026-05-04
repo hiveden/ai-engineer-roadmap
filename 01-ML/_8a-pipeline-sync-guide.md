@@ -21,7 +21,7 @@
 | 6 | 失败模式 | 遇到问题 |
 | 7 | 推送之后（下游会做什么）| 想了解管线全貌 |
 
-> 上游录屏 → [`_4-recording-guide.md`](./_4-recording-guide.md)；下游发布 → [`_6-publish-guide.md`](./_6-publish-guide.md)
+> 上游录屏 → [`_6-recording-guide.md`](./_6-recording-guide.md)；下游发布 → [`_8b-publish-guide.md`](./_8b-publish-guide.md)
 
 ---
 
@@ -145,7 +145,7 @@ for sid, info in m['shots'].items():
 "
 ```
 
-时长偏差 < 50 ms 即合格（与 `_4-recording-guide.md` §4 标准一致）。
+时长偏差 < 50 ms 即合格（与 `_6-recording-guide.md` §4 标准一致）。
 
 ## 6. 失败模式
 
@@ -155,7 +155,7 @@ for sid, info in m['shots'].items():
 | 下游读到半截 mp4 | 必须 `.tmp + mv` 原子写；脚本已实现，禁直接 cp 到目标 |
 | 下游收到旧 `.ready` 但 mp4 还在拷 | 脚本开头先 `rm -f .ready`，禁省略 |
 | pipeline 目录不存在 | 脚本会 `mkdir -p`；但 ml01-ml12 通常已被 tts 创建过 |
-| manifest.json 时长与 wav 不对 | 录屏脚本里 T_END 写错——回 `_4-recording-guide.md` 复盘，不是 sync 的问题 |
+| manifest.json 时长与 wav 不对 | 录屏脚本里 T_END 写错——回 `_6-recording-guide.md` 复盘，不是 sync 的问题 |
 | `--all` 跳过某期 | 该期 `recording/` 无 mp4，正常 SKIP |
 | 推完 astral 端 scaffold 报 series 不识别 | 待 astral-video 扩 SUPPORTED_SERIES 白名单加 `ml`（HANDSHAKE C.4 流程） |
 

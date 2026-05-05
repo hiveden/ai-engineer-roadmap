@@ -19,12 +19,41 @@
 - 掌握常用的回归评估方法
 - 了解不同评估方法的特点
 
-#### Slide 83 · MAE / MSE / RMSE 三种
+#### Slide 83 · 线性回归模型评估 – MAE / MSE / RMSE 三种
 
-- 我们希望衡量预测值和真实值之间的差距，会用到 MAE、MSE、RMSE 多种测评函数进行评价
-- **平均绝对误差** Mean Absolute Error (MAE)
-- **均方误差** Mean Squared Error (MSE)
-- **均方根误差** Root Mean Squared Error (RMSE)
+**为什么要进行线性回归模型的评估**：我们希望衡量预测值和真实值之间的差距，会用到 MAE、MSE、RMSE 多种测评函数进行评价。
+
+**1) 平均绝对误差** Mean Absolute Error (MAE)
+
+$$\text{MAE} = \frac{1}{n} \sum_{i=1}^{n} \lvert y_i - \hat{y}_i \rvert$$
+
+- n 为样本数量, y 为实际值, ŷ 为预测值
+- MAE 越小模型预测越准确
+
+```python
+from sklearn.metrics import mean_absolute_error
+mean_absolute_error(y_test, y_predict)
+```
+
+**2) 均方误差** Mean Squared Error (MSE)
+
+$$\text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$$
+
+- n 为样本数量, y 为实际值, ŷ 为预测值
+- MSE 越小模型预测越准确
+
+```python
+from sklearn.metrics import mean_squared_error
+mean_squared_error(y_test, y_predict)
+```
+
+**3) 均方根误差** Root Mean Squared Error (RMSE)
+
+$$\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2} = \sqrt{\text{MSE}}$$
+
+- n 为样本数量, y 为实际值, ŷ 为预测值
+- RMSE 越小模型预测越准确
+- **RMSE 是 MSE 的平方根，某些情况下比 MSE 更有用**
 
 > **RMSE 不适合当 loss 函数 —— 求导难！**
 
@@ -45,6 +74,7 @@
 - 对比第一张图，数据点弥散度变大，**所有指标都变大了**
 - **RMSE 几乎达到 MAE 值的两倍**——RMSE 对异常点更为敏感
 - **MSE 对异常点特别敏感**，几乎爆炸（正常数据和异常数据的误差共同决定了该误差，但**异常数据的贡献占了大头**！！！）
+- 对误差的平方级**乘法**（PPT 原文 typo，应为"惩罚"——同 slide 85 表述）
 
 #### Slide 87 · 异常点存在时为何推荐 MAE
 

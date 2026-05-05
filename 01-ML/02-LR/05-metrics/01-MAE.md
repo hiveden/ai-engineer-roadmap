@@ -1,20 +1,56 @@
+---
+tags: [回归/评估, 评估/MAE]
+---
+
 # 平均绝对误差 MAE
 
-> 级别：【知道】
 > 维度：概念
-> 章节底稿见 [`README.md`](./README.md)（PPT slide 83-85）
+> 知识点级别：【知道】MAE = 误差绝对值的平均；单位与 y 一致，最容易解释；对离群点不敏感
+> 章节底稿全文见 [`README.md`](./README.md)（PPT slide 83 MAE 段, 87）
 
-## 公式
+## ━━━━━━━━ 底稿 ━━━━━━━━
+
+### PPT
+
+> Slide 83 · 线性回归模型评估（MAE 部分）
+
+**为什么要进行线性回归模型的评估**：我们希望衡量预测值和真实值之间的差距，会用到 MAE、MSE、RMSE 多种测评函数进行评价。
+
+**平均绝对误差** Mean Absolute Error (MAE)
 
 $$\text{MAE} = \frac{1}{n} \sum_{i=1}^{n} \lvert y_i - \hat{y}_i \rvert$$
 
-n 为样本数量，$y_i$ 为真实值，$\hat{y}_i$ 为预测值。
+- n 为样本数量, y 为实际值, ŷ 为预测值
+- MAE 越小模型预测越准确
 
-**Mean Absolute Error**：把每个样本的「预测差距」取绝对值，求平均。
+```python
+from sklearn.metrics import mean_absolute_error
+mean_absolute_error(y_test, y_predict)
+```
+
+> Slide 87 · 异常点存在时为何推荐 MAE
+
+当数据存在大量异常点，相较于 MAE，使用 **MSE 损失函数**异常点对 loss 值的贡献过大。
+
+在梯度下降的优化过程中，为了让 loss 降得更低（即避免异常值产生很大的 loss），训练结束后即使 MSE loss 降到最低，**模型的拟合会偏向异常值**，从而降低对正常数据分布的拟合精度。
+
+此时推荐 **MAE**，模型失真不严重。
+
+> **补充说明**：作为 loss 函数，MAE 和 MSE 对模型优化的差异显著。
+
+### 笔记
+
+> 【知道】平均绝对误差
+
+- n 为样本数量，y 为实际值，$\hat{y}$ 为预测值
+- MAE 越小模型预测约准确
+- 单位 = 目标变量单位（房价是元，体重是 kg），**最容易解释**
 
 ---
 
-## 直觉
+## ━━━━━━━━ 讲解 ━━━━━━━━
+
+### 直觉
 
 一句话：**平均每次预测差多少** —— 字面意义上的平均误差。
 
@@ -22,7 +58,7 @@ n 为样本数量，$y_i$ 为真实值，$\hat{y}_i$ 为预测值。
 
 MSE 单位是「元²」，没法解释；RMSE 单位虽然回到「元」但是「均方根」，业务方听不懂。**MAE 是唯一一个能直接念给老板的指标**。
 
-## 对离群点不敏感（线性增长）
+### 对离群点不敏感（线性增长）
 
 误差对 MAE 的贡献是**线性的**：
 
@@ -38,18 +74,7 @@ MSE 单位是「元²」，没法解释；RMSE 单位虽然回到「元」但是
 
 → **结论**：异常点存在时，MAE 比 MSE / RMSE 更稳健（robust）。
 
-## sklearn API
-
-```python
-from sklearn.metrics import mean_absolute_error
-
-mae = mean_absolute_error(y_test, y_predict)
-# 参数顺序：先真实值，后预测值
-```
-
-返回标量 float，**越小越好**。
-
-## 何时用 MAE
+### 何时用 MAE
 
 | 场景 | 用 MAE 的理由 |
 |---|---|
@@ -58,18 +83,12 @@ mae = mean_absolute_error(y_test, y_predict)
 | 评估**鲁棒回归**模型（Huber / Quantile）| 这类模型本就是为离群点设计的 |
 | 误差分布**长尾**（金融损失、保险理赔）| 长尾下 MSE 会被尾部主导 |
 
-## 何时**不要**用 MAE
+### 何时**不要**用 MAE
 
 - **作为 loss 函数训练 LR**：MAE 在 0 点不可导（绝对值的尖角），梯度下降不稳定。LR 训练用 MSE，见 [`03b-math/01-损失函数.md`](../03b-math/01-损失函数.md)。
 - **想惩罚大误差**：MAE 对大误差和小误差一视同仁，如果业务上「差 100 万比差两次 50 万更糟」，必须用 RMSE。
 
-## 与 MSE / RMSE 的对比
-
-完整对比见 [`04-三种指标比较.md`](./04-三种指标比较.md)。一句话先记住：
-
-> **MAE 老实，MSE 放大，RMSE 是 MSE 开根号回到正常单位**。
-
-## 数值小例
+### 数值小例
 
 预测误差为 [1, 3]：
 
@@ -79,10 +98,21 @@ $$\text{MAE} = \frac{1 + 3}{2} = 2$$
 
 $$\text{MAE} = \frac{1 + 3 + 100}{3} \approx 34.7$$
 
-变化倍数 = 34.7 / 2 ≈ **17 倍**。下一节看 MSE 同样情境会变多少倍。
+变化倍数 = 34.7 / 2 ≈ **17 倍**。下一节看 MSE 同样情境会变 667 倍。
 
-## 衔接
+### 与 MSE / RMSE 的对比
+
+完整对比见 [`04-三种指标比较.md`](./04-三种指标比较.md)。一句话先记住：
+
+> **MAE 老实，MSE 放大，RMSE 是 MSE 开根号回到正常单位**。
+
+### 衔接
 
 - 跑 demo 看离群点对三种指标的影响差异：[`demos/metric-vs-outlier.py`](./demos/metric-vs-outlier.py)
 - 训练为何选 MSE 而非 MAE：[`03b-math/01-损失函数.md`](../03b-math/01-损失函数.md)
 - 实战中怎么报告 MAE：[`06-boston/`](../06-boston/) 加州房价案例
+
+> Sources：
+> - PPT Slide 83 (MAE 段), 87
+> - 笔记（README §05 平均绝对误差）
+> - sklearn 文档 `sklearn.metrics.mean_absolute_error`

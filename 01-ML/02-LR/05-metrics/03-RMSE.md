@@ -1,18 +1,46 @@
+---
+tags: [回归/评估, 评估/RMSE]
+---
+
 # 均方根误差 RMSE
 
-> 级别：【知道】
 > 维度：概念
-> 章节底稿见 [`README.md`](./README.md)（PPT slide 83-88）
+> 知识点级别：【知道】RMSE = √MSE，单位回到 y；工业默认报告指标；不能当 loss（求导难）
+> 章节底稿全文见 [`README.md`](./README.md)（PPT slide 83 RMSE 段, 84）
 
-## 公式
+## ━━━━━━━━ 底稿 ━━━━━━━━
+
+### PPT
+
+> Slide 83 · 线性回归模型评估（RMSE 部分）
+
+**均方根误差** Root Mean Squared Error (RMSE)
 
 $$\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2} = \sqrt{\text{MSE}}$$
 
-**Root Mean Squared Error**：MSE 开个根号。
+- n 为样本数量, y 为实际值, ŷ 为预测值
+- RMSE 越小模型预测越准确
+- **RMSE 是 MSE 的平方根，某些情况下比 MSE 更有用**
+
+> **RMSE 不适合当 loss 函数 —— 求导难！**
+
+> Slide 84 · 评估函数 vs loss 函数
+
+一些函数被被拿来用作模型评估函数，也同时可以被当做 loss 函数。
+
+### 笔记
+
+> 【知道】均方根误差
+
+- n 为样本数量，y 为实际值，$\hat{y}$ 为预测值
+- RMSE 越小模型预测约准确
+- **单位回到目标变量本身**（解决了 MSE 平方单位的问题），同时保留 MSE 对大误差敏感的特性
 
 ---
 
-## 直觉
+## ━━━━━━━━ 讲解 ━━━━━━━━
+
+### 直觉
 
 一句话：**RMSE = MSE 但单位回到 y** —— 报告评估指标时的工业默认。
 
@@ -26,7 +54,7 @@ MSE 有个硬伤：单位是 y²，没法解释。开根号一切恢复正常：
 
 注意 **RMSE 通常比 MAE 略大**：因为平方再开根号会「放大」误差分布的离散度。两者相等只在所有误差都相同时成立。
 
-## 解决了 MSE 单位问题，保留对大误差敏感
+### 解决了 MSE 单位问题，保留对大误差敏感
 
 开根号是**单调函数**，不改变排序：
 
@@ -35,7 +63,7 @@ MSE 有个硬伤：单位是 y²，没法解释。开根号一切恢复正常：
 
 → **RMSE = MSE 的可解释版本**，二者的「敏感性结论」完全一致。
 
-## RMSE 不能当 loss 函数
+### RMSE 不能当 loss 函数
 
 PPT 强调过：**RMSE 不适合当 loss —— 求导难**。
 
@@ -47,9 +75,9 @@ $$\frac{\partial \text{RMSE}}{\partial w} = \frac{1}{2\sqrt{\text{MSE}}} \cdot \
 
 > 训练用 MSE，报告用 RMSE —— 一对黄金搭档。
 
-## sklearn API（注意版本）
+### sklearn API（注意版本）
 
-### sklearn 1.5+（2024 起的现代写法）
+#### sklearn 1.5+（2024 起的现代写法）
 
 ```python
 from sklearn.metrics import root_mean_squared_error
@@ -57,7 +85,7 @@ from sklearn.metrics import root_mean_squared_error
 rmse = root_mean_squared_error(y_test, y_predict)
 ```
 
-### sklearn 1.4 及以前（旧写法，**已废弃**）
+#### sklearn 1.4 及以前（旧写法，**已废弃**）
 
 ```python
 from sklearn.metrics import mean_squared_error
@@ -72,7 +100,7 @@ rmse = np.sqrt(mean_squared_error(y_test, y_predict))
 
 → **生产代码用新 API `root_mean_squared_error`**，老代码看到 `squared=False` 知道在做什么即可。
 
-## 数值小例
+### 数值小例
 
 误差 [1, 3]：
 
@@ -92,7 +120,7 @@ $$\text{RMSE} = \sqrt{\frac{1 + 9 + 10000}{3}} \approx 57.76$$
 
 → RMSE 的离群点敏感度**介于 MAE 和 MSE 之间，但单位还是 y**，所以是工业上的默认报告指标。
 
-## 报告评估的首选
+### 报告评估的首选
 
 业内默认结论：
 
@@ -102,8 +130,13 @@ $$\text{RMSE} = \sqrt{\frac{1 + 9 + 10000}{3}} \approx 57.76$$
 - 异常点多 → 改 MAE
 - 分类问题 → 改 Accuracy / F1 / AUC（见 [`../../03-LogReg/`](../../03-LogReg/)）
 
-## 衔接
+### 衔接
 
 - 三个指标的全方位对比 → [`04-三种指标比较.md`](./04-三种指标比较.md)
 - RMSE 在加州房价案例的实际数值 → [`06-boston/`](../06-boston/)
 - 跑 demo 看不同 outlier 比例下 RMSE 的变化 → [`demos/metric-vs-outlier.py`](./demos/metric-vs-outlier.py)
+
+> Sources：
+> - PPT Slide 83 (RMSE 段), 84
+> - 笔记（README §05 均方根误差）
+> - sklearn 文档 `sklearn.metrics.root_mean_squared_error`（1.5+）

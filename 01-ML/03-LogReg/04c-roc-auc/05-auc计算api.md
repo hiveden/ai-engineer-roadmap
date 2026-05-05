@@ -51,11 +51,20 @@ sklearn.metrics.roc_auc_score(
 
 ## ━━━━━━━━ 讲解 ━━━━━━━━
 
+### 生活锚 · 电子血压计
+
+家里老人量血压，没人还在用水银柱听诊器：
+
+- **手动版**：袖带充气、放气、听科氏音、看刻度——每一步都可能错，自己量给自己听根本听不准
+- **电子版**：袖带绑好、按一下"开始"——30 秒后屏幕直接跳出"高压 128 / 低压 82 / 心率 76"，连判读都帮你做完
+
+测的还是同一根血管，原理没变，但调用方式从"5 步手动操作"压成"按一个按钮读一个数"。出错的可能性也从"5 处都可能错"压成"袖带没绑紧"这一处。本节的 AUC 计算 API 就是这种"按一下出数"的工具——03 节那条手算 7 个点连线再求面积的流程，被压成一行函数调用。
+
 ### 业务问题
 
 03 节算 AUC 是手算面积，工程不会真的去积分。`roc_auc_score` 一行算完，配套 `roc_curve` 还能拿到画图所需的所有点。两者搭配是评估二分类的标配。
 
-### API 解读
+### 【代码】API 解读
 
 ```python
 from sklearn.metrics import roc_auc_score, roc_curve
@@ -75,7 +84,7 @@ fpr, tpr, thresholds = roc_curve(y_true, y_score)
 - `fpr`、`tpr`：可直接 `plt.plot(fpr, tpr)` 画图
 - `thresholds`：与 (fpr, tpr) 一一对应的阈值，长度比样本多 1（首位是哨兵阈值 `np.inf`，对应 (0, 0) 点）
 
-### 反例：传 0/1 标签的退化
+### 【代码】反例：传 0/1 标签的退化
 
 最高频的坑——把 `predict` 的 0/1 标签当 `y_score` 传：
 
@@ -103,7 +112,7 @@ roc_auc_score(y_te, y_score)
 | 全是同一类 | `ValueError: Only one class present` | 检查数据划分，确保 train/test 都包含正负 |
 | 多分类直接调用 | 报错 | 加 `multi_class='ovr'` 或 `'ovo'` 参数 |
 
-### 多分类
+### 【代码】多分类
 
 `roc_auc_score` 在 sklearn ≥ 0.22 起支持多分类，需指定策略：
 
@@ -116,7 +125,7 @@ roc_auc_score(y_true, y_score_matrix, multi_class='ovr', average='macro')
 
 数学细节不在本章范围。
 
-### 完整可运行 demo
+### 【代码】完整可运行 demo
 
 ```python
 from sklearn.datasets import make_classification

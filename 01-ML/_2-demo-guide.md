@@ -2,6 +2,31 @@
 
 > **Step 1** · marimo demo 设计 + grid 布局 + 视频录屏友好
 
+---
+
+## 🚨 必读 · ML 章节所有 demo = 录屏 demo
+
+**ML 教程的所有 demo 都进 B 站视频管线**（KNN / LR / LogReg / DT / KMeans / NB 全部 12 期视频章）。**没有"非录屏 demo"选项**——除非整章不出视频（极少）。
+
+**开工前必先读 [`_5-layout-guide.md`](./_5-layout-guide.md)**，特别 §10 顶部"🚨 强制流程"段：
+
+1. **抄骨架**：参考已改造好的 demo（如 `02-LR/01-intro/demos/k-to-w-migration.py` + `custom.css` + `layouts/*.grid.json`），不要重新发明
+2. **打印 §10 11 项 closing gate** 到工作记忆顶
+3. **每改一处 grid.json / chart properties / label** → playwright 截图自检
+4. **不让 user 当 QA**——交付前自己确保 11 项全 ✓
+
+**典型违规模式（avoid）**：
+- shot dropdown / narration / 提示卡 塞进录屏区（违反 _5 §3）
+- sidebar 5+ col 因为"中文 dropdown 选项长"（违反 _5 §4，应改选项不改 sidebar）
+- label 带中文括号 "切分特征（X1 还是 X2）"（违反 _5 §4 极简 label）
+- css_file 用 `marimo.css`（旧）而非 `custom.css`（_5 标准）
+
+**本指南（`_2`）的 §0-§9 是 demo 设计层面的基础知识**（5 原则 / cell 拆分 / mo.md 陷阱 / grid 配置基础），适用于所有 demo；**录屏专属规则全在 `_5`**（录屏分辨率 / Strategy A vs B / sidebar 极简 / 字体覆盖 / 失败模式表 / 11 项 closing gate）。
+
+> **不要只看本文写完 demo 就交付**——必须用 `_5 §10` 的 closing gate 做最终检查。
+
+---
+
 ## 何时用
 
 - 写新 marimo demo（控件 + chart + 数据卡）

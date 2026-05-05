@@ -40,6 +40,17 @@ Alex（转型 AI Agent 工程师 / 多 Agent 架构）。
 
 ---
 
+## Demo 验收
+
+Demo（marimo / 任何视觉产物）做完**必须**走验收：
+1. 自检跑通：`marimo run` + Playwright 截图（默认 + ≥1 极端态）
+2. 截图给用户审视觉 → 等明确反馈
+3. 用户没说"过"之前**不批量推进**下一个 demo（即使方案已敲定）
+
+不要做完一个直接开下一个。
+
+---
+
 ## numpy / pandas
 
 不单独学（SQL / Lodash 直觉覆盖 80% API）。遇到时就地讲解（1-3 句）+ 标注坑点（`SettingWithCopyWarning` / `dtype=object` / 链式索引 / 向量化 vs 循环）。**不做**：暂停主线去过章节、出专题练习。

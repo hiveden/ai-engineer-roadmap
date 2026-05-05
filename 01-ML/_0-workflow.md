@@ -25,7 +25,7 @@
 |---|---|---|---|
 | 0 底稿装载 | [`_0a-source-guide.md`](./_0a-source-guide.md) | 独立 guide | 起手新章节 / 底稿丢数据 / 拆子文件 |
 | 1a 讲解段 | [`_1-explanation-guide.md`](./_1-explanation-guide.md) | 独立 guide | 写讲解段 |
-| 1b demo 制作 | [`_2-demo-guide.md`](./_2-demo-guide.md) + [`_marimo-guide.md`](./_marimo-guide.md) + [`_marimo-math-guide.md`](./_marimo-math-guide.md) | 独立 guide | 写 marimo demo |
+| 1b demo 制作 | [`_2-demo-guide.md`](./_2-demo-guide.md) + [`_5-layout-guide.md`](./_5-layout-guide.md)（**录屏类必读**）+ [`_marimo-guide.md`](./_marimo-guide.md) + [`_marimo-math-guide.md`](./_marimo-math-guide.md) | 独立 guide | 写 marimo demo（**ML 章 demo 全是录屏类，开工前必看 _5**） |
 | 2 拆分 | — | 散 _0 §2（5 条依据）| 拆期 |
 | 3 写脚本 | [`_3-script-guide.md`](./_3-script-guide.md) | 独立 guide | 写 plan.md / script.json |
 | 3.5 实测复核 | — | 散 _0 §3.5（待抽出 _3.5-fact-check-guide.md）| TTS 前最后一关 |

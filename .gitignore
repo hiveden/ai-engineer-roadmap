@@ -56,3 +56,6 @@ yarn-error.log*
 *.pth
 *.h5
 *.bin
+
+# === PPT 源文件（章资源不入 git；已 tracked 的 02-LR/03线性回归.pptx 不受此影响）===
+*.pptx

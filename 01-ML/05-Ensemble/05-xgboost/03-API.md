@@ -61,15 +61,35 @@ bst.fit(X_train, y_train)
 
 ## ━━━━━━━━ 讲解 ━━━━━━━━
 
-### 安装：与 sklearn 解耦
+### 生活锚 · 给医生组配上调度面板
 
-XGBoost 是独立开源库，**不打包在 sklearn 里**（GBDT 打包在 sklearn，XGBoost 独立发布）：
+接 [`./02-目标函数.md`](./02-目标函数.md) 推导出的 $\gamma$、$\lambda$、学习率 learning rate——这些公式里的旋钮，落到代码就是 `XGBClassifier(...)` 构造函数的参数。
+
+类比：医院给每位接力医生发了张**调度面板**，几个核心旋钮：
+
+- **开多少棒**（n_estimators）：医生数量上限，配合「连续若干棒没改善就收工」的早停 early stopping 自动决定
+- **每棒说话音量**（learning_rate）：每棒处方按比例缩水，避免某一棒过激；越小越稳但要更多棒
+- **每棒看多深**（max_depth）：每棵树最多分几层
+- **开重药扣分**（reg_lambda / gamma）：对应推导里的 $\lambda$、$\gamma$
+- **抽签机制**（subsample / colsample_bytree）：每棒只看部分病例 / 部分指标，加多样性也提速
+
+本节把这些旋钮和工程接口（sklearn vs 原生、早停、GPU）讲清楚。
+
+### 业务问题：sklearn 里没有 XGBoost，得自己装
+
+工程师上手时第一坑：`from sklearn.ensemble import XGBClassifier` 报错。原因：XGBoost 是 2014 年陈天奇团队独立开源的库，**和 sklearn 是两个项目**——sklearn 自带的是 `GradientBoostingClassifier`（GBDT），XGBoost 必须 `pip install` 单独装。
+
+装好后还有第二个抉择：**两套 API 选哪个**。原生 API（`xgb.train` + DMatrix）性能更好但不进 sklearn 生态；sklearn 兼容 API（`XGBClassifier` / `XGBRegressor`）能直接插 Pipeline / GridSearchCV，但参数名有些和原生不同（`learning_rate` vs `eta`、`reg_lambda` vs `lambda`）。
+
+本节默认用 sklearn 兼容 API——日常 90% 场景够用，需要榨性能再换原生。
+
+### 【代码】安装与两套 API 选型
+
+XGBoost 是独立开源库，**不打包在 sklearn 里**：
 
 ```bash
 pip install xgboost
 ```
-
-安装后有两套 API，选哪个：
 
 ```
 两套 API
@@ -85,9 +105,9 @@ sklearn 兼容 API（XGBClassifier / XGBRegressor）
   适合：快速实验、和 sklearn 生态配合
 ```
 
-本讲解用 sklearn 兼容 API。
+下面的讲解默认 sklearn 兼容 API。
 
-### XGBClassifier 关键参数
+### 【代码】XGBClassifier 关键参数
 
 ```python
 from xgboost import XGBClassifier
@@ -138,7 +158,7 @@ estimator = XGBClassifier(
 | `subsample` | 行采样比例 | 0.6-0.9（降过拟合 + 提速） |
 | `colsample_bytree` | 列采样比例 | 0.6-0.9（类似随机森林效果） |
 
-### sklearn 兼容接口
+### 【代码】sklearn 兼容接口
 
 fit / predict / score 和 sklearn 一致，可以直接插 Pipeline：
 
@@ -155,7 +175,7 @@ pipe.fit(X_train, y_train)
 print(pipe.score(X_test, y_test))
 ```
 
-### 早停机制
+### 【代码】早停机制
 
 `early_stopping_rounds` 是 XGBoost 原生功能，**比死设 `n_estimators` 聪明**：
 
@@ -188,7 +208,7 @@ print(f"最优树数量: {estimator.best_iteration}")
 
 **工程建议**：学习率调小（0.01-0.05）+ 大 `n_estimators` + 早停，是调 XGBoost 的标准姿势。
 
-### DMatrix vs sklearn 接口选型
+### 【代码】DMatrix vs sklearn 接口选型
 
 ```
 场景                            推荐接口
@@ -226,7 +246,7 @@ model = xgb.train(
 )
 ```
 
-### GPU 加速
+### 【代码】GPU 加速
 
 有 NVIDIA GPU + 安装了 CUDA 版 XGBoost 时：
 
@@ -238,11 +258,11 @@ estimator = XGBClassifier(
 )
 ```
 
-提速幅度：CPU 单核 vs GPU，数据量 > 10 万时通常 5-20x。没 GPU 时 `tree_method='hist'`（CPU 直方图，仍比默认快）。
+提速幅度：CPU 单核 vs GPU，数据量 > 10 万时通常 5-20x（**虚构示意**，具体看 GPU 型号 / 数据形态）。没 GPU 时 `tree_method='hist'`（CPU 直方图，仍比默认快）。
 
-### 一句话钉板
+**这一节的关键启示**：**调 XGBoost 三件套：树深 + 正则 + 早停，不死设 n_estimators**。
 
-**XGBClassifier 是 sklearn 兼容的薄壳，核心参数三类：树结构（`max_depth`）、正则（`gamma / reg_lambda`）、采样（`subsample / colsample_bytree`）；加上早停（`early_stopping_rounds`），就是工业级调参的标准姿势。**
+→ 下一步：[`./04-红酒预测.md`](./04-红酒预测.md) —— 完整 pipeline 跑一遍多分类 + 不均衡 + GridSearch
 
 > Sources：
 > - PPT Slide 82；Slide 88（小结 API 段）；笔记 API 段

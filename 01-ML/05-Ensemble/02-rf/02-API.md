@@ -56,7 +56,22 @@ clf = RandomForestClassifier(
 
 ## ━━━━━━━━ 讲解 ━━━━━━━━
 
-### 参数地图：1 个规模 + 1 个开关 + N 把刹车 + 1 个种子
+### 直觉
+
+**业务痛点**：[`01-算法思想.md`](./01-算法思想.md) 把"两层随机"讲清楚了 —— 但工程上落地时面对的是 **15+ 个参数**的 `RandomForestClassifier`，不知道哪个该动、哪个保持默认、哪个有版本坑。
+
+**生活锚（接 5 位医生的类比）**：参数就是医院给会诊小组定的**操作手册**：
+
+| 旋钮 | 翻译 |
+|---|---|
+| `n_estimators` | 请几位医生（5 位 / 100 位 / 500 位）|
+| `max_features` | 每位医生每道题最多看几个指标 |
+| `bootstrap` | 病例库是抽样发还是全量发 |
+| `max_depth` / `min_samples_*` | 单个医生最多能多细致地分析（防钻牛角尖）|
+
+一句话：**API 把两层随机翻译成 3 个森林旋钮 + 沿用决策树的刹车**。
+
+### 【代码】参数地图：1 个规模 + 1 个开关 + N 把刹车 + 1 个种子
 
 ```
                 ┌────────────────────────────────┐
@@ -80,7 +95,7 @@ clf = RandomForestClassifier(
 
 ---
 
-### 关键参数表
+### 【代码】关键参数表
 
 | 参数 | 默认值 | 作用 | 调参直觉 |
 |---|---|---|---|
@@ -95,7 +110,7 @@ clf = RandomForestClassifier(
 
 ---
 
-### `n_estimators`：多少棵树才够
+### 【代码】`n_estimators`：多少棵树才够
 
 N 棵树投票的误差随 N 递减，但**边际收益会饱和**：
 
@@ -120,7 +135,7 @@ N > 200 → 收益递减，主要影响训练时间
 
 ---
 
-### `max_features`：最重要的刹车
+### 【代码】`max_features`：最重要的刹车
 
 这是 RF 独有的参数，决定"树间相关性"：
 
@@ -138,7 +153,7 @@ max_features 效果对比：
 
 ---
 
-### `bootstrap=True`：为什么几乎不改
+### 【代码】`bootstrap=True`：为什么几乎不改
 
 关闭 Bootstrap（`bootstrap=False`）意味着：
 - 每棵树用**完整**训练集（无放回）
@@ -155,7 +170,7 @@ print(clf.oob_score_)   # 不切 validation set 也能知道泛化误差
 
 ---
 
-### 调参优先级
+### 【代码】调参优先级
 
 ```
 第1优先：n_estimators  →  直接拉到计算允许的最大值（100-200 通常足够）
@@ -178,7 +193,7 @@ RandomForestClassifier(
 
 ---
 
-### 与 DecisionTreeClassifier 参数复用提示
+### 【代码】与 DecisionTreeClassifier 参数复用提示
 
 RF 的 `criterion / max_depth / min_samples_split / min_samples_leaf / random_state` 含义与单棵 `DecisionTreeClassifier` 完全一致——详细调参直觉见 [`../../04-DecisionTree/05-titanic/02-API.md`](../../04-DecisionTree/05-titanic/02-API.md)（"1 开关 + 3 把刹车 + 1 个种子"部分）。
 
@@ -186,9 +201,26 @@ RF 的 `criterion / max_depth / min_samples_split / min_samples_leaf / random_st
 
 ---
 
-### 一句话钉板
+### 不在本章范围
 
-**RF 参数 = 单棵决策树参数（刹车/准则/种子）+ 森林专属三件套（`n_estimators` 树的棵数、`max_features` 每节点候选特征数、`bootstrap` 是否自助采样）。调参顺序：先把 `n_estimators` 拉大，再动 `max_features`，最后才考虑 `max_depth`。**
+- **GridSearchCV 实战调参** → [`03-泰坦尼克实践.md`](./03-泰坦尼克实践.md)
+- **决策树自身参数详解**（`criterion / max_depth / min_samples_*`）→ [`../../04-DecisionTree/05-titanic/02-API.md`](../../04-DecisionTree/05-titanic/02-API.md)
+
+### 术语版
+
+| 故事里的元素 | 术语名 | 主场 |
+|---|---|---|
+| 请几位医生 | `n_estimators` 树的棵数 | 本节 |
+| 每位医生每题看几个指标 | `max_features` 每节点候选特征数 | 本节 |
+| 病例库抽样 vs 全量 | `bootstrap` 是否自助采样 | 本节 |
+| 没被抽到的样本天然当验证集 | OOB / 袋外样本 out-of-bag（`oob_score`）| 本节 |
+| 单棵树深度 / 叶子刹车 | `max_depth` / `min_samples_split` / `min_samples_leaf` | [`../../04-DecisionTree/05-titanic/02-API.md`](../../04-DecisionTree/05-titanic/02-API.md) |
+| 分裂准则 | `criterion`（gini / entropy）| [`../../04-DecisionTree/05-titanic/02-API.md`](../../04-DecisionTree/05-titanic/02-API.md) |
+| 随机种子 | `random_state` | — |
+
+**这一节的关键启示**：**先拉 `n_estimators`，再调 `max_features`，最后才动 `max_depth`**。
+
+→ 下一步：[`03-泰坦尼克实践.md`](./03-泰坦尼克实践.md) —— 这些旋钮在真实数据上怎么转
 
 > Sources：
 > - PPT Slide 20-21, 24

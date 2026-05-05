@@ -4,7 +4,7 @@
 >
 > **按知识点拆分的讲解版**：
 >
-> 1. [`01-是什么.md`](./01-是什么.md) — 【知道】集成学习是什么
+> 1. [`01-是什么.md`](01-集成学习是什么.md) — 【知道】集成学习是什么
 > 2. [`02-分类.md`](./02-分类.md) — 【了解】bagging vs boosting
 > 3. [`03-bagging.md`](./03-bagging.md) — 【理解】bagging 集成
 > 4. [`04-boosting.md`](./04-boosting.md) — 【理解】boosting 集成

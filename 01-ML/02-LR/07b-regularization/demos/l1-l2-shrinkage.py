@@ -1,12 +1,17 @@
 """
-L1 / L2 正则化 · 收缩与稀疏 · 10 次多项式过拟合数据
+L1 / L2 正则化 · 收缩与稀疏 · Strategy B 双槽（slot1=L1 / slot2=L2）
 
-A. 散点 + 三条拟合曲线（无正则 / L1 / L2）  → 业务对比
-B. 权重柱图（三组并排，L1 零柱「黄填黑边」标记）→ 主舞台 · 「砍 vs 压」
-C. λ-MSE U 形 · L1+L2 同框（toggle 高亮当前选择）→ 偏差-方差权衡
+教学核心：10 次多项式过拟合数据上看正则化怎么把系数拉回来。
+- L1 (Lasso)：菱形约束 → 砍特征（产生零系数）
+- L2 (Ridge)：圆形约束 → 压特征（等比收缩）
+
+镜头脚本（Strategy B · 始终左 L1 右 L2）：
+- A · 拟合曲线：slot1=L1 散点+拟合, slot2=L2 散点+拟合（看输出差异）
+- B · 权重对比（主舞台）：slot1=L1 权重柱(零柱黄标), slot2=L2 权重柱(压缩)
+- C · λ-MSE：slot1=L1 U 形, slot2=L2 U 形（看最优 λ 位置差异）
 
 数据：与 07a-overfit 共享（seed=666, N=100, split random_state=5），10 次多项式 + StandardScaler
-跑：marimo edit --port 2734 --headless --no-token l1-l2-shrinkage.py
+跑：cd 01-ML/02-LR/07b-regularization/demos && marimo run --port 2761 l1-l2-shrinkage.py
 """
 
 import marimo
@@ -15,6 +20,7 @@ __generated_with = "0.23.4"
 app = marimo.App(
     width="medium",
     layout_file="layouts/l1-l2-shrinkage.grid.json",
+    css_file="custom.css",
 )
 
 
@@ -25,7 +31,6 @@ def _():
     import numpy as np
     import pandas as pd
     import altair as alt
-    import matplotlib.pyplot as plt
 
     from sklearn.linear_model import LinearRegression, Lasso, Ridge
     from sklearn.preprocessing import PolynomialFeatures, StandardScaler
@@ -36,9 +41,6 @@ def _():
 
     warnings.filterwarnings("ignore", category=ConvergenceWarning)
     warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
-
-    plt.rcParams["font.sans-serif"] = ["PingFang SC", "Heiti SC", "Arial Unicode MS", "DejaVu Sans"]
-    plt.rcParams["axes.unicode_minus"] = False
     return (
         Lasso,
         LinearRegression,
@@ -55,82 +57,12 @@ def _():
     )
 
 
-@app.cell
-def _(mo):
+@app.cell(hide_code=True)
+def title(mo):
     mo.md(
-        r"""
-        # L1 / L2 正则化 · 收缩与稀疏
-
-        用与 07a 同款的「10 次多项式过拟合」数据，看正则化怎么把红色「疯狂振荡」拉回来。
-
-        $$
-        \mathcal{L}_{\text{L1}}(W) = \text{MSE}(W) + \lambda \sum_i |w_i| \quad\text{（Lasso · 砍特征）}
-        $$
-
-        $$
-        \mathcal{L}_{\text{L2}}(W) = \text{MSE}(W) + \lambda \sum_i w_i^2 \quad\text{（Ridge · 压特征）}
-        $$
-
-        - **A 图**：三条拟合曲线对比（红=无正则，橙=L1，绿=L2）
-        - **B 图（主舞台）**：权重柱图，L1「黄底黑边」零柱 = 被砍掉的特征
-        - **C 图**：λ-MSE U 形（L1+L2 同框对比甜蜜点）
-        """
-    )
+        r"### L1 / L2 正则化 · 砍特征 vs 压特征 · 拖 $\lambda$ 看系数收缩"
+    ).style(margin="0", padding="4px 12px", font_size="15px", line_height="1.3")
     return
-
-
-@app.cell
-def _(mo):
-    PRESETS = {
-        "「✋」手动 (滑块控制)": None,
-        "「0」无正则 · λ ≈ 1e-4": -4.0,
-        "「🌱」弱 · λ = 0.01": -2.0,    # review 建议：从 -3 调到 -2，跨度更明显
-        "「✓」适中 · λ = 0.1": -1.0,
-        "「💪」强 · λ = 10": 1.0,
-    }
-
-    preset = mo.ui.dropdown(
-        options=PRESETS,
-        value="「✓」适中 · λ = 0.1",
-        label="预设场景",
-    )
-    reg_type = mo.ui.radio(
-        options=["L1 (Lasso)", "L2 (Ridge)"],
-        value="L1 (Lasso)",
-        label="正则类型 (影响 C 图高亮 + A/B 视觉聚焦)",
-        inline=True,
-    )
-    log_lambda = mo.ui.slider(
-        start=-4.0, stop=2.0, step=0.05, value=-1.0,
-        label="正则强度 log₁₀(λ)",
-        show_value=True,
-    )
-    return PRESETS, log_lambda, preset, reg_type
-
-
-@app.cell
-def _(log_lambda, mo, preset, reg_type):
-    mo.vstack(
-        [
-            mo.hstack([preset, reg_type], justify="start", gap=2),
-            log_lambda,
-        ],
-        gap=1,
-    )
-    return
-
-
-@app.cell
-def _(log_lambda, preset):
-    # 派生量：preset 优先，否则用滑块
-    if preset.value is None:
-        cur_log_lambda = float(log_lambda.value)
-        is_preset = False
-    else:
-        cur_log_lambda = float(preset.value)
-        is_preset = True
-    cur_lambda = float(10.0 ** cur_log_lambda)
-    return cur_lambda, cur_log_lambda, is_preset
 
 
 @app.cell
@@ -146,6 +78,61 @@ def _(np, train_test_split):
         X_all, y_all, test_size=0.3, random_state=5
     )
     return X_test, X_train, x_all, y_all, y_test, y_train
+
+
+@app.cell
+def _(mo):
+    # ===== 控件定义（极简 label）=====
+    _S = dict(show_value=True, full_width=True)
+    log_lambda = mo.ui.slider(
+        -4.0, 2.0, step=0.1, value=-1.0, label="log₁₀λ", **_S
+    )
+    preset = mo.ui.dropdown(
+        options={
+            "✋ 手动": None,
+            "≈0 (-4)": -4.0,
+            "弱 (-2)": -2.0,
+            "中 (-1)": -1.0,
+            "强 (+1)": 1.0,
+        },
+        value="✋ 手动",
+        label="preset",
+    )
+    shot = mo.ui.dropdown(
+        options=["A · 拟合曲线", "B · 权重对比", "C · λ-MSE"],
+        value="B · 权重对比",
+        label="🎬 镜头",
+    )
+    return log_lambda, preset, shot
+
+
+@app.cell
+def controls(log_lambda, mo, preset):
+    # sidebar 控件组合（4col = 160px · 极致紧凑）
+    _h = lambda s: mo.md(s).style(
+        margin="0", padding="0", font_size="11px",
+        font_weight="700", color="#6b7280", letter_spacing="0.05em",
+    )
+    _div = mo.md("").style(
+        border_top="1px solid #e5e7eb", margin="4px 0", padding="0", height="1px",
+    )
+    mo.vstack(
+        [_h("正则强度"), preset, log_lambda, _div],
+        gap=0,
+        align="stretch",
+    )
+    return
+
+
+@app.cell
+def _(log_lambda, preset):
+    # 派生量：preset 优先，否则用滑块
+    if preset.value is not None:
+        cur_log_lambda = float(preset.value)
+    else:
+        cur_log_lambda = float(log_lambda.value)
+    cur_lambda = float(10.0 ** cur_log_lambda)
+    return cur_lambda, cur_log_lambda
 
 
 @app.cell
@@ -175,6 +162,7 @@ def _(
         pl1.fit(X_train, y_train)
         pl2.fit(X_train, y_train)
         return pn, pl1, pl2
+
     return (fit_three,)
 
 
@@ -185,27 +173,25 @@ def _(X_train, cur_lambda, fit_three, y_train):
 
 
 @app.cell
-def _(np, pipe_l1, pipe_l2, pipe_none):
-    w_none = np.asarray(pipe_none.named_steps["reg"].coef_).ravel()
-    w_l1 = np.asarray(pipe_l1.named_steps["reg"].coef_).ravel()
-    w_l2 = np.asarray(pipe_l2.named_steps["reg"].coef_).ravel()
-    ZERO_TOL = 1e-6
-    zero_count_l1 = int(np.sum(np.abs(w_l1) < ZERO_TOL))
-    zero_count_l2 = int(np.sum(np.abs(w_l2) < ZERO_TOL))
-    return ZERO_TOL, w_l1, w_l2, w_none, zero_count_l1
-
-
-@app.cell
 def _(
     X_test,
     X_train,
     mean_squared_error,
+    np,
     pipe_l1,
     pipe_l2,
     pipe_none,
     y_test,
     y_train,
 ):
+    # 提取权重 + 计算 metrics
+    w_none = np.asarray(pipe_none.named_steps["reg"].coef_).ravel()
+    w_l1 = np.asarray(pipe_l1.named_steps["reg"].coef_).ravel()
+    w_l2 = np.asarray(pipe_l2.named_steps["reg"].coef_).ravel()
+    ZERO_TOL = 1e-6
+    zero_count_l1 = int(np.sum(np.abs(w_l1) < ZERO_TOL))
+    zero_count_l2 = int(np.sum(np.abs(w_l2) < ZERO_TOL))
+
     def _mse_pair(pipe):
         tr = float(mean_squared_error(y_train, pipe.predict(X_train)))
         te = float(mean_squared_error(y_test, pipe.predict(X_test)))
@@ -214,12 +200,20 @@ def _(
     tr_n, te_n = _mse_pair(pipe_none)
     tr_l1, te_l1 = _mse_pair(pipe_l1)
     tr_l2, te_l2 = _mse_pair(pipe_l2)
-    metrics = {
-        "none": {"train": tr_n, "test": te_n, "gap": te_n - tr_n},
-        "L1":   {"train": tr_l1, "test": te_l1, "gap": te_l1 - tr_l1},
-        "L2":   {"train": tr_l2, "test": te_l2, "gap": te_l2 - tr_l2},
-    }
-    return (metrics,)
+    return (
+        ZERO_TOL,
+        te_l1,
+        te_l2,
+        te_n,
+        tr_l1,
+        tr_l2,
+        tr_n,
+        w_l1,
+        w_l2,
+        w_none,
+        zero_count_l1,
+        zero_count_l2,
+    )
 
 
 @app.cell
@@ -236,7 +230,7 @@ def _(X_test, X_train, fit_three, mean_squared_error, np, pd, y_test, y_train):
                     "log_lambda": float(np.log10(_lam)),
                     "type": _name,
                     "train_mse": float(mean_squared_error(y_train, _pipe.predict(X_train))),
-                    "test_mse":  float(mean_squared_error(y_test, _pipe.predict(X_test))),
+                    "test_mse": float(mean_squared_error(y_test, _pipe.predict(X_test))),
                 })
         return _rows
 
@@ -245,471 +239,382 @@ def _(X_test, X_train, fit_three, mean_squared_error, np, pd, y_test, y_train):
 
 
 @app.cell
-def _(
-    cur_lambda,
-    cur_log_lambda,
-    is_preset,
-    metrics,
-    mo,
-    preset,
-    reg_type,
-    zero_count_l1,
-):
-    # 模式徽章 · 必修 2：preset 锁定时附加「滑块已锁定」提示
-    if is_preset:
-        _badge_label = preset.value
-        _mode_html = (
-            f'<span style="background:#fef3c7;color:#92400e;padding:3px 10px;'
-            f'border-radius:4px;font-size:12px;font-weight:600;border:1px solid #f59e0b;">'
-            f'🟡 预设模式 · {_badge_label} · λ={cur_lambda:.4g}</span>'
-            f' <span style="color:#92400e;font-size:11px;margin-left:6px;">'
-            f'（手动滑块已锁定，选 ✋ 手动 解锁）</span>'
-        )
-    else:
-        _mode_html = (
-            f'<span style="background:#dbeafe;color:#1e40af;padding:3px 10px;'
-            f'border-radius:4px;font-size:12px;font-weight:600;border:1px solid #3b82f6;">'
-            f'🔵 手动模式 · log₁₀(λ)={cur_log_lambda:.2f} · λ={cur_lambda:.4g}</span>'
-        )
-
-    # 当前选择高亮
-    _sel = "L1" if reg_type.value.startswith("L1") else "L2"
-    _sel_html = (
-        f'<span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:4px;'
-        f'font-size:11px;margin-left:8px;">当前聚焦：{_sel}</span>'
-    )
-
-    def _gap_color(gap):
-        if gap < 0.15:
-            return "#10b981"
-        if gap < 0.40:
-            return "#f59e0b"
-        return "#ef4444"
-
-    def _gap_dot(gap):
-        return f'<span style="color:{_gap_color(gap)}; font-weight:700;">●</span>'
-
-    m_n, m_l1, m_l2 = metrics["none"], metrics["L1"], metrics["L2"]
-
-    mo.md(
-        f"""
-        <div style="font-family:ui-monospace,monospace; font-size:13px; line-height:1.7;">
-          <div>{_mode_html}{_sel_html}</div>
-          <div style="margin-top:6px;">
-            <span style="color:#dc2626;font-weight:700;">无正则</span> ·
-            train={m_n['train']:.3f}　test={m_n['test']:.3f}　gap={m_n['gap']:.3f} {_gap_dot(m_n['gap'])}
-            <span style="color:#9ca3af;">（过拟合基线）</span>
-          </div>
-          <div>
-            <span style="color:#f97316;font-weight:700;">L1 (Lasso)</span> ·
-            train={m_l1['train']:.3f}　test={m_l1['test']:.3f}　gap={m_l1['gap']:.3f} {_gap_dot(m_l1['gap'])}
-            　<b>zero_count = {zero_count_l1}/10</b>
-          </div>
-          <div>
-            <span style="color:#10b981;font-weight:700;">L2 (Ridge)</span> ·
-            train={m_l2['train']:.3f}　test={m_l2['test']:.3f}　gap={m_l2['gap']:.3f} {_gap_dot(m_l2['gap'])}
-          </div>
-        </div>
-        """
-    )
-    return
-
-
-@app.cell
-def _(
-    alt,
-    cur_lambda,
-    np,
-    pd,
-    pipe_l1,
-    pipe_l2,
-    pipe_none,
-    reg_type,
-    x_all,
-    y_all,
-):
-    # ========== A · 散点 + 三条拟合曲线 ==========
+def _(alt, cur_lambda, np, pd, pipe_l1, pipe_l2, pipe_none, x_all, y_all):
+    # ========== 拟合曲线图 · L1 / L2 各一张 ==========
     df_scatter = pd.DataFrame({"x": x_all, "y": y_all})
-
     xs = np.linspace(-3, 3, 200).reshape(-1, 1)
     yp_none = pipe_none.predict(xs).ravel()
     yp_l1 = pipe_l1.predict(xs).ravel()
     yp_l2 = pipe_l2.predict(xs).ravel()
-    y_true_curve = 0.5 * xs.ravel() ** 2 + xs.ravel() + 2
+    y_true = 0.5 * xs.ravel() ** 2 + xs.ravel() + 2
 
-    df_lines = pd.concat(
-        [
-            pd.DataFrame({"x": xs.ravel(), "y": yp_none, "model": "无正则"}),
-            pd.DataFrame({"x": xs.ravel(), "y": yp_l1,   "model": "L1 (Lasso)"}),
-            pd.DataFrame({"x": xs.ravel(), "y": yp_l2,   "model": "L2 (Ridge)"}),
-        ]
-    )
-    df_truth = pd.DataFrame({"x": xs.ravel(), "y": y_true_curve})
+    _x_dom = [-3.2, 3.2]
+    _y_dom = [-6, 12]
 
-    # 建议 3：toggle 联动 — 当前选中模型 100% 不透明，另一者降到 0.35
-    _sel = "L1 (Lasso)" if reg_type.value.startswith("L1") else "L2 (Ridge)"
-    df_lines["opacity"] = df_lines["model"].apply(
-        lambda m: 1.0 if (m == "无正则" or m == _sel) else 0.35
-    )
-    df_lines["sw"] = df_lines["model"].apply(
-        lambda m: 3.0 if m == _sel else (2.5 if m == "无正则" else 1.8)
-    )
+    def _make_fit_chart(yp_reg, model_name, color):
+        df_none_line = pd.DataFrame({"x": xs.ravel(), "y": yp_none})
+        df_reg_line = pd.DataFrame({"x": xs.ravel(), "y": yp_reg})
+        df_true_line = pd.DataFrame({"x": xs.ravel(), "y": y_true})
 
-    color_scale = alt.Scale(
-        domain=["无正则", "L1 (Lasso)", "L2 (Ridge)"],
-        range=["#ef4444", "#f97316", "#10b981"],
-    )
-
-    pts = (
-        alt.Chart(df_scatter)
-        .mark_circle(size=55, color="#1f77b4", opacity=0.55, stroke="white", strokeWidth=1)
-        .encode(
-            x=alt.X("x:Q", scale=alt.Scale(domain=[-3.2, 3.2]), title="x"),
-            y=alt.Y("y:Q", scale=alt.Scale(domain=[-6, 12]), title="y"),
+        pts = (
+            alt.Chart(df_scatter)
+            .mark_circle(size=40, color="#64748b", opacity=0.45)
+            .encode(
+                x=alt.X("x:Q", scale=alt.Scale(domain=_x_dom), title="x"),
+                y=alt.Y("y:Q", scale=alt.Scale(domain=_y_dom), title="y"),
+            )
         )
-    )
-    truth = (
-        alt.Chart(df_truth)
-        .mark_line(color="#6b7280", strokeDash=[4, 3], strokeWidth=1.5)
-        .encode(x="x:Q", y="y:Q")
-    )
-    lines = (
-        alt.Chart(df_lines)
-        .mark_line()
-        .encode(
-            x="x:Q",
-            y="y:Q",
-            color=alt.Color("model:N", scale=color_scale, legend=alt.Legend(title="拟合曲线")),
-            opacity=alt.Opacity("opacity:Q", legend=None, scale=alt.Scale(domain=[0, 1], range=[0, 1])),
-            size=alt.Size("sw:Q", legend=None, scale=alt.Scale(domain=[1, 3], range=[1.8, 3.0])),
+        truth = (
+            alt.Chart(df_true_line)
+            .mark_line(color="#6b7280", strokeDash=[4, 3], strokeWidth=1.5)
+            .encode(x="x:Q", y="y:Q")
         )
-    )
+        none_line = (
+            alt.Chart(df_none_line)
+            .mark_line(color="#ef4444", strokeWidth=1.8, opacity=0.4, strokeDash=[3, 2])
+            .encode(x="x:Q", y="y:Q")
+        )
+        reg_line = (
+            alt.Chart(df_reg_line)
+            .mark_line(color=color, strokeWidth=3)
+            .encode(x="x:Q", y="y:Q")
+        )
+        return (truth + pts + none_line + reg_line).properties(
+            width=460, height=340,
+            title=alt.TitleParams(
+                text=f"{model_name} · λ={cur_lambda:.4g}",
+                subtitle="灰虚=真实曲线 · 红淡=无正则 · 粗线=正则化后",
+                fontSize=12, subtitleFontSize=10, subtitleColor="#6b7280",
+            ),
+        )
 
-    chart_A = (truth + pts + lines).properties(
-        width=420,
-        height=340,
-        title=alt.TitleParams(
-            text=f"A · 三种拟合对比 · λ={cur_lambda:.4g}",
-            subtitle="灰虚线=真实曲线 y=0.5x²+x+2 · 加粗=当前选中正则",
-            fontSize=13,
-            subtitleFontSize=10,
-            subtitleColor="#6b7280",
-        ),
-    )
-    return (chart_A,)
+    chart_fit_l1 = _make_fit_chart(yp_l1, "L1 (Lasso)", "#f97316")
+    chart_fit_l2 = _make_fit_chart(yp_l2, "L2 (Ridge)", "#10b981")
+    return chart_fit_l1, chart_fit_l2
 
 
 @app.cell
-def _(ZERO_TOL, alt, np, pd, reg_type, w_l1, w_l2, w_none):
-    # ========== B · 权重柱图（主舞台） ==========
-    # 必修 1：零柱用「黄色实心填充 + 黑边」(避免与无正则红撞色)
-    # 必修 3：副标题标注「标准化空间下系数」
+def _(ZERO_TOL, alt, np, pd, w_l1, w_l2, w_none):
+    # ========== 权重柱图 · L1 / L2 各一张 ==========
     degrees = np.arange(1, 11)
-    rows = []
-    for name, w in [("无正则", w_none), ("L1 (Lasso)", w_l1), ("L2 (Ridge)", w_l2)]:
-        for d, wv in zip(degrees, w):
-            rows.append({
-                "degree": int(d),
-                "weight": float(wv),
-                "model": name,
-                "is_zero": (name == "L1 (Lasso)") and (abs(float(wv)) < ZERO_TOL),
-                "abs_w": abs(float(wv)),
-            })
-    df_w = pd.DataFrame(rows)
-
-    _color_scale_b = alt.Scale(
-        domain=["无正则", "L1 (Lasso)", "L2 (Ridge)"],
-        range=["#ef4444", "#f97316", "#10b981"],
-    )
-
-    # 联动：选 L1 时 L2 行变淡，反之亦然（无正则始终满）
-    _sel = "L1 (Lasso)" if reg_type.value.startswith("L1") else "L2 (Ridge)"
-    df_w["row_opacity"] = df_w["model"].apply(
-        lambda m: 1.0 if (m == "无正则" or m == _sel) else 0.4
-    )
-
-    # 共享 y 轴范围（让三行可比）
     _w_max = max(float(np.max(np.abs(w_none))), 0.1)
     y_dom = [-_w_max * 1.15, _w_max * 1.15]
 
-    def _row_chart(model_name, title_color):
-        sub = df_w[df_w["model"] == model_name].copy()
+    def _make_weight_chart(w_reg, model_name, color, is_l1=False):
+        # 上行：无正则（参考基线）
+        df_none = pd.DataFrame({
+            "degree": degrees, "weight": w_none, "model": "无正则",
+        })
+        row_none = (
+            alt.Chart(df_none)
+            .mark_bar(color="#ef4444", opacity=0.5)
+            .encode(
+                x=alt.X("degree:O", title=None,
+                         axis=alt.Axis(labelExpr="'w' + datum.value", labelFontSize=9)),
+                y=alt.Y("weight:Q", scale=alt.Scale(domain=y_dom), title=None,
+                         axis=alt.Axis(labelFontSize=9)),
+            )
+        ).properties(width=460, height=100,
+                     title=alt.TitleParams(text="无正则(基线)", fontSize=10,
+                                           color="#dc2626", anchor="start"))
+
+        # 下行：正则化后
+        df_reg = pd.DataFrame({
+            "degree": degrees, "weight": w_reg,
+            "is_zero": [abs(float(w)) < ZERO_TOL for w in w_reg],
+        })
 
         bars = (
-            alt.Chart(sub)
-            .mark_bar(stroke="white", strokeWidth=0.5)
+            alt.Chart(df_reg)
+            .mark_bar(color=color)
             .encode(
-                x=alt.X(
-                    "degree:O",
-                    title=None,
-                    axis=alt.Axis(labelExpr="'w' + datum.value", labelFontSize=10),
-                ),
-                y=alt.Y(
-                    "weight:Q",
-                    scale=alt.Scale(domain=y_dom),
-                    title=None,
-                    axis=alt.Axis(labelFontSize=9),
-                ),
-                color=alt.Color("model:N", scale=_color_scale_b, legend=None),
-                opacity=alt.Opacity("row_opacity:Q", legend=None, scale=alt.Scale(domain=[0, 1], range=[0, 1])),
+                x=alt.X("degree:O", title=None,
+                         axis=alt.Axis(labelExpr="'w' + datum.value", labelFontSize=9)),
+                y=alt.Y("weight:Q", scale=alt.Scale(domain=y_dom), title=None,
+                         axis=alt.Axis(labelFontSize=9)),
             )
         )
         zero_rule = (
             alt.Chart(pd.DataFrame({"y": [0]}))
-            .mark_rule(color="#1f2937", strokeWidth=1)
+            .mark_rule(color="#1f2937", strokeWidth=0.8)
             .encode(y="y:Q")
         )
 
-        # 零柱标记（仅 L1 行有效）—— 必修 1：黄色实心填充 + 黑边
-        zero_marks = (
-            alt.Chart(sub[sub["is_zero"]])
-            .mark_bar(
-                fill="#fde047",         # 鲜黄实心
-                fillOpacity=0.9,
-                stroke="#000000",       # 黑边
-                strokeWidth=1.8,
-            )
-            .encode(
-                x=alt.X("degree:O"),
-                y=alt.Y("y_lo:Q"),
-                y2="y_hi:Q",
-            )
-            .transform_calculate(
-                y_lo=f"-{_w_max * 0.06}",
-                y_hi=f"{_w_max * 0.06}",
-            )
-        )
-        zero_text = (
-            alt.Chart(sub[sub["is_zero"]])
-            .mark_text(
-                text="0",
-                fontSize=11,
-                fontWeight="bold",
-                color="#000000",
-                dy=0,
-            )
-            .encode(x="degree:O", y=alt.value(180))
+        layers = [zero_rule, bars]
+
+        # L1 零柱标记：黄色实心 + 黑边
+        if is_l1:
+            df_zero = df_reg[df_reg["is_zero"]].copy()
+            if len(df_zero) > 0:
+                zero_marks = (
+                    alt.Chart(df_zero)
+                    .mark_bar(fill="#fde047", fillOpacity=0.9,
+                              stroke="#000000", strokeWidth=1.8)
+                    .encode(x="degree:O", y=alt.value(55), y2=alt.value(45))
+                )
+                zero_text = (
+                    alt.Chart(df_zero)
+                    .mark_text(text="0", fontSize=10, fontWeight="bold", color="#000")
+                    .encode(x="degree:O", y=alt.value(50))
+                )
+                layers += [zero_marks, zero_text]
+
+        row_reg = alt.layer(*layers).properties(
+            width=460, height=160,
+            title=alt.TitleParams(text=model_name, fontSize=10,
+                                  color=color, anchor="start"),
         )
 
-        # 数值小标签
-        val_text = (
-            alt.Chart(sub[~sub["is_zero"]])
-            .mark_text(fontSize=8, color="#374151", baseline="bottom", dy=-2)
-            .encode(
-                x="degree:O",
-                y="weight:Q",
-                text=alt.Text("weight:Q", format=".2f"),
-            )
+        return alt.vconcat(row_none, row_reg, spacing=4).properties(
+            title=alt.TitleParams(
+                text=f"{model_name} · 权重柱图",
+                subtitle="标准化空间系数 · 上=无正则基线 下=正则化后",
+                fontSize=12, subtitleFontSize=9, subtitleColor="#6b7280",
+            ),
         )
 
-        return (zero_rule + bars + zero_marks + val_text + zero_text).properties(
-            width=520, height=110,
-            title=alt.TitleParams(text=model_name, color=title_color, fontSize=11, anchor="start"),
-        )
-
-    chart_B = alt.vconcat(
-        _row_chart("无正则", "#dc2626"),
-        _row_chart("L1 (Lasso)", "#ea580c"),
-        _row_chart("L2 (Ridge)", "#059669"),
-        spacing=4,
-    ).properties(
-        title=alt.TitleParams(
-            text="B · 权重柱图 · L1「黄底黑边」= 被砍掉 (zero)",
-            subtitle="⚠ 标准化空间下系数 (PolynomialFeatures+StandardScaler 后) · 仅供稀疏性对比，非原始 x^k 系数",
-            fontSize=13,
-            subtitleFontSize=10,
-            subtitleColor="#9333ea",
-        ),
-    )
-    return (chart_B,)
+    chart_w_l1 = _make_weight_chart(w_l1, "L1 (Lasso)", "#f97316", is_l1=True)
+    chart_w_l2 = _make_weight_chart(w_l2, "L2 (Ridge)", "#10b981", is_l1=False)
+    return chart_w_l1, chart_w_l2
 
 
 @app.cell
-def _(
-    X_test,
-    X_train,
-    alt,
+def _(alt, cur_lambda, cur_log_lambda, df_curve, np, pd):
+    # ========== λ-MSE U 形 · L1 / L2 各一张 ==========
+    def _make_mse_chart(reg_type, color):
+        df_sel = df_curve[df_curve["type"] == reg_type].copy()
+        df_long = pd.melt(
+            df_sel, id_vars=["lambda", "log_lambda", "type"],
+            value_vars=["train_mse", "test_mse"],
+            var_name="split", value_name="mse",
+        )
+        df_long["split"] = df_long["split"].map(
+            {"train_mse": "train", "test_mse": "test"}
+        )
+
+        split_color = alt.Scale(
+            domain=["train", "test"], range=["#3b82f6", "#f97316"]
+        )
+
+        lines = (
+            alt.Chart(df_long)
+            .mark_line(strokeWidth=2.5, point=True)
+            .encode(
+                x=alt.X("lambda:Q", scale=alt.Scale(type="log", domain=[1e-4, 1e2]),
+                         title="λ (log)"),
+                y=alt.Y("mse:Q", title="MSE", scale=alt.Scale(zero=False)),
+                color=alt.Color("split:N", scale=split_color,
+                                legend=alt.Legend(title="集合")),
+                tooltip=[alt.Tooltip("lambda:Q", format=".4g"),
+                         alt.Tooltip("mse:Q", format=".4f"), "split"],
+            )
+        )
+
+        # 当前 λ 垂直线
+        rule_v = (
+            alt.Chart(pd.DataFrame({"lambda": [cur_lambda]}))
+            .mark_rule(color="#9ca3af", strokeDash=[3, 3], strokeWidth=1.5)
+            .encode(x="lambda:Q")
+        )
+
+        # 当前 λ 红点（内插 train/test）
+        _idx = int(np.argmin(np.abs(df_sel["lambda"].values - cur_lambda)))
+        _row = df_sel.iloc[_idx]
+        df_cur = pd.DataFrame({
+            "lambda": [cur_lambda, cur_lambda],
+            "split": ["train", "test"],
+            "mse": [float(_row["train_mse"]), float(_row["test_mse"])],
+        })
+        cur_dots = (
+            alt.Chart(df_cur)
+            .mark_circle(size=200, stroke="white", strokeWidth=2)
+            .encode(
+                x="lambda:Q", y="mse:Q",
+                color=alt.Color("split:N", scale=split_color, legend=None),
+            )
+        )
+
+        return (lines + rule_v + cur_dots).properties(
+            width=460, height=340,
+            title=alt.TitleParams(
+                text=f"{reg_type} · λ-MSE · log₁₀λ={cur_log_lambda:.1f}",
+                subtitle="蓝=train 橙=test · 竖线=当前λ · U形谷底=最优",
+                fontSize=12, subtitleFontSize=10, subtitleColor="#6b7280",
+            ),
+        )
+
+    chart_mse_l1 = _make_mse_chart("L1", "#f97316")
+    chart_mse_l2 = _make_mse_chart("L2", "#10b981")
+    return chart_mse_l1, chart_mse_l2
+
+
+@app.cell
+def shot_picker(shot):
+    # 镜头切换器（提示区，录屏 crop 掉）
+    shot
+    return
+
+
+@app.cell
+def truth_hint(cur_lambda, cur_log_lambda, mo, zero_count_l1, zero_count_l2):
+    # 真实参数提示（录屏外）
+    mo.md(
+        f"""<div style="background:#dbeafe;color:#1e40af;border-left:4px solid #3b82f6;
+        padding:6px 14px;border-radius:6px;font-size:13px;line-height:1.4;margin:0;">
+        🎯 当前 λ={cur_lambda:.4g} (log₁₀={cur_log_lambda:.2f})
+        &nbsp;·&nbsp; L1 零系数={zero_count_l1}/10
+        &nbsp;·&nbsp; L2 零系数={zero_count_l2}/10
+        &nbsp;·&nbsp; 真实函数 y=0.5x²+x+2
+        </div>"""
+    )
+    return
+
+
+@app.cell
+def stage(
+    chart_fit_l1,
+    chart_fit_l2,
+    chart_mse_l1,
+    chart_mse_l2,
+    chart_w_l1,
+    chart_w_l2,
+    mo,
+    shot,
+):
+    # 🎬 中央舞台 · Strategy B 双槽（slot1=L1 / slot2=L2）
+    # 直接传 altair chart 对象（不用 mo.ui.altair_chart 避免 duplicate signal 冲突）
+    if shot.value.startswith("A"):
+        _slot1, _slot2 = chart_fit_l1, chart_fit_l2
+    elif shot.value.startswith("B"):
+        _slot1, _slot2 = chart_w_l1, chart_w_l2
+    else:  # C
+        _slot1, _slot2 = chart_mse_l1, chart_mse_l2
+
+    mo.hstack([_slot1, _slot2], gap=0.5, widths="equal", align="start")
+    return
+
+
+@app.cell
+def panel(
     cur_lambda,
     cur_log_lambda,
-    df_curve,
-    fit_three,
-    mean_squared_error,
-    np,
-    pd,
-    reg_type,
-    y_test,
-    y_train,
+    mo,
+    te_l1,
+    te_l2,
+    te_n,
+    tr_l1,
+    tr_l2,
+    tr_n,
+    zero_count_l1,
 ):
-    # ========== C · λ-MSE U 形（建议 1：L1 + L2 同框对比） ==========
-    sel_type = "L1" if reg_type.value.startswith("L1") else "L2"
+    # 数字面板（录屏内 · 紧凑单行）
+    def _gc(gap):
+        if gap < 0.15:
+            return "#10b981"
+        return "#f59e0b" if gap < 0.4 else "#ef4444"
 
-    # 长格式数据（每行：lambda, type, split=train/test, mse）
-    df_long = pd.melt(
-        df_curve,
-        id_vars=["lambda", "log_lambda", "type"],
-        value_vars=["train_mse", "test_mse"],
-        var_name="split",
-        value_name="mse",
-    )
-    df_long["split"] = df_long["split"].map({"train_mse": "train", "test_mse": "test"})
-    df_long["selected"] = df_long["type"] == sel_type
+    _gap_n = te_n - tr_n
+    _gap_l1 = te_l1 - tr_l1
+    _gap_l2 = te_l2 - tr_l2
 
-    # 当前 λ 红点（只对选中类型计算）
-    _pn, _pl1, _pl2 = fit_three(cur_lambda, X_train, y_train)
-    _pipe_sel = _pl1 if sel_type == "L1" else _pl2
-    _cur_train = float(mean_squared_error(y_train, _pipe_sel.predict(X_train)))
-    _cur_test = float(mean_squared_error(y_test, _pipe_sel.predict(X_test)))
-    df_cur = pd.DataFrame({
-        "lambda": [cur_lambda, cur_lambda],
-        "split": ["train", "test"],
-        "mse": [_cur_train, _cur_test],
-    })
-
-    split_color = alt.Scale(
-        domain=["train", "test"],
-        range=["#3b82f6", "#f97316"],
-    )
-
-    # 选中类型：实线粗，未选中：虚线细
-    sel_lines = (
-        alt.Chart(df_long[df_long["selected"]])
-        .mark_line(strokeWidth=2.8, point=True)
-        .encode(
-            x=alt.X("lambda:Q", scale=alt.Scale(type="log", domain=[1e-4, 1e2]), title="λ (log scale)"),
-            y=alt.Y("mse:Q", title="MSE", scale=alt.Scale(zero=False)),
-            color=alt.Color("split:N", scale=split_color, legend=alt.Legend(title="集合 (选中)")),
-            tooltip=["type", "split", alt.Tooltip("lambda:Q", format=".4g"), alt.Tooltip("mse:Q", format=".4f")],
-        )
-    )
-    other_lines = (
-        alt.Chart(df_long[~df_long["selected"]])
-        .mark_line(strokeWidth=1.5, strokeDash=[4, 3], opacity=0.45, point=False)
-        .encode(
-            x=alt.X("lambda:Q", scale=alt.Scale(type="log", domain=[1e-4, 1e2])),
-            y="mse:Q",
-            color=alt.Color("split:N", scale=split_color, legend=None),
-        )
-    )
-
-    # 当前 λ 垂直参考线
-    rule_v = (
-        alt.Chart(pd.DataFrame({"lambda": [cur_lambda]}))
-        .mark_rule(color="#9ca3af", strokeDash=[3, 3])
-        .encode(x="lambda:Q")
-    )
-    cur_dots = (
-        alt.Chart(df_cur)
-        .mark_circle(size=260, stroke="white", strokeWidth=2.5)
-        .encode(
-            x="lambda:Q",
-            y="mse:Q",
-            color=alt.Color("split:N", scale=split_color, legend=None),
-        )
-    )
-
-    chart_C = (other_lines + sel_lines + rule_v + cur_dots).properties(
-        width=420,
-        height=340,
-        title=alt.TitleParams(
-            text=f"C · λ-MSE U 形 · 当前 {sel_type} · λ={cur_lambda:.4g} (log₁₀={cur_log_lambda:.2f})",
-            subtitle="实线=选中正则，虚线=另一种 (对比甜蜜点位置) · 红点=当前 λ",
-            fontSize=13,
-            subtitleFontSize=10,
-            subtitleColor="#6b7280",
-        ),
-    )
-    return (chart_C,)
-
-
-@app.cell
-def _(chart_A, mo):
-    # A 视图：散点 + 三条拟合曲线（独占 cell · grid 友好）
-    mo.ui.altair_chart(chart_A)
+    mo.md(f"""
+    <div style="font-family:ui-monospace,monospace; font-size:12px; line-height:1.4;
+            background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px;
+            padding:5px 12px; margin:0;">
+    <b>λ={cur_lambda:.3g}</b> (log₁₀={cur_log_lambda:.1f}) &nbsp;|&nbsp;
+    <span style="color:#dc2626">NoReg</span> test={te_n:.2f}
+    <span style="color:{_gc(_gap_n)}">gap={_gap_n:.2f}</span> &nbsp;|&nbsp;
+    <span style="color:#f97316">L1</span> test={te_l1:.2f}
+    <span style="color:{_gc(_gap_l1)}">gap={_gap_l1:.2f}</span>
+    zero={zero_count_l1}/10 &nbsp;|&nbsp;
+    <span style="color:#10b981">L2</span> test={te_l2:.2f}
+    <span style="color:{_gc(_gap_l2)}">gap={_gap_l2:.2f}</span>
+    </div>
+    """)
     return
 
 
 @app.cell
-def _(chart_B, mo):
-    # B 视图：权重柱图（主舞台 · L1 黄柱稀疏）
-    mo.ui.altair_chart(chart_B)
-    return
+def narration(mo, shot):
+    # 口播稿：按 shot 切换（录屏外）
+    _scripts = {
+        "A": """
+    **🎬 A · 拟合曲线**（40 秒）
 
+    > "左 L1 右 L2，同一份过拟合数据。
+    >  拖 λ 从 -4 → +2：
+    >  - 红淡虚线 = 无正则（始终疯狂振荡）
+    >  - 粗线 = 加正则后 → λ 越大越平滑
+    >  - L1 先把高频部分砍平（突然变直），L2 是渐进变平。"
 
-@app.cell
-def _(chart_C, mo):
-    # C 视图：训练/测试 MSE vs λ
-    mo.ui.altair_chart(chart_C)
-    return
+    🎯 对照：相同 λ 下两边曲线的平滑程度差异
+    """,
+        "B": """
+    **🎬 B · 权重对比（主舞台）**（60 秒）
 
+    > "左 L1 右 L2，上行灰色 = 无正则基线（系数爆炸）。
+    >  拖 λ 增大：
+    >  - **L1 行出现黄底黑边「0」** = 被彻底砍掉的特征
+    >  - **L2 行所有柱等比缩矮** 但没有零柱
+    >  核心区别：L1 砍 (sparsity) vs L2 压 (shrinkage)。"
 
-@app.cell
-def _(mo):
-    mo.md(
-        """
-        ---
-        ### 玩法
+    🎯 λ=0.1 时 L1 约 4-6 个零柱；L2 零柱 = 0
+    """,
+        "C": """
+    **🎬 C · λ-MSE U 形**（40 秒）
 
-        1. **拖 log₁₀(λ) 滑块** 从 -4 → 2：A 图三条线从「红色疯狂抖 / 橙绿贴真值」 → 「全部压成水平线」
-        2. **看 B 图（主舞台）**：
-           - 「无正则」行高次项系数巨大（过拟合的根源）
-           - **「L1」行黄底黑边「0」标记** = 被砍掉的特征 → λ 越大零柱越多
-           - 「L2」行所有柱「整体矮化」但**无零柱** = 等比收缩
-        3. **切 L1/L2 toggle**：A/B 视图对应行加粗高亮，C 图实线在选中类型上
-        4. **C 图（U 形）**：实线 = 选中正则，虚线 = 另一种；
-           注意 L1 和 L2 的**测试 MSE 谷底位置**通常不在同一 λ
-        5. **4 档预设**：一键对比「无正则 / 弱 / 适中 / 强」
-           - ⚠️ 选预设后再拖滑块**无效**（已锁定）→ 切回「✋ 手动」解锁
+    > "左 L1 右 L2，都是 train(蓝) / test(橙) MSE vs λ。
+    >  注意两边**谷底位置不同**：
+    >  - L1 最优 λ ≈ 0.01-0.1
+    >  - L2 最优 λ 可能偏更大
+    >  竖线 = 当前 λ，拖滑块看红点爬 U 形。"
 
-        ### 与 07a-overfit 衔接
-        端口 2733（07a 过拟合演示）+ 2734（本 demo · 解药）共享同款数据，可两 tab 并排对照。
-        """
+    🎯 test MSE 谷底 = 最佳偏差-方差权衡点
+    """,
+    }
+    _key = shot.value[0] if shot.value else "B"
+    mo.md(_scripts.get(_key, "")).style(
+        font_size="15px", line_height="1.6", margin="0", padding="14px 24px",
+        background="#fffbeb", border_radius="8px",
+        border_left="4px solid #fbbf24",
     )
     return
 
 
 @app.cell
-def _(mo):
-    # ===== 📐 录屏 grid 布局参考（开发用 · 录屏隐藏 · position=null）=====
+def layout_doc(mo):
+    # ===== 📐 录屏 grid 布局参考（开发用）=====
     mo.accordion(
         {
             "📐 录屏布局参考（grid 设计意图）": mo.md(
                 r"""
-**目标 viewport**：1400 宽 · 24 列 · rowHeight 20 · 信息密度高
-B 视图（权重柱图）= 主舞台占右侧大块；A/C 左侧上下叠放（散点 / U 形）
+    **目标 viewport**：1280 宽 · 32 列 · rowHeight 20
 
-### Grid 骨架（24 列 · 行单位 = 20px）
+    ### Grid 骨架（32 列 · 行 = 20px）
 
-```
-   0                       9                                24
-0  ┌──────────────── 标题（h=3）─────────────────────────────┐
-3  ├──────────────── 控件 preset/reg/slider（h=4）──────────┤
-7  ├──────────────── 模式徽章 + 三组 MSE 指标（h=5）────────┤
-12 ├─ A 散点+三拟合 ──┬──────────────────────────────────────┤
-   │  (9w × 17h)      │                                      │
-   │                  │   B · 权重柱图（主舞台）             │
-29 ├─ C λ-MSE U 形 ──┤   (15w × 34h · 三行 vconcat)         │
-   │  (9w × 17h)      │   L1 黄底黑边零柱 = 砍特征证据       │
-   │                  │                                      │
-46 ├──────────────── 玩法说明（h=10）────────────────────────┤
-56 └────────────────────────────────────────────────────────┘
-```
+    ```
+       0    4                              32
+    0  ┌──────── title (32w × 3h) ─────────┐
+    3  ├─ ctrl ─┬── stage (28w × 26h) ────┤  ┐
+       │ (4w)   │  slot1(L1) | slot2(L2)  │  │
+       │ preset │                          │  ├ 录屏 1280×720
+       │ log₁₀λ│                          │  │
+    29 ├────────┴── panel (32w × 3h) ─────┤  │
+    32 ├───────────────────────────────────┤  ┘ ← y=32 (640px)
+       │        (gap 36-32=4 rows)         │
+    36 ├─ shot_picker (5w × 2h) ──────────┤  ← y=36 (720px)
+    38 ├─ truth_hint (10w × 3h) ──────────┤
+    41 ├─ narration (32w × 10h) ──────────┤
+    51 └───────────────────────────────────┘
+    ```
 
-### 镜头脚本
+    ### 镜头脚本（Strategy B · 左 L1 右 L2 永远对照）
 
-| # | 时长 | 焦点 | 操作 |
-|---|---|---|---|
-| **A** | 0-30s | 标题 + 控件 + 模式徽章 | 介绍三种正则 + λ 概念 |
-| **B** | 30-90s | B 主舞台（权重柱图） | 拖滑块 -4→2，看 L1 黄柱出现/L2 整体压扁 |
-| **C** | 90-150s | A 散点（左上） | 看红线疯狂抖 → λ 增大变平 |
-| **D** | 150-200s | C U 形（左下） | 切 L1/L2 toggle，看实虚线甜蜜点错位 |
-| **E** | 200-240s | 4 档预设巡游 | 「无 / 弱 / 适中 / 强」一键演示 |
-
-### 关键提示
-
-1. **B 占大头是主舞台**：右侧 15 列 × 34 行（680px 高）容纳三行权重对比
-2. **A/C 左侧叠放**：相同宽度（9 列）让两种视图垂直对齐
-3. **控件区一行 hstack**：preset + reg_type 同行，log_λ 滑块单独一行
-4. **指标卡 h=5**：三种正则 + zero_count 信息密度需要 100px
+    | # | 时长 | slot1 (L1) | slot2 (L2) | 教学焦点 |
+    |---|---|---|---|---|
+    | **A** | 0-40s | L1 拟合曲线 | L2 拟合曲线 | λ 对输出平滑的影响差异 |
+    | **B** | 40-100s | L1 权重柱(黄零柱) | L2 权重柱(等比压) | 砍 vs 压 核心视觉 |
+    | **C** | 100-140s | L1 U 形 | L2 U 形 | 最优 λ 位置不同 |
                 """
             )
         },

@@ -1,5 +1,36 @@
 # Marimo 实用速查手册
 
+> **API 速查** · 写 marimo demo 时查 cell / 反应式 / UI 控件 / 布局原语
+
+## 何时用
+
+- 不记得某个 marimo API（cell 装饰器 / mo.ui.X / mo.hstack 参数）
+- 反应式触发不工作（变量冲突 / cell 不重算）
+- 启动命令选择（edit / run / 脚本嵌入）
+
+## 索引（按需取读）
+
+| § | 内容 | 何时读 |
+|---|---|---|
+| Cell 基础 | 装饰器 / 返回值 / 局部变量 / 隐藏 | 写新 cell |
+| 反应式 + 变量冲突 | 不能重定义同名变量 | 触发不工作 |
+| UI 控件清单 | slider / dropdown / switch / table | 找控件 API |
+| 布局原语 | hstack / vstack / tabs | 排控件 |
+| 数据展示 | mo.ui.table / dataframe / data_explorer | 表格选型 |
+| 图表（Altair 一等公民）| chart 渲染 / 选择 | 写图表 |
+| 状态（mo.state）| 跨 cell 状态 | 复杂状态机 |
+| 缓存 | `@functools.cache` / `mo.cache` | 慢计算 |
+| 样式 | marimo.css / inline style | 视觉调整 |
+| 模式与启动命令 | edit / run / headless / port | 启动 |
+| 测试 | pytest / 嵌入测试 | 写单测 |
+| 常见陷阱 | 顺序 / 隐藏 / 重渲染 | 遇到问题 |
+| 实战教训 | 已踩过的坑 | 排错 |
+| 文档链接 | 官方资源 | 进一步查 |
+
+> demo 设计原则 → [`_2-demo-guide.md`](./_2-demo-guide.md)；数学交互套路 → [`_marimo-math-guide.md`](./_marimo-math-guide.md)
+
+---
+
 ## Cell 基础
 
 | 规则 | 要点 | 代码 |
@@ -92,13 +123,32 @@ mo.md(f"count={get_n()}")
 
 ## 样式
 
+### 公开 API
+
 | 配置 | 代码 |
 |---|---|
 | 注入 CSS | `marimo.App(css_file="custom.css")` |
 | 注入 `<head>` | `marimo.App(html_head_file="head.html")` |
 | 公共 CSS 变量 | `--marimo-monospace-font` / `--marimo-text-font` / `--marimo-heading-font` |
 | 强制主题 | 脚本头 `# [tool.marimo.display]\n# theme = "dark"` |
-| 选择器 | `[data-cell-name='x'] { ... }` |
+| 选择器（cell 命名）| `[data-cell-name='x'] { ... }`（cell 函数有名字时生效，`def _():` 不行；**仅 edit 模式**，run 模式 DOM 没此 attr）|
+| 选择器（cell 输出）| `[data-cell-name='x'] [data-cell-role='output'] { ... }`（同上，**仅 edit 模式**）|
+| 元素 .style() 链式 | `mo.md("...").style(margin="0", font_size="13px")` |
+| 元素 .center() / .right() / .left() | 链式对齐 |
+
+### 录屏类布局常用 hack（详见 [`_5-layout-guide.md`](./_5-layout-guide.md)）
+
+| 需求 | 选择器（**跨版本不稳**）|
+|---|---|
+| 锁画布宽度 | `.react-grid-layout { width: Npx !important }` |
+| 去顶部留白 | `[class*="sm:pt-8"] { padding-top: 0 }` |
+| sidebar 视觉再压缩 | `[data-cell-name='controls'] { transform: scale(0.92); transform-origin: top left; width: 109% }` |
+| stage 防溢出 | `[data-cell-name='stage'] [data-cell-role='output'] { overflow-x: hidden }` |
+| 录屏区可视化边框（开发期）| `.react-grid-layout::before { ... border: 2px dashed red }` |
+
+> **铁律**：除 3 个字体变量外，所有 className / data-attr hack 都依赖 marimo 内部实现，跨版本可能断。升级 marimo 后逐条复测。
+>
+> **edit vs run 模式 DOM 差异（重要）**：`[data-cell-name='X']` / `[data-cell-role='output']` **仅 edit 模式生效**，run 模式（部署 / 录屏用）DOM 无此 attr——靠 cell name 选样式的 hack 在录屏时失效。详见 [`_5-layout-guide.md`](./_5-layout-guide.md) §11。
 
 ## 模式与启动命令
 
@@ -145,6 +195,11 @@ mo.md(f"count={get_n()}")
 | **图表库选择** | **Altair 一等公民**，比 matplotlib 在 marimo 渲染更稳；选择互动也只 Altair 完整支持 |
 | **`width="container"`** | 不可靠，需父容器显式 CSS 才生效；推荐固定 px 值 |
 | **自检** | 改完跑 `python -c "from x import app; app.run()"` 静态检查，能抓变量冲突 / 语法错误，不用启 marimo edit |
+| **mo.ui.slider 没有 `.set_value()` 方法** | 想让 button 改 slider 值 → 用 `mo.state` 共享：`get_x, set_x = mo.state(2)`；button `on_click=lambda _: set_x(N)`；slider `value=get_x()`。直接调 `slider.set_value()` 是幻觉 API |
+| **mo.ui.button `on_click` 是 `Callable[[T], T]` 不是 setter** | 返回值会成为新 `button.value`（计数器），而非执行副作用。要做 setter 必须配合 `mo.state` |
+| **mo.state 改变让同 cell 多 widget 全重建** | cell 重跑 = 重新执行所有 ui 创建语句，无关 widget 也 reset。**拆 widget 到独立 cell**，只让需要的 cell 依赖 state |
+| **mo.ui.altair_chart 包同构 chart 报 duplicate signal** | Strategy B 双槽常见。直接传 chart 对象到 hstack（不包 mo.ui.altair_chart）即可；代价：失去 chart 选择交互 |
+| **mo.md 内嵌 HTML block 不解析内部 markdown** | CommonMark 行为。`mo.md(f"<div>...| a | b |</div>")` 中 markdown table 不会渲染。要么全 md，要么全 HTML `<table>` |
 
 ## 文档链接
 

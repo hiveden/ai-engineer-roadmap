@@ -16,7 +16,7 @@ __generated_with = "0.23.4"
 app = marimo.App(
     width="medium",
     layout_file="layouts/api-walkthrough.grid.json",
-    css_file="marimo.css",
+    css_file="custom.css",
 )
 
 
@@ -32,21 +32,23 @@ def _():
     return LinearRegression, alt, fetch_california_housing, mo, np, pd
 
 
-@app.cell
-def _(mo):
+@app.cell(hide_code=True)
+def title(mo):
+    # 录屏内紧凑标题
+    mo.md(
+        r"### sklearn `LinearRegression` · 5 步流程走查 · `fit() → coef_ / intercept_ → predict()`"
+    ).style(margin="0", padding="4px 12px", font_size="15px", line_height="1.3")
+    return
+
+
+@app.cell(hide_code=True)
+def howto(mo):
+    # 玩法说明（录屏外）
     mo.md(
         r"""
-        # sklearn `LinearRegression` · 5 步流程走查
-
-        ## 🎬 怎么用这个 demo
-
-        1. **先选一个场景**（顶部 dropdown），读绿色卡片里的「关键发现」——理解这个场景演示什么
-        2. **看右图 + 参数面板**：场景的预期结果是不是真的发生了？
-        3. **想自己玩**：选「✋ 自定义」，下方 3 个滑块解锁
-
-        每个场景 30 秒 - 2 分钟，6 个跑完 5-10 分钟覆盖 sklearn LR API 全部要点。
+        **🎬 玩法**：① 顶部选一个场景 → 读绿色卡片「关键发现」 ② 看主图 + 参数面板核对预期 ③ 想自己玩选「✋ 自定义」解锁滑块
         """
-    )
+    ).style(font_size="12px", color="#6b7280", margin="0", padding="6px 12px")
     return
 
 
@@ -56,7 +58,7 @@ def _():
     SCENARIOS = {
         "0 · ✋ 自定义（用下方滑块手动调）": None,
         "1 · 🎯 PPT 经典：4 行代码跑通": {
-            "dataset": "身高体重 · 5 点（PPT 原版）",
+            "dataset": "身高体重 · 5 点",
             "fit_intercept": True,
             "x_new": 176.0,
             "教学": (
@@ -67,7 +69,7 @@ def _():
             ),
         },
         "2 · 🚫 关掉 fit_intercept：看 b 被强制 0": {
-            "dataset": "身高体重 · 5 点（PPT 原版）",
+            "dataset": "身高体重 · 5 点",
             "fit_intercept": False,
             "x_new": 176.0,
             "教学": (
@@ -80,7 +82,7 @@ def _():
             ),
         },
         "3 · 📈 数据从 5 点 → 30 点：参数稳吗？": {
-            "dataset": "身高体重 · 加噪声 30 点",
+            "dataset": "身高体重 · 30 点",
             "fit_intercept": True,
             "x_new": 176.0,
             "教学": (
@@ -91,7 +93,7 @@ def _():
             ),
         },
         "4 · 🌍 切到加州房价真实数据": {
-            "dataset": "加州房价 · 单特征版（MedInc → target）",
+            "dataset": "加州房价",
             "fit_intercept": True,
             "x_new": 5.0,
             "教学": (
@@ -103,7 +105,7 @@ def _():
             ),
         },
         "5 · ⚠️ 加州数据 + 关 fit_intercept": {
-            "dataset": "加州房价 · 单特征版（MedInc → target）",
+            "dataset": "加州房价",
             "fit_intercept": False,
             "x_new": 5.0,
             "教学": (
@@ -115,7 +117,7 @@ def _():
             ),
         },
         "6 · 🎚️ 拖动新样本：看 predict 范围": {
-            "dataset": "身高体重 · 5 点（PPT 原版）",
+            "dataset": "身高体重 · 5 点",
             "fit_intercept": True,
             "x_new": 165.0,
             "教学": (
@@ -142,19 +144,21 @@ def _(SCENARIOS, mo):
 
 
 @app.cell
-def _(SCENARIOS, mo, preset):
+def scenario_card(SCENARIOS, mo, preset):
     # ===== 场景说明卡片（先理解再操作）=====
+    # cell 命名 scenario_card → custom.css 内压字号
     _p = SCENARIOS.get(preset.value)
     if _p is None:
-        mo.callout(
+        _card = mo.callout(
             mo.md("**自定义模式** —— 用下方 3 个滑块手动调，自由探索 sklearn LR API。"),
             kind="info",
         )
     else:
-        mo.callout(
+        _card = mo.callout(
             mo.md(f"### {preset.value}\n\n{_p['教学']}"),
             kind="success",
         )
+    _card
     return
 
 
@@ -163,14 +167,14 @@ def _(mo):
     # ===== 控件区（自定义模式时用） =====
     dataset = mo.ui.dropdown(
         options=[
-            "身高体重 · 5 点（PPT 原版）",
-            "身高体重 · 加噪声 30 点",
-            "加州房价 · 单特征版（MedInc → target）",
+            "身高体重 · 5 点",
+            "身高体重 · 30 点",
+            "加州房价",
         ],
-        value="身高体重 · 5 点（PPT 原版）",
-        label="数据集",
+        value="身高体重 · 5 点",
+        label="",
     )
-    fit_intercept = mo.ui.switch(value=True, label="fit_intercept（学截距 b）")
+    fit_intercept = mo.ui.switch(value=True, label="fit_intercept")
     return dataset, fit_intercept
 
 
@@ -208,9 +212,9 @@ def _(fetch_california_housing, np):
         return _x, _y, "MedInc (万美元)", "房价中位数 (10 万美元)"
 
     DATA_FACTORY = {
-        "身高体重 · 5 点（PPT 原版）": _make_5pt,
-        "身高体重 · 加噪声 30 点": _make_30pt,
-        "加州房价 · 单特征版（MedInc → target）": _make_california,
+        "身高体重 · 5 点": _make_5pt,
+        "身高体重 · 30 点": _make_30pt,
+        "加州房价": _make_california,
     }
     return (DATA_FACTORY,)
 
@@ -284,8 +288,9 @@ def _(X, mo):
         stop=round(_xmax, 2),
         step=_step,
         value=round(_default, 2),
-        label="x_new （新样本特征值）",
+        label="x_new",
         show_value=True,
+        full_width=True,
     )
     return (x_new,)
 
@@ -303,12 +308,15 @@ def _(SCENARIOS, preset, x_new):
 
 @app.cell
 def _(mo):
-    mo.md("## 1️⃣ 控件")
+    mo.md("""
+    ## 1️⃣ 控件
+    """)
     return
 
 
 @app.cell
-def _(preset):
+def preset_view(preset):
+    # 场景 dropdown（录屏内 · 唯一切换器）
     preset
     return
 
@@ -334,43 +342,45 @@ def _(SCENARIOS, mo, preset):
 
 
 @app.cell
-def _(dataset, fit_intercept, mo, x_new):
-    # 控件组合排版（一行 hstack 是合理颗粒度）
-    mo.hstack([dataset, fit_intercept, x_new], gap=2, justify="start")
+def controls(dataset, fit_intercept, mo, x_new):
+    # 控件组合（sidebar vstack 风格）
+    mo.vstack([dataset, fit_intercept, x_new], gap=0.4, align="stretch")
     return
 
 
 @app.cell
-def _(coef, eff_fit_intercept, intercept, mo):
-    # ===== 5 步代码块 =====
+def code_block(coef, eff_fit_intercept, intercept, mo):
+    # ===== 5 步代码块（slot 2 录屏内，6 col=320px 紧凑版）=====
     _fi = "True" if eff_fit_intercept else "False"
-    code_md = mo.md(
+    mo.md(
         rf"""
-## 2️⃣ 5 步代码 · 实时跑
+**📜 5 步代码（实时跑）**
 
 ```python
 # 1. 导入
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model \
+  import LinearRegression
 
-# 2. 准备数据：X 必须 2D（n_samples × n_features），y 1D
-#    （上方 dropdown 切换不同数据集 → X, y 联动）
+# 2. 数据 X (n,1) y (n,)
 
-# 3. 实例化（内部走 SVD 解最小二乘）
-model = LinearRegression(fit_intercept={_fi})
+# 3. 实例化
+m = LinearRegression(
+  fit_intercept={_fi})
 
-# 4. 训练 fit() —— sklearn 算 w 和 b
-model.fit(X, y)
-print(model.coef_, model.intercept_)
-# →  coef_ = [{coef:.4f}],  intercept_ = {intercept:.4f}
+# 4. fit
+m.fit(X, y)
+# coef_=[{coef:.3f}]
+# intercept_={intercept:.3f}
 
-# 5. 预测 predict() —— 套公式 ŷ = w·x + b
-y_hat = model.predict([[x_new]])
+# 5. predict
+m.predict([[x_new]])
 ```
-
-> 切场景或滑块 → 上面的数字实时变。
 """
+    ).style(
+        font_size="11px",
+        line_height="1.45",
+        padding="6px 8px",
     )
-    code_md
     return
 
 
@@ -463,8 +473,8 @@ def _(X, alt, coef, eff_x_new, intercept, model, np, pd, x_label, y, y_label):
     )
 
     chart = (_residuals + _line + _pts + _diamond + _diamond_label).properties(
-        width=620,
-        height=380,
+        width=600,
+        height=440,
         title=f"sklearn 拟合直线  ŷ = {coef:.4f}·x + ({intercept:.4f})",
     )
     return (chart,)
@@ -472,12 +482,15 @@ def _(X, alt, coef, eff_x_new, intercept, model, np, pd, x_label, y, y_label):
 
 @app.cell
 def _(mo):
-    mo.md("## 3️⃣ 拟合可视化")
+    mo.md("""
+    ## 3️⃣ 拟合可视化
+    """)
     return
 
 
 @app.cell
-def _(chart, mo):
+def stage(chart, mo):
+    # 🎬 中央舞台 · Strategy A 单图（场景切换 = 内容变，骨架不变）
     mo.ui.altair_chart(chart)
     return
 
@@ -518,83 +531,44 @@ def _(
     )
 
     _panel = f"""
-<div style="font-family:ui-monospace,monospace; font-size:14px; line-height:1.75;
-            background:#f9fafb; border:1px solid #e5e7eb; border-radius:8px;
-            padding:14px 18px;">
-
-<div style="margin-bottom:10px;">
-  <span style="background:#ecfeff;color:#0e7490;padding:2px 8px;border-radius:5px;font-size:12px;margin-right:6px;">{eff_dataset}</span>
-  {_fi_badge}
-</div>
-
-<table style="border-collapse:collapse;width:100%;">
-<thead>
-  <tr style="border-bottom:1px solid #d1d5db;">
-    <th style="text-align:left;padding:6px 10px;color:#6b7280;font-weight:600;">模型属性</th>
-    <th style="text-align:left;padding:6px 10px;color:#6b7280;font-weight:600;">sklearn 输出</th>
-    <th style="text-align:left;padding:6px 10px;color:#6b7280;font-weight:600;">含义</th>
-  </tr>
-</thead>
-<tbody>
-  <tr><td style="padding:4px 10px;"><code>model.coef_</code></td>
-      <td style="padding:4px 10px;"><b>[{coef:.4f}]</b></td>
-      <td style="padding:4px 10px;color:#6b7280;">权重 w（每多 1 单位 x，y 变 w）</td></tr>
-  <tr><td style="padding:4px 10px;"><code>model.intercept_</code></td>
-      <td style="padding:4px 10px;"><b>{intercept:.4f}</b></td>
-      <td style="padding:4px 10px;color:#6b7280;">截距 b（x=0 时 y 的基线）</td></tr>
-  <tr><td style="padding:4px 10px;"><code>model.n_features_in_</code></td>
-      <td style="padding:4px 10px;"><b>{n_features}</b></td>
-      <td style="padding:4px 10px;color:#6b7280;">训练时见过的特征数</td></tr>
-  <tr><td style="padding:4px 10px;"><code>model.score(X, y)</code></td>
-      <td style="padding:4px 10px;"><b>R² = {_r2:.4f}</b>,&nbsp;MSE = {_mse:.4f}</td>
-      <td style="padding:4px 10px;color:#6b7280;">拟合优度 / 平均平方误差</td></tr>
-</tbody>
-</table>
-
-<div style="height:10px;border-top:1px dashed #d1d5db;margin:12px 0 8px 0;"></div>
-
-<b>预测对账 · x_new = {_xn:.4f}</b>
-<table style="border-collapse:collapse;width:100%;margin-top:6px;">
-<tbody>
-  <tr><td style="padding:4px 10px;color:#6b7280;width:48%;"><code>model.predict([[{_xn:.2f}]])</code></td>
-      <td style="padding:4px 10px;"><b>{_y_sklearn:.6f}</b></td></tr>
-  <tr><td style="padding:4px 10px;color:#6b7280;">手动 <code>coef_·x + intercept_</code></td>
-      <td style="padding:4px 10px;"><b>{coef:.4f} × {_xn:.2f} + ({intercept:.4f}) = {_y_manual:.6f}</b></td></tr>
-  <tr><td style="padding:4px 10px;color:#6b7280;">差值 |sklearn − 手动|</td>
-      <td style="padding:4px 10px;">{abs(_y_sklearn - _y_manual):.2e} &nbsp;&nbsp; {_mark}</td></tr>
-</tbody>
-</table>
-
-</div>
-"""
+    <div style="font-family:ui-monospace,monospace; font-size:13px; line-height:1.5;
+            background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px;
+            padding:6px 12px; margin:0;">
+    <span style="background:#ecfeff;color:#0e7490;padding:2px 8px;border-radius:5px;font-size:12px;margin-right:6px;">{eff_dataset}</span>
+    {_fi_badge}<br>
+    <b>coef_</b>=[{coef:.4f}] · <b>intercept_</b>={intercept:.4f} · <b>R²</b>={_r2:.4f} · <b>MSE</b>={_mse:.4f}<br>
+    <b>predict([[{_xn:.2f}]])</b>={_y_sklearn:.4f} = {coef:.4f}×{_xn:.2f} + ({intercept:.4f}) {_mark}
+    </div>
+    """
     panel = mo.md(_panel)
     return (panel,)
 
 
 @app.cell
 def _(mo):
-    mo.md("## 4️⃣ 模型属性 + 公式验算面板")
+    mo.md("""
+    ## 4️⃣ 模型属性 + 公式验算面板
+    """)
     return
 
 
 @app.cell
-def _(panel):
+def panel_view(panel):
+    # 数字面板（录屏内）
     panel
     return
 
 
 @app.cell
 def _(mo):
-    mo.md(
-        r"""
-        ---
-        ### 一句话总结
+    mo.md(r"""
+    ---
+    ### 一句话总结
 
-        > **`LinearRegression()` = 一个把 `coef_` 和 `intercept_` 算出来的对象**。
-        > `fit()` 算两个数，`predict()` 套公式 `coef_·x + intercept_`。
-        > 整套 API 4 行代码能跑通，6 个场景跑完覆盖所有要点。
-        """
-    )
+    > **`LinearRegression()` = 一个把 `coef_` 和 `intercept_` 算出来的对象**。
+    > `fit()` 算两个数，`predict()` 套公式 `coef_·x + intercept_`。
+    > 整套 API 4 行代码能跑通，6 个场景跑完覆盖所有要点。
+    """)
     return
 
 
@@ -605,47 +579,47 @@ def _(mo):
         {
             "📐 Grid 布局参考（16:9 · 录屏推荐）": mo.md(
                 r"""
-**目标 viewport**：1280px maxWidth · 24 columns · rowHeight 20 · 16:9 横屏。
-三段式：标题 + 场景卡（顶）/ 控件区 + 数据表 + 5 步代码 + 拟合图（中）/ 模型属性面板 + 总结（底）。
+    **目标 viewport**：1280px maxWidth · 24 columns · rowHeight 20 · 16:9 横屏。
+    三段式：标题 + 场景卡（顶）/ 控件区 + 数据表 + 5 步代码 + 拟合图（中）/ 模型属性面板 + 总结（底）。
 
-### 横屏骨架
+    ### 横屏骨架
 
-```
-   0                       12                       24
-y=0   ┌──────── 大标题 + 玩法说明 (cell 1) ─────────┐  h=4
-y=4   ├──────── 场景说明 callout (cell 4) ──────────┤  h=5
-y=9   ├──────── ## 1️⃣ 控件 (cell 16) ──────────────┤  h=1
-y=10  ├──────── preset dropdown (cell 17) ──────────┤  h=2
-y=12  ├──────── 锁定/自定义 提示横条 (cell 18) ─────┤  h=1
-y=13  ├──── dataset / fit_intercept / x_new (19) ───┤  h=3
-y=16  ├── 数据集小标题 (9)  │ ## 3️⃣ 拟合 (22) ─────┤  h=1
-y=17  ├── 数据表 (11)       │                       │
+    ```
+       0                       12                       24
+    y=0   ┌──────── 大标题 + 玩法说明 (cell 1) ─────────┐  h=4
+    y=4   ├──────── 场景说明 callout (cell 4) ──────────┤  h=5
+    y=9   ├──────── ## 1️⃣ 控件 (cell 16) ──────────────┤  h=1
+    y=10  ├──────── preset dropdown (cell 17) ──────────┤  h=2
+    y=12  ├──────── 锁定/自定义 提示横条 (cell 18) ─────┤  h=1
+    y=13  ├──── dataset / fit_intercept / x_new (19) ───┤  h=3
+    y=16  ├── 数据集小标题 (9)  │ ## 3️⃣ 拟合 (22) ─────┤  h=1
+    y=17  ├── 数据表 (11)       │                       │
       │   h=8               │  拟合图 chart (23)    │
-y=25  ├── shape 提示 (12)   │  h=21                 │
+    y=25  ├── shape 提示 (12)   │  h=21                 │
       │   h=2               │                       │
-y=27  ├── 5 步代码 (20)     │                       │
+    y=27  ├── 5 步代码 (20)     │                       │
       │   h=11              │                       │
-y=38  ├──────── ## 4️⃣ 模型属性 (cell 25) ──────────┤  h=1
-y=39  ├──────── 参数面板 panel (cell 26) ───────────┤  h=11
-y=50  ├──────── 一句话总结 (cell 27) ───────────────┤  h=4
-```
+    y=38  ├──────── ## 4️⃣ 模型属性 (cell 25) ──────────┤  h=1
+    y=39  ├──────── 参数面板 panel (cell 26) ───────────┤  h=11
+    y=50  ├──────── 一句话总结 (cell 27) ───────────────┤  h=4
+    ```
 
-### 镜头脚本（横屏切镜头 = 切场景）
+    ### 镜头脚本（横屏切镜头 = 切场景）
 
-| # | 时长 | 操作 | 教学焦点 |
-|---|---|---|---|
-| **A** | 0-30s | 选场景 1 · PPT 经典 | 4 行代码跑通 sklearn LR |
-| **B** | 30-60s | 选场景 2 · 关 fit_intercept | 看 b=0 拟合明显失败 |
-| **C** | 60-100s | 选场景 3 · 30 点加噪 | 参数稳，靠数据分布 |
-| **D** | 100-140s | 选场景 4 · 加州房价 | API 不变，coef/intercept 自动算新 |
-| **E** | 140-170s | 选场景 5 · 加州 + 关 b | 大数据 + 没中心化 = 别关 |
-| **F** | 170-220s | 选场景 6 · 拖 x_new | 外推风险：LR 没「我不知道」机制 |
+    | # | 时长 | 操作 | 教学焦点 |
+    |---|---|---|---|
+    | **A** | 0-30s | 选场景 1 · PPT 经典 | 4 行代码跑通 sklearn LR |
+    | **B** | 30-60s | 选场景 2 · 关 fit_intercept | 看 b=0 拟合明显失败 |
+    | **C** | 60-100s | 选场景 3 · 30 点加噪 | 参数稳，靠数据分布 |
+    | **D** | 100-140s | 选场景 4 · 加州房价 | API 不变，coef/intercept 自动算新 |
+    | **E** | 140-170s | 选场景 5 · 加州 + 关 b | 大数据 + 没中心化 = 别关 |
+    | **F** | 170-220s | 选场景 6 · 拖 x_new | 外推风险：LR 没「我不知道」机制 |
 
-### position=null 的 cell
+    ### position=null 的 cell
 
-imports / SCENARIOS dict / preset 定义 / 控件定义 / DATA_FACTORY / X y 加载 /
-table_view 计算 / model.fit / x_new slider 定义 / eff_x_new 解析 /
-chart 计算 / panel 计算 / 本 accordion → 共 13 计算 cell + 1 accordion = 14 个 null
+    imports / SCENARIOS dict / preset 定义 / 控件定义 / DATA_FACTORY / X y 加载 /
+    table_view 计算 / model.fit / x_new slider 定义 / eff_x_new 解析 /
+    chart 计算 / panel 计算 / 本 accordion → 共 13 计算 cell + 1 accordion = 14 个 null
                 """
             )
         },

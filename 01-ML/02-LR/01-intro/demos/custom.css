@@ -1,0 +1,66 @@
+/* === 字体（中文优先用现代无衬线，盖掉 marimo 默认宋体）=== */
+:root {
+  --marimo-heading-font: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Inter", system-ui, sans-serif;
+  --marimo-text-font: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Inter", system-ui, sans-serif;
+}
+
+/* === marimo grid 画布锁定 2560px ===
+   防止画布跟随浏览器窗口缩放
+   注意：依赖 marimo 内部 className `.react-grid-layout`，跨版本可能失效
+*/
+
+/* 强制 grid 容器固定宽度 */
+.react-grid-layout {
+  width: 1280px !important;
+  min-width: 1280px !important;
+  max-width: 1280px !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* 浏览器窗口窄于画布时启用横向滚动 */
+#App,
+#app-chrome-body {
+  overflow-x: auto !important;
+}
+
+/* 去掉顶部留白（marimo 默认 sm:pt-8 = 32px）让录屏区从 y=0 开始 */
+[class*="sm:pt-8"] {
+  padding-top: 0 !important;
+}
+.react-grid-layout {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  position: relative !important;
+}
+
+/* === sidebar 视觉再压缩 0.92 倍 === */
+[data-cell-name='controls'] {
+  transform: scale(0.92);
+  transform-origin: top left;
+  width: 109% !important;  /* 抵消 scale 后的视觉宽 = 1/0.92 */
+}
+
+/* === stage cell 防 hstack 溢出（双图模式 fallback）=== */
+[data-cell-name='stage'] [data-cell-role='output'] {
+  overflow-x: hidden !important;
+}
+
+/* === 录屏区可视化边框（1280×720）===
+   人工流程化时显示，自动化录屏前需注释掉这段 */
+.react-grid-layout::before {
+  content: "📹 录屏区 1280×720 (16:9)";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1280px;
+  height: 720px;
+  border: 2px dashed #ef4444;
+  pointer-events: none;
+  z-index: 9999;
+  font: 600 12px ui-monospace, monospace;
+  color: #ef4444;
+  padding: 4px 8px;
+  background: rgba(239, 68, 68, 0.04);
+  box-sizing: border-box;
+}

@@ -131,14 +131,14 @@ sklearn.tree.DecisionTreeClassifier(
 
 ### 为什么默认 gini
 
-`criterion='gini'` 是默认值（sklearn 选 CART 作底盘）。**实战里几乎不调**：
+两种切法的区别一句话：**gini 快、entropy 算得细一点但慢**。两者衡量的都是"这堆样本混不混"，结论几乎一样——选哪个对最终树的形状影响微乎其微。sklearn 默认 gini 就是因为它不用算 log，**快**。
 
-| 准则 | 公式直觉 | 计算成本 | 工程选型 |
+| 准则 | 一句话直觉 | 计算成本 | 工程选型 |
 |---|---|---|---|
-| `gini` | $1 - \sum p_i^2$ | 快（无 log） | 默认，不动 |
-| `entropy` | $-\sum p_i \log p_i$ | 慢 ~10% | 论文复现 / 偶尔涨 0.5% |
+| `gini` | 随手抓两个样本，类不一样的概率 | 快（无 log） | 默认，不动 |
+| `entropy` | 把这堆样本编码所需的"信息量" | 慢 ~10% | 论文复现 / 偶尔涨 0.5% |
 
-> 没事别为了"显得专业"换 entropy。换了大概率不涨，但 GridSearch 时间翻倍。
+> 没事别为了"显得专业"换 entropy。换了大概率不涨，但 GridSearch 时间翻倍。基尼快、信息熵慢但更"细"——99% 场景看不出差别。
 
 ### 三把刹车的工程直觉
 
@@ -225,6 +225,8 @@ DecisionTreeClassifier(
 | `max_features` | 分裂时只考虑 k 个特征（随机） | 高维 / 想加随机性 / 转 RandomForest 思维过渡 |
 | `class_weight='balanced'` | 类别不平衡时自动加权 | y 分布偏斜（如欺诈检测 1:99） |
 | `ccp_alpha` | 后剪枝强度（cost-complexity） | 第 7 章剪枝主场 |
+
+**这一节的关键启示**：开关选默认，刹车踩到位，种子别忘了。
 
 > Sources：
 > - PPT Slide 61-62

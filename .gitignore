@@ -59,3 +59,10 @@ yarn-error.log*
 
 # === PPT 源文件（章资源不入 git；已 tracked 的 02-LR/03线性回归.pptx 不受此影响）===
 *.pptx
+
+# === 录屏 pipeline 产物（大量 PNG / 视频 binaries + WIP 探针脚本）===
+**/recording/
+**/_recording/
+
+# === scratch / sandbox（本地实验，非教材产物）===
+sandbox/

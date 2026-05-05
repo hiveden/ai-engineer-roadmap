@@ -14,11 +14,9 @@
 
 **已知**：客户性别、年龄、年收入、消费指数。
 
-**需求**：对客户分群，找业务突破口、定位"黄金客户"。
+**需求**：对客户进行分析，找到业务突破口，寻找黄金客户。（没有使用标准化，因为量纲差别不大）
 
-**数据**：200 条顾客数据，4 个特征（Mall Customer Segmentation Dataset 风格）。
-
-业务视角：聚类结果交给市场团队解读——比如某簇"高收入低消费"= 潜力未开发用户，针对性营销。
+**数据**：200 条顾客数据，4 个特征。
 
 > 【实践】案例实现
 
@@ -32,44 +30,68 @@
 5. 可视化 + 业务解读
 ```
 
-**代码骨架**：
+**代码**（PPT Slide 59）：
 
 ```python
 import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score, calinski_harabasz_score
+import matplotlib.pyplot as plt
+from sklearn.metrics import silhouette_score
 
-# 1. 加载数据
-df = pd.read_csv('Mall_Customers.csv')
-X = df[['Age', 'Annual Income (k$)', 'Spending Score (1-100)']]
+# 聚类分析用户分群
+def dm01_聚类分析用户群():
+    dataset = pd.read_csv('data/customers.csv')
+    dataset.info()
+    print('dataset-->\n', dataset)
+    X = dataset.iloc[:, [3, 4]]
+    print('X-->\n', X)
+    mysse = []
+    mysscore = []
+    # 评估聚类个数
+    for i in range(2, 11):
+        mykeans = KMeans(n_clusters=i)
+        mykeans.fit(X)
+        mysse.append(mykeans.inertia_)      # inertia 簇内误差平方和
+        ret = mykeans.predict(X)
+        mysscore.append(silhouette_score(X, ret))    # sc系数 聚类需要1个以上的类别
 
-# 2. 标准化
-X_scaled = StandardScaler().fit_transform(X)
-
-# 3. 肘部法选 K
-sse = []
-for k in range(2, 11):
-    km = KMeans(n_clusters=k, random_state=22, n_init=10).fit(X_scaled)
-    sse.append(km.inertia_)
-plt.plot(range(2, 11), sse, marker='o')
-plt.xlabel('K'); plt.ylabel('SSE'); plt.show()
-
-# 4. 选定 K 后聚类
-km = KMeans(n_clusters=5, random_state=22, n_init=10).fit(X_scaled)
-df['cluster'] = km.labels_
-
-# 5. 评估
-print('SC:', silhouette_score(X_scaled, km.labels_))
-print('CH:', calinski_harabasz_score(X_scaled, km.labels_))
-
-# 6. 业务解读：按簇看均值画像
-print(df.groupby('cluster')[['Age', 'Annual Income (k$)', 'Spending Score (1-100)']].mean())
+    plt.plot(range(2, 11), mysse)
+    plt.title('the elbow method')
+    plt.xlabel('number of clusters')
+    plt.ylabel('mysse')
+    plt.grid()
+    plt.show()
+    plt.title('sh')
+    plt.plot(range(2, 11), mysscore)
+    plt.grid(True)
+    plt.show()
+    pass
 ```
 
-**坑点提醒**：
+**效果分析**：通过肘方法、sc 系数都可以看出，聚成 5 类效果最好
 
-- 不标准化 → `Annual Income` 数值大主导欧氏距离，`Spending Score` 几乎不起作用
-- `n_init=10`：随机初始化 10 次取 SSE 最优，缓解局部最优
-- 性别是类别变量需先编码（如 `pd.get_dummies`）才能进 K-Means
+```python
+def dm02_聚类分析用户群():
+    dataset = pd.read_csv('data/customers.csv')
+    X = dataset.iloc[:, [3, 4]]
+    mykeans = KMeans(n_clusters=5)
+    mykeans.fit(X)
+    y_kmeans = mykeans.predict(X)
+    # 把类别是0的, 第0类数据,第1列数据, 作为x/y, 传给plt.scatter函数
+    plt.scatter(X.values[y_kmeans == 0, 0], X.values[y_kmeans == 0, 1], s=100, c='red', label='Standard')
+    # 把类别是1的, 第0类数据,第1列数据, 作为x/y, 传给plt.scatter函数
+    plt.scatter(X.values[y_kmeans == 1, 0], X.values[y_kmeans == 1, 1], s=100, c='blue', label='Traditional')
+    # 把类别是2的, 第0类数据,第1列数据, 作为x/y, 传给plt.scatter函数
+    plt.scatter(X.values[y_kmeans == 2, 0], X.values[y_kmeans == 2, 1], s=100, c='green', label='Normal')
+    plt.scatter(X.values[y_kmeans == 3, 0], X.values[y_kmeans == 3, 1], s=100, c='cyan', label='Youth')
+    plt.scatter(X.values[y_kmeans == 4, 0], X.values[y_kmeans == 4, 1], s=100, c='magenta', label='TA')
+    plt.scatter(mykeans.cluster_centers_[:, 0], mykeans.cluster_centers_[:, 1], s=300, c='black', label='Centroids')
+
+    plt.title('Clusters of customers')
+    plt.xlabel('Annual Income (k$)')
+    plt.ylabel('Spending Score (1-100)')
+    plt.legend()
+    plt.show()
+```
+
+**业务结论**：聚成 5 类，右上角属于挣的多，消费的也多黄金客户群

@@ -92,5 +92,6 @@ cue 词：
 ## 待办
 
 - [x] Python 实测：μ/σ 计算、异常值场景下 z-score
-- [ ] script.json 正稿（本文件相邻产出）
-- [ ] cta 推迟项与 E10 hook 对齐
+- [x] script.json 正稿（本文件相邻产出）
+- [x] cta 推迟项与 E10 hook 对齐
+- [x] Step 3.5 实测复核（全部 13 项量化描述通过，TTS 闸门已开）

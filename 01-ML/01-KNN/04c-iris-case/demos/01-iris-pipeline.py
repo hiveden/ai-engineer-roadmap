@@ -1,16 +1,29 @@
 """
-鸢尾花完整 ML pipeline · KNN + 标准化实战
+鸢尾花完整 ML pipeline · KNN + 标准化实战（v2 · 16:9 grid 友好）
+
+按 _2-demo-guide §9 重做：
+  - 16:9 横屏布局（maxWidth=1280, total height=720 / 24×36 grid）
+  - 每个 chart / 状态卡独占 cell（无嵌套 vstack/hstack）
+  - 决策边界 + 混淆矩阵横排双列
+  - chart 不带 properties(width/height)，由 grid 决定尺寸
+  - 末尾加 ASCII 布局参考 cell
 
 互动：拖 k / test_size / random_state、切换标准化、选 2 维投影看决策边界
 对照：4 维全特征训练 vs 当前 2 维投影训练，准确率差距体现"维度信息量"
 
-跑：marimo edit 01-iris-pipeline.py
+跑：
+  marimo edit 01-iris-pipeline.py --port 2718                          # 调布局
+  marimo run  01-iris-pipeline.py --port 2755 --no-token --headless    # 录屏
 """
 
 import marimo
 
 __generated_with = "0.23.4"
-app = marimo.App(width="medium", css_file="marimo.css")
+app = marimo.App(
+    width="medium",
+    layout_file="layouts/01-iris-pipeline.grid.json",
+    css_file="marimo.css",
+)
 
 
 @app.cell
@@ -28,7 +41,6 @@ def _():
         confusion_matrix,
         classification_report,
     )
-
     return (
         KNeighborsClassifier,
         StandardScaler,
@@ -46,78 +58,63 @@ def _():
 
 @app.cell
 def _(mo):
-    mo.md(
-        """
-    # 鸢尾花完整 ML Pipeline · KNN 实战
-
-    > 6 步标准流程：**加载 → 拆分 → 标准化 → 训练 → 评估 → 预测**
-    >
-    > 你能调的：训练/测试比例、k、random_state、标准化开关、2D 投影特征。
-    > 你能看的：准确率、混淆矩阵、分类报告、决策边界（2D 投影）。
-        """
-    )
+    mo.md("## 鸢尾花完整 ML Pipeline · KNN 实战")
     return
 
 
 @app.cell
 def _(load_iris):
     iris = load_iris()
-    feature_names = list(iris.feature_names)  # 4 个英文名
-    feature_names_zh = ["花萼长 sepal_len", "花萼宽 sepal_wid", "花瓣长 petal_len", "花瓣宽 petal_wid"]
-    target_names = list(iris.target_names)  # ['setosa', 'versicolor', 'virginica']
-    X_full = iris.data  # (150, 4)
-    y_full = iris.target  # (150,)
+    feature_names_zh = [
+        "花萼长 sepal_len",
+        "花萼宽 sepal_wid",
+        "花瓣长 petal_len",
+        "花瓣宽 petal_wid",
+    ]
+    target_names = list(iris.target_names)
+    X_full = iris.data       # (150, 4)
+    y_full = iris.target     # (150,)
     return X_full, feature_names_zh, target_names, y_full
 
 
 @app.cell
 def _(X_full, feature_names_zh, mo, target_names, y_full):
-    mo.md(
-        f"""
-<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:10px 14px;font-size:13px;line-height:1.7;">
-<strong>数据集</strong>：sklearn `load_iris()` · 经典 ML hello world<br>
-• 样本量 <code>N={len(X_full)}</code> · 4 个特征 · 3 类（每类 {(y_full == 0).sum()}/{(y_full == 1).sum()}/{(y_full == 2).sum()}）<br>
-• 特征：{" / ".join(feature_names_zh)}<br>
-• 类别：<span style="color:#dc2626;">{target_names[0]}</span> · <span style="color:#16a34a;">{target_names[1]}</span> · <span style="color:#2563eb;">{target_names[2]}</span>
+    mo.md(f"""
+<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:6px 14px;font-size:13px;line-height:1.55;">
+<strong>数据集</strong> sklearn <code>load_iris()</code> · ML hello world ·
+<code>N={len(X_full)}</code> · 4 特征 · 3 类（{(y_full == 0).sum()}/{(y_full == 1).sum()}/{(y_full == 2).sum()}）<br>
+特征：{" / ".join(feature_names_zh)}<br>
+类别 <span style="color:#dc2626;font-weight:600;">{target_names[0]}</span> ·
+<span style="color:#16a34a;font-weight:600;">{target_names[1]}</span> ·
+<span style="color:#2563eb;font-weight:600;">{target_names[2]}</span> ·
+6 步 <code>load_iris</code> → <code>train_test_split</code> → <code>StandardScaler</code> → <code>KNeighborsClassifier.fit</code> → <code>accuracy_score</code> · <code>confusion_matrix</code> → <code>predict</code>
 </div>
-        """
-    )
+""")
     return
 
 
 @app.cell
-def _(feature_names_zh, mo):
-    section_style = (
-        "border-left:2px solid #6366f1;padding:1px 8px;"
-        "font-weight:600;font-size:12px;color:#475569;margin-bottom:2px;"
-    )
+def _(mo):
     test_size = mo.ui.slider(0.1, 0.5, value=0.3, step=0.05, label="test_size 测试集占比")
-    k_slider = mo.ui.slider(1, 30, value=5, step=2, label="k 邻居数")
     seed = mo.ui.slider(0, 100, value=22, step=1, label="random_state")
-    scale_switch = mo.ui.switch(value=True, label="StandardScaler 标准化")
+    mo.vstack([test_size, seed])
+    return seed, test_size
 
+
+@app.cell
+def _(mo):
+    k_slider = mo.ui.slider(1, 30, value=5, step=2, label="k 邻居数")
+    scale_switch = mo.ui.switch(value=True, label="StandardScaler 标准化")
+    mo.vstack([k_slider, scale_switch])
+    return k_slider, scale_switch
+
+
+@app.cell
+def _(feature_names_zh, mo):
     feat_x = mo.ui.dropdown(options=feature_names_zh, value=feature_names_zh[2], label="2D 投影 X")
     feat_y = mo.ui.dropdown(options=feature_names_zh, value=feature_names_zh[3], label="2D 投影 Y")
-
-    mo.hstack(
-        [
-            mo.vstack([
-                mo.md(f'<div style="{section_style}">数据拆分</div>'),
-                test_size, seed,
-            ]),
-            mo.vstack([
-                mo.md(f'<div style="{section_style}">KNN 参数</div>'),
-                k_slider, scale_switch,
-            ]),
-            mo.vstack([
-                mo.md(f'<div style="{section_style}">2D 投影特征</div>'),
-                feat_x, feat_y,
-            ]),
-        ],
-        widths=[1, 1, 1],
-        justify="space-around",
-    )
-    return feat_x, feat_y, k_slider, scale_switch, seed, test_size
+    mo.vstack([feat_x, feat_y])
+    return feat_x, feat_y
 
 
 @app.cell
@@ -133,7 +130,6 @@ def _(
     train_test_split,
     y_full,
 ):
-    # 4 维全特征训练（与下面 2D 投影做对比）
     Xtr, Xte, ytr, yte = train_test_split(
         X_full, y_full,
         test_size=test_size.value,
@@ -150,7 +146,7 @@ def _(
     model_4d.fit(Xtr_s, ytr)
     yhat_4d = model_4d.predict(Xte_s)
     acc_4d = float(accuracy_score(yte, yhat_4d))
-    return Xtr, Xte, acc_4d, scaler, yhat_4d, ytr, yte
+    return acc_4d, yhat_4d, yte
 
 
 @app.cell
@@ -169,11 +165,9 @@ def _(
     train_test_split,
     y_full,
 ):
-    # 仅 2 维投影训练（演示决策边界 + 与 4D 对比）
     ix = feature_names_zh.index(feat_x.value)
     iy = feature_names_zh.index(feat_y.value)
     if ix == iy:
-        # 防呆：两个轴选了同一个，强制 X 用 idx, Y 用 idx+1
         iy = (ix + 1) % 4
     X2 = X_full[:, [ix, iy]]
     Xtr2, Xte2, ytr2, yte2 = train_test_split(
@@ -193,37 +187,32 @@ def _(
     model_2d.fit(Xtr2_s, ytr2)
     yhat_2d = model_2d.predict(Xte2_s)
     acc_2d = float(accuracy_score(yte2, yhat_2d))
-    return (
-        X2,
-        Xtr2_s,
-        Xte2_s,
-        acc_2d,
-        ix,
-        iy,
-        model_2d,
-        scaler2,
-        yhat_2d,
-        ytr2,
-        yte2,
-    )
+    return X2, Xte2_s, Xtr2_s, acc_2d, model_2d, scaler2, yte2, ytr2
 
 
 @app.cell
 def _(acc_2d, acc_4d, k_slider, mo, scale_switch):
     delta = (acc_4d - acc_2d) * 100
     if delta > 5:
-        diff_msg = f"<span style='color:#dc2626;'>⚠️ 4D 比 2D 高 {delta:.1f} pp，**说明剩余 2 维有信息**</span>"
+        diff_msg = (
+            f"<span style='color:#dc2626;font-weight:600;'>"
+            f"4D 比 2D 高 {delta:.1f} pp · 剩余 2 维有信息"
+            f"</span>"
+        )
     elif delta > 0:
-        diff_msg = f"<span style='color:#16a34a;'>✓ 4D 比 2D 高 {delta:.1f} pp，但差距小</span>"
+        diff_msg = (
+            f"<span style='color:#16a34a;'>"
+            f"4D 比 2D 高 {delta:.1f} pp · 差距小"
+            f"</span>"
+        )
     else:
-        diff_msg = f"<span style='color:#16a34a;'>2D 已经够（运气或这两维信息量大）</span>"
+        diff_msg = (
+            "<span style='color:#16a34a;'>2D 已经够（这两维信息量大）</span>"
+        )
     mo.md(
         f"""
-<div style="padding:8px 14px;background:#eff6ff;border-left:4px solid #2563eb;border-radius:4px;font-size:14px;">
-<strong>测试集准确率对比</strong> · k=<code>{k_slider.value}</code> · 标准化 <code>{'ON' if scale_switch.value else 'OFF'}</code><br>
-• <strong>4 维全特征</strong>（标准训练）：<code>{acc_4d:.1%}</code><br>
-• <strong>2 维投影特征</strong>（仅当前可视化的两维）：<code>{acc_2d:.1%}</code><br>
-{diff_msg}
+<div style="padding:6px 14px;background:#eff6ff;border-left:4px solid #2563eb;border-radius:4px;font-size:14px;line-height:1.5;">
+<strong>测试集准确率对比</strong> · k=<code>{k_slider.value}</code> · 标准化 <code>{'ON' if scale_switch.value else 'OFF'}</code> · <strong>4D 全特征</strong> <code>{acc_4d:.1%}</code> · <strong>2D 投影</strong> <code>{acc_2d:.1%}</code> · {diff_msg}
 </div>
         """
     )
@@ -233,6 +222,7 @@ def _(acc_2d, acc_4d, k_slider, mo, scale_switch):
 @app.cell
 def _(
     X2,
+    Xte2_s,
     Xtr2_s,
     alt,
     feat_x,
@@ -243,12 +233,9 @@ def _(
     scale_switch,
     scaler2,
     target_names,
-    ytr2,
     yte2,
-    Xte2_s,
+    ytr2,
 ):
-    # 决策边界（2D 投影模型）
-    # 用标准化后的特征空间生成网格 → 反标准化回原始特征空间显示
     if scale_switch.value:
         xmin, xmax = float(Xtr2_s[:, 0].min()) - 0.5, float(Xtr2_s[:, 0].max()) + 0.5
         ymin, ymax = float(Xtr2_s[:, 1].min()) - 0.5, float(Xtr2_s[:, 1].max()) + 0.5
@@ -263,7 +250,6 @@ def _(
     GX, GY = np.meshgrid(gx, gy)
     grid_pts = np.c_[GX.ravel(), GY.ravel()]
     grid_pred = model_2d.predict(grid_pts)
-    # 反标准化回原始特征空间显示坐标
     if scale_switch.value:
         grid_pts_disp = scaler2.inverse_transform(grid_pts)
     else:
@@ -278,7 +264,6 @@ def _(
         "pred": [target_names[p] for p in grid_pred],
     })
 
-    # 训练点 + 测试点
     Xtr2_disp = scaler2.inverse_transform(Xtr2_s) if scale_switch.value else Xtr2_s
     Xte2_disp = scaler2.inverse_transform(Xte2_s) if scale_switch.value else Xte2_s
     df_train = pd.DataFrame({
@@ -309,7 +294,10 @@ def _(
         size=80, stroke="black", strokeWidth=0.6, opacity=0.85,
     ).encode(
         x="x:Q", y="y:Q",
-        color=alt.Color("label:N", scale=palette, legend=alt.Legend(title="类别")),
+        color=alt.Color(
+            "label:N", scale=palette,
+            legend=alt.Legend(title="类别", orient="top-right", offset=-4),
+        ),
         tooltip=["x:Q", "y:Q", "label:N", "kind:N"],
     )
     test_pts = alt.Chart(df_test).mark_point(
@@ -320,18 +308,16 @@ def _(
         tooltip=["x:Q", "y:Q", "label:N", "kind:N"],
     )
 
-    chart = (region + train_pts + test_pts).properties(
-        width=560, height=420,
-        title=f"2D 决策边界（仅用 {feat_x.value} × {feat_y.value} 训练 KNN）· 圆=训练 · 十字=测试",
+    chart = (region + train_pts + test_pts).resolve_scale(color="independent").properties(
+        width=620, height=420,
     )
     chart
     return
 
 
 @app.cell
-def _(confusion_matrix, mo, pd, target_names, yhat_4d, yte):
+def _(alt, confusion_matrix, pd, target_names, yhat_4d, yte):
     cm = confusion_matrix(yte, yhat_4d)
-    n_test = int(cm.sum())
     rows = []
     for i, real in enumerate(target_names):
         for j, pred in enumerate(target_names):
@@ -343,34 +329,29 @@ def _(confusion_matrix, mo, pd, target_names, yhat_4d, yte):
             })
     df_cm = pd.DataFrame(rows)
 
-    import altair as _alt
-    heat = _alt.Chart(df_cm).mark_rect(stroke="white", strokeWidth=2).encode(
-        x=_alt.X("预测:N", sort=target_names, title="预测类别"),
-        y=_alt.Y("真实:N", sort=target_names, title="真实类别"),
-        color=_alt.Color(
+    heat = alt.Chart(df_cm).mark_rect(stroke="white", strokeWidth=2).encode(
+        x=alt.X("预测:N", sort=target_names, title="预测类别"),
+        y=alt.Y("真实:N", sort=target_names, title="真实类别"),
+        color=alt.Color(
             "count:Q",
-            scale=_alt.Scale(scheme="blues"),
-            legend=_alt.Legend(title="样本数"),
+            scale=alt.Scale(scheme="blues"),
+            legend=alt.Legend(title="样本数"),
         ),
         tooltip=["真实:N", "预测:N", "count:Q"],
     )
-    text = _alt.Chart(df_cm).mark_text(fontSize=18, fontWeight="bold").encode(
+    text = alt.Chart(df_cm).mark_text(fontSize=18, fontWeight="bold").encode(
         x="预测:N", y="真实:N",
         text="count:Q",
-        color=_alt.condition(
+        color=alt.condition(
             "datum.count > 5",
-            _alt.value("white"),
-            _alt.value("#0f172a"),
+            alt.value("white"),
+            alt.value("#0f172a"),
         ),
     )
-    cm_chart = (heat + text).properties(
-        width=320, height=300,
-        title=f"4 维全特征 · 测试集混淆矩阵（N={n_test}）",
+    cm_chart = (heat + text).resolve_scale(color="independent").properties(
+        width=440, height=400,
     )
-    mo.vstack([
-        mo.md("### 混淆矩阵（4 维模型）"),
-        cm_chart,
-    ])
+    cm_chart
     return
 
 
@@ -396,7 +377,7 @@ def _(classification_report, mo, target_names, yhat_4d, yte):
 def _(mo):
     mo.accordion(
         {
-            "📖 这个 demo 在演示什么": mo.md(
+            "这个 demo 在演示什么": mo.md(
                 "**完整 ML pipeline 6 步**：\n\n"
                 "1. **加载** `load_iris()` 拿数据 + 特征名 + 类别名\n"
                 "2. **拆分** `train_test_split(test_size, random_state, stratify=y)` —— "
@@ -429,6 +410,28 @@ def _(mo):
             ),
         },
         multiple=False,
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        """
+## Grid 布局参考（16:9 · maxWidth 1280 · total 36 行 = 720px · 录屏推荐）
+
+```
+   0           8          14         16             24
+ 0 ├──── 标题 h=2 ──────────────────────────────────┤  cell 2
+ 2 ├──── 数据集卡 h=3 ──────────────────────────────┤  cell 4
+ 5 ├ 数据拆分 ┬ KNN 参数 ┬ 2D 投影 ─ h=5 ──────────-┤  cell 5/6/7
+10 ├──── acc 对比卡 h=3 ────────────────────────────┤  cell 10
+13 ├── 决策边界图 14 列 ──────┬── 混淆矩阵 10 列 h=23┤  cell 11 + cell 12
+36
+```
+
+cell 1 imports / 3 load_iris / 8 4D训练 / 9 2D训练 / 13 classification_report / 14 accordion / 15 本块 → null
+"""
     )
     return
 

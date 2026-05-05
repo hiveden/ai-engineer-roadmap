@@ -47,6 +47,10 @@ marimo run 02-knn-scaling.py
 |---|---|
 | `02-knn-scaling.py` | KNN + 缩放对比（k / scaler / 异常值 / 新人特征） |
 
+## 已知优化点
+
+- 控件区是 `hstack([vstack(...), vstack(...)])` 嵌套结构，违反 `_2-demo-guide.md` §1。当前 layouts 是按这个 cell 数（7）调好的，重构会让 grid 配置失效。等下一轮 demo 调整时一并改：4 控件展平到一行 hstack widths=[1,1,1,1]，重生成 layouts。
+
 ## 玩法（详见 demo 文末"玩法建议"）
 
 1. 基线 → 默认设置

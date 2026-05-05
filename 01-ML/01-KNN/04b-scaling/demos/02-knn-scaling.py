@@ -1,19 +1,24 @@
 """
-KNN 缩放对比 · 健康预测案例（紧凑版）
+KNN 缩放对比 · 健康预测案例（v2 · grid 友好）
 
-紧凑布局：
-  - 控件横排两列
-  - 预测 callout 居中
-  - 散点图小尺寸
-  - 详情合并到一个折叠面板
+按 _2-demo-guide §9 重做：
+  - 每个 chart / 表 独立 cell（无嵌套 vstack/hstack）
+  - 控件分两行 hstack（模型参数 / 新人特征）
+  - 顶部绑定 layout_file
 
-跑：marimo run 02-knn-scaling.py --port 2718 --no-token
+跑：
+  marimo edit 02-knn-scaling.py --port 2718        # 调布局
+  marimo run  02-knn-scaling.py --port 2752 --no-token --headless  # 录屏
 """
 
 import marimo
 
 __generated_with = "0.23.4"
-app = marimo.App(width="medium", css_file="marimo.css")
+app = marimo.App(
+    width="medium",
+    layout_file="layouts/02-knn-scaling.grid.json",
+    css_file="marimo.css",
+)
 
 
 @app.cell
@@ -28,9 +33,7 @@ def _():
 
 @app.cell
 def _(mo):
-    mo.md("""
-    # KNN 缩放对比 · 健康预测
-    """)
+    mo.md("# KNN 缩放对比 · 健康预测")
     return
 
 
@@ -43,41 +46,17 @@ def _(mo):
         label="缩放",
     )
     outlier_switch = mo.ui.switch(value=False, label="注入异常值 (体重 250kg)")
+    mo.hstack([k_slider, scaler_choice, outlier_switch], widths=[1, 1, 1], gap=2)
+    return k_slider, outlier_switch, scaler_choice
 
+
+@app.cell
+def _(mo):
     new_height = mo.ui.slider(160, 195, value=173, step=1, label="身高 cm")
     new_weight = mo.ui.slider(50, 130, value=80, step=1, label="体重 kg")
     new_vision = mo.ui.slider(0.1, 2.0, value=1.0, step=0.1, label="视力")
-
-    section_style = (
-        "border-left:3px solid #6366f1;padding:2px 10px;"
-        "font-weight:600;font-size:14px;margin-bottom:4px;"
-    )
-    mo.hstack(
-        [
-            mo.vstack([
-                mo.md(f'<div style="{section_style}">模型参数</div>'),
-                k_slider,
-                scaler_choice,
-                outlier_switch,
-            ]),
-            mo.vstack([
-                mo.md(f'<div style="{section_style}">新人特征</div>'),
-                new_height,
-                new_weight,
-                new_vision,
-            ]),
-        ],
-        justify="space-around",
-        widths=[1, 1],
-    )
-    return (
-        k_slider,
-        new_height,
-        new_vision,
-        new_weight,
-        outlier_switch,
-        scaler_choice,
-    )
+    mo.hstack([new_height, new_weight, new_vision], widths=[1, 1, 1], gap=2)
+    return new_height, new_vision, new_weight
 
 
 @app.cell
@@ -147,9 +126,9 @@ def _(
     text_color = "#166534" if prediction == 1 else "#991b1b"
 
     mo.md(
-        f'<div style="padding:6px 12px;background:{bg_color};'
+        f'<div style="padding:8px 14px;background:{bg_color};'
         f'border-left:4px solid {border_color};border-radius:4px;'
-        f'font-size:14px;line-height:1.4;color:{text_color};">'
+        f'font-size:15px;line-height:1.5;color:{text_color};">'
         f"<strong>{label}</strong> · 健康 {healthy} / 不健康 {unhealthy}"
         f" · k=<code>{k_slider.value}</code>"
         f" · <code>{scaler_choice.value}</code>{outlier_tag}"
@@ -190,19 +169,7 @@ def _(
 
 
 @app.cell
-def _(
-    X_data,
-    X_scaled,
-    dists,
-    k_slider,
-    mo,
-    np,
-    scaler,
-    scaler_choice,
-    sorted_idx,
-    y_data,
-):
-    # ---- 距离明细（top-k 用黄色高亮背景） ----
+def _(X_data, dists, k_slider, mo, sorted_idx, y_data):
     dist_rows = []
     for rank, i in enumerate(sorted_idx, start=1):
         h, w, v = X_data[i]
@@ -218,35 +185,43 @@ def _(
             f"| {rank} | {h:.0f} | {w:.0f} | {v:.1f} | {kind} | {dist_cell} |"
         )
     dist_md = (
+        "**距离明细**（黄色高亮 = 前 k 近邻）\n\n"
         "| 排名 | 身高 | 体重 | 视力 | 标签 | 距离 |\n"
         "|---|---|---|---|---|---|\n"
         + "\n".join(dist_rows)
-        + f"\n\n> 黄色高亮 = 前 k={k_slider.value} 个最近邻"
     )
+    mo.md(dist_md)
+    return
 
-    # ---- 缩放参数 ----
+
+@app.cell
+def _(mo, np, scaler, scaler_choice):
     if scaler_choice.value == "MinMaxScaler":
-        params_md = (
+        _params_md = (
+            "**缩放参数**（MinMaxScaler · 公式 `x' = (x − min) / (max − min)`）\n\n"
             "| 特征 | min | max | 跨度 |\n"
             "|---|---|---|---|\n"
             f"| 身高 | {scaler.data_min_[0]:.2f} | {scaler.data_max_[0]:.2f} | {scaler.data_range_[0]:.2f} |\n"
             f"| 体重 | {scaler.data_min_[1]:.2f} | {scaler.data_max_[1]:.2f} | {scaler.data_range_[1]:.2f} |\n"
-            f"| 视力 | {scaler.data_min_[2]:.2f} | {scaler.data_max_[2]:.2f} | {scaler.data_range_[2]:.2f} |\n"
-            "\n公式 `x' = (x − min) / (max − min)`"
+            f"| 视力 | {scaler.data_min_[2]:.2f} | {scaler.data_max_[2]:.2f} | {scaler.data_range_[2]:.2f} |"
         )
     elif scaler_choice.value == "StandardScaler":
-        params_md = (
+        _params_md = (
+            "**缩放参数**（StandardScaler · 公式 `x' = (x − μ) / σ`）\n\n"
             "| 特征 | μ | σ |\n"
             "|---|---|---|\n"
             f"| 身高 | {scaler.mean_[0]:.2f} | {np.sqrt(scaler.var_[0]):.2f} |\n"
             f"| 体重 | {scaler.mean_[1]:.2f} | {np.sqrt(scaler.var_[1]):.2f} |\n"
-            f"| 视力 | {scaler.mean_[2]:.2f} | {np.sqrt(scaler.var_[2]):.2f} |\n"
-            "\n公式 `x' = (x − μ) / σ`"
+            f"| 视力 | {scaler.mean_[2]:.2f} | {np.sqrt(scaler.var_[2]):.2f} |"
         )
     else:
-        params_md = "未缩放——直接用原始量纲"
+        _params_md = "**缩放参数**\n\n未缩放——直接用原始量纲"
+    mo.md(_params_md)
+    return
 
-    # ---- 缩放前后对比 ----
+
+@app.cell
+def _(X_data, X_scaled, mo, y_data):
     compare_rows = "\n".join([
         (
             f"| {i+1} | {X_data[i, 0]:.0f} | {X_data[i, 1]:.0f} | {X_data[i, 2]:.1f} | "
@@ -256,47 +231,51 @@ def _(
         for i in range(len(X_data))
     ])
     compare_md = (
+        "**缩放前后对比**\n\n"
         "| # | 身高 | 体重 | 视力 | 身高' | 体重' | 视力' | 标签 |\n"
         "|---|---|---|---|---|---|---|---|\n"
         + compare_rows
     )
+    mo.md(compare_md)
+    return
 
-    detail_section_style = (
-        "border-left:3px solid #6366f1;padding:2px 10px;"
-        "font-weight:600;font-size:14px;margin-bottom:4px;"
-    )
-    side_by_side = mo.hstack(
-        [
-            mo.vstack([
-                mo.md(f'<div style="{detail_section_style}">距离明细</div>'),
-                mo.md(dist_md),
-            ]),
-            mo.vstack([
-                mo.md(f'<div style="{detail_section_style}">缩放前后对比</div>'),
-                mo.md(compare_md),
-            ]),
-        ],
-        widths=[1, 1.2],
-        justify="space-between",
-        gap=2,
-    )
 
-    mo.vstack([
-        side_by_side,
-        mo.accordion(
-            {
-                f"缩放参数（{scaler_choice.value}）": mo.md(params_md),
-                "玩法建议": mo.md(
-                    "1. 基线：默认 → 看预测\n\n"
-                    "2. 量纲独裁：保持 `None`，调体重 50→130 → 预测翻转\n\n"
-                    "3. 切 `MinMax` / `Standard` → 看距离重排\n\n"
-                    "4. 异常值 + `MinMax` → 崩；异常值 + `Standard` → 稳\n\n"
-                    "5. k=1 vs k=7 → 投票稳定性"
-                ),
-            },
-            multiple=True,
-        ),
-    ])
+@app.cell
+def _(mo):
+    mo.accordion(
+        {
+            "玩法建议": mo.md(
+                "1. 基线：默认 → 看预测\n\n"
+                "2. 量纲独裁：保持 `None`，调体重 50→130 → 预测翻转\n\n"
+                "3. 切 `MinMax` / `Standard` → 看距离重排\n\n"
+                "4. 异常值 + `MinMax` → 崩；异常值 + `Standard` → 稳\n\n"
+                "5. k=1 vs k=7 → 投票稳定性"
+            ),
+        },
+    )
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(
+        """
+## Grid 布局参考（16:9 · maxWidth 1280 · 录屏推荐）
+
+```
+   0           12           24
+ 0 ┌────── 标题（h=2）─────────┐    cell 2
+ 2 ├─模型参数 h=5 ┬─新人特征──┤    cell 3 + cell 4
+ 7 ├──── 预测卡 h=3 ───────────┤    cell 6
+10 ├────── 散点图 h=10 ────────┤    cell 7
+20 ├─距离明细 h=15┬─缩放参数──┤    cell 8 + cell 9
+35 ├──── 缩放前后对比 h=12 ────┤    cell 10
+47
+```
+
+cell 1 (imports) / 5 (计算) / 11 (玩法 accordion) / 12 (本块) → null
+"""
+    )
     return
 
 

@@ -8,3 +8,54 @@
   --marimo-monospace-font: 'Geist Mono', 'SF Mono', 'JetBrains Mono', monospace;
   --marimo-heading-font: 'Geist', 'Inter', sans-serif;
 }
+
+/* ========== 控件密集行紧凑化（cell 3/4 h=4 槽位） ========== */
+
+/* label 字号 + 字重 */
+label {
+  font-size: 11px !important;
+  font-weight: 400 !important;
+}
+
+/* slider track 宽度：tailwind 默认 w-36 (144px) → 96px */
+.touch-none[data-orientation="horizontal"],
+[data-orientation="horizontal"].relative.flex {
+  width: 96px !important;
+}
+
+/* slider thumb：默认 h-4 w-4 (16px) → 12px */
+[role="slider"] {
+  height: 12px !important;
+  width: 12px !important;
+}
+
+/* switch 整体缩：默认 h-6 w-11 (24×44) → 18×32 */
+[role="switch"] {
+  height: 18px !important;
+  width: 32px !important;
+}
+[role="switch"] > span {
+  height: 14px !important;
+  width: 14px !important;
+}
+
+/* dropdown / select trigger 高度 + 字号：默认 h-6 → h-5 */
+button[aria-haspopup="listbox"],
+[role="combobox"] {
+  height: 22px !important;
+  font-size: 12px !important;
+  padding: 0 6px !important;
+}
+
+/* slider 当前值显示（小数字徽章） */
+.font-prose:not(h1):not(h2):not(h3):not(h4):not(p):not(td):not(th) {
+  font-size: 11px !important;
+}
+
+/* 数字 / 文本输入框（如有） */
+.marimo input[type="number"],
+.marimo input[type="text"] {
+  font-size: 11px !important;
+  height: 22px !important;
+  padding: 2px 6px !important;
+}

@@ -21,11 +21,11 @@
 
 ## Demo 片段
 
-- `05-hyperparameter/demos/01-cv-gridsearch.py` Tab 2（GridSearchCV 热力图）+ Tab 3（手写数字）
+- `05-hyperparameter/demos/02-gridsearch.py`（GridSearchCV 热力图，端口 2756）+ `03-digits.py`（手写数字，端口 2757）
 
 **实际 UI**（按这个写录屏稿，**已读 demo 代码**）：
 
-### Tab 2 · GridSearchCV 热力图
+### 02-gridsearch.py · GridSearchCV 热力图
 - 静态图（无控件，预先跑好的结果）
 - 4 行 × 9 列热力图
   - 行：(uniform·p=1, uniform·p=2, distance·p=1, distance·p=2)
@@ -36,7 +36,7 @@
 - 下方文字：最优组合 `best_params_` + 最差组合 + 跨度 pp
 - accordion 2 个：训练次数公式 / refit=True 机制
 
-### Tab 3 · 手写数字 KNN
+### 03-digits.py · 手写数字 KNN
 - 顶部说明卡：测试集准确率（~98-99%）+ 训练集 1347 / 测试集 450
 - 控件：`pick` 滑块（0-449，选测试样本编号）
 - 主图：当前测试样本 8×8 灰度图（mark_rect + 灰度 viridis）
@@ -46,24 +46,24 @@
 
 **关键档位**：
 
-| Tab | 档位 | 现象 | 教学要点 |
+| Demo | 档位 | 现象 | 教学要点 |
 |---|---|---|---|
-| Tab 2 | 静态 | 36 组热力图 best=k≈9 distance p=2 ~0.97 | 网格搜索 + best_params_ |
-| Tab 3 | pick=0 | 真实=数字 X，预测=X ✓，proba 单峰 | KNN 跑通 |
-| Tab 3 | pick=找一个错的 | proba 多峰，top-3 邻居标签不一致 | 看 KNN 错在哪 |
+| 02-gridsearch | 静态 | 36 组热力图 best=distance·p=2·k=9 · CV 0.967 | 网格搜索 + best_params_ |
+| 03-digits | pick=0 | 真实=数字 X，预测=X ✓，proba 单峰 | KNN 跑通 |
+| 03-digits | pick=310 | 真=8 预=1，proba 双峰 {1:0.689, 8:0.311}，top-3=[1,1,8] | 看 KNN 错在哪 |
 
 **states 操作清单**（草拟）：
 
 ```yaml
 states:
-  1. tab2-intro    — 切到 Tab 2，静帧介绍热力图
-  2. tab2-best     — hover 最优格子，tooltip 显示 best_params_
-  3. tab3-intro    — 切到 Tab 3，pick=0
+  1. gs-intro     — 打开 02-gridsearch demo，静帧介绍热力图
+  2. gs-best      — hover 最优格子（distance·p=2·k=9），tooltip 显示 0.967
+  3. dg-intro     — 切到 03-digits demo，pick=0
                     expect: 真实=显示的数字，预测=同 ✓，proba 集中
-  4. tab3-correct  — pick 拖到第二个，预测仍对
+  4. dg-correct   — pick 拖到第二个，预测仍对
                     expect: 类似上面但不同数字
-  5. tab3-wrong    — pick 拖到测试集中预测错的样本
-                    expect: 预测 ✗，proba 多峰，top-3 邻居标签不一致
+  5. dg-wrong     — pick=310（真=8 预=1）
+                    expect: 预测 ✗，proba 双峰 {1:0.689, 8:0.311}，top-3=[1,1,8]
 ```
 
 ## 砍掉
@@ -99,8 +99,8 @@ states:
 | 3 | content | 维度爆炸 + 训练次数公式 | A | ~250 |
 | 4 | content | sklearn `GridSearchCV` 三件套 + Pipeline 双下划线 | A | ~330 |
 | 5 | content | Pipeline 防数据泄漏（关键工程纪律） | A | ~280 |
-| 6 | content | **Demo · GridSearchCV 热力图**（Tab 2 36 组实测） | **B** | ~330 |
-| 7 | content | **Demo · 手写数字识别**（Tab 3 + KNN 在 64 维表现） | **B** | ~340 |
+| 6 | content | **Demo · GridSearchCV 热力图**（02-gridsearch 36 组实测） | **B** | ~330 |
+| 7 | content | **Demo · 手写数字识别**（03-digits + KNN 在 64 维表现） | **B** | ~340 |
 | 8 | content | 整章 KNN 收束：核心 1 + 变种 2 + 三大问题 + 三件套 + 缩放 + 超参搜索 | A | ~370 |
 | 9 | cta | 下一站第 2 章 LR 预告 + 章节告别 | A | ~300 |
 
@@ -109,8 +109,8 @@ states:
 ## 待办
 
 - [ ] script.json 正稿
-- [ ] 实跑 demo Tab 2，校准最优组合 best_params_ 数字（README 说常见是 k≈9, distance, p=2, ~0.96-0.97）
-- [ ] 实跑 demo Tab 3，校准手写数字测试准确率（README 说 ~98%）
+- [x] 实跑 02-gridsearch.py 校准 best_params_：实测 distance·p=2·k=9 · CV 0.9667（Step 3.5 已核）
+- [x] 实跑 03-digits.py 校准手写数字测试准确率：实测 0.9844 / 错 7 张（Step 3.5 已核）
 - [ ] 网格搜索动画素材：1 维 → 2 维 → 3 维网格表
 - [ ] 维度爆炸表格动画
 - [ ] Pipeline 防泄漏图：CV 前 fit_transform 错 vs Pipeline 包起来对

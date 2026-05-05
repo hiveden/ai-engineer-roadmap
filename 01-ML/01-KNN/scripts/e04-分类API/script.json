@@ -16,7 +16,7 @@
       "id": 2,
       "type": "content",
       "topic": "sklearn 是什么 + 三件套总览",
-      "text": "先介绍工具。sklearn 全名 scikit-learn，读音 S K learn，是 Python 里 ML 的标准工具库。简单说，它把主流算法都打包好了——KNN、决策树、SVM、逻辑回归这些后面要学的算法，都在里面。这些算法的用法在 sklearn 里高度一致，统一遵守一个模板，叫三件套。第一件，构造：写一行代码把算法装进一个对象，同时把超参数填进去——比如 KNN 就是把 K 填进去。第二件，训练，英文叫 fit，意思是把数据喂给这个对象。第三件，预测，英文叫 predict，给一个新样本，让对象给出预测结果。三步走完，整个流程就闭环了。我们上一期讲的 5 步——算距离、排序、取前 K、投票、输出——全都被 sklearn 藏在 fit 和 predict 这两件事里。我们不用再自己写。",
+      "text": "先介绍工具。sklearn 全名 scikit-learn，是 Python 里 ML 的标准工具库。简单说，它把主流算法都打包好了——KNN、决策树、SVM、逻辑回归这些后面要学的算法，都在里面。这些算法的用法在 sklearn 里高度一致，统一遵守一个模板，叫三件套。第一件，构造：写一行代码把算法装进一个对象，同时把超参数填进去——比如 KNN 就是把 K 填进去。第二件，训练，英文叫 fit，意思是把数据喂给这个对象。第三件，预测，英文叫 predict，给一个新样本，让对象给出预测结果。三步走完，整个流程就闭环了。我们上一期讲的 5 步——算距离、排序、取前 K、投票、输出——全都被 sklearn 藏在 fit 和 predict 这两件事里。我们不用再自己写。",
       "notes": "~290字。\n[src: 02-api/01-分类API.md \"关于 sklearn\" + \"直觉：sklearn 三件套\"]\n\ntitle \"sklearn = ML 标准工具库\"[术语]\nbody \"主流算法都打包好：KNN / 决策树 / SVM / 逻辑回归 ...\"\nfigure \"sklearn 三件套示意图：构造 → fit → predict\"\nformula \"三件套：\\n  model = Algorithm(超参数)   # 构造\\n  model.fit(X, y)             # 训练\\n  model.predict(X_new)        # 预测\"[模板]\nquote \"上一期 5 步全藏在 fit 和 predict 里\"[衔接E03]\n\n注：暂不展开 \"sklearn 包名 ≠ 导入名\" 工程坑点，与 ML 主题无关。"
     },
     {
@@ -37,7 +37,7 @@
       "id": 5,
       "type": "content",
       "topic": "lazy learner 兑现 · fit 几乎不做事",
-      "text": "现在我们看 sklearn 内部，看一个反直觉的事实。一般我们提到训练，会想到模型在做大量计算——读数据、调参数、迭代很多轮。KNN 是不是这样？我们给 fit 和 predict 分别计时看看。第三个 Cell 跑完，输出大致是这样的：fit 不到 1 毫秒，predict 几十倍于 fit，差不多一个数量级。也就是说，predict 明显比 fit 慢——这跟一般直觉完全相反。为什么？因为 KNN 的 fit 几乎什么都没干，它只是把 X 和 y 原样存了起来。我们再跑第四个 Cell 验证一下，直接看模型对象内部存了什么。fit 之后，模型里多了一个属性叫下划线 fit X，形状是 9 行 2 列——就是我们刚才喂进去的 X 原封不动。",
+      "text": "现在我们看 sklearn 内部，看一个反直觉的事实。一般我们提到训练，会想到模型在做大量计算——读数据、调参数、迭代很多轮。KNN 是不是这样？我们给 fit 和 predict 分别计时看看。第三个 Cell 跑完，输出大致是这样的：fit 大概一百微秒，predict 比 fit 慢好几倍。也就是说，predict 明显比 fit 慢——这跟一般直觉完全相反。为什么？因为 KNN 的 fit 几乎什么都没干，它只是把 X 和 y 原样存了起来。我们再跑第四个 Cell 验证一下，直接看模型对象内部存了什么。fit 之后，模型里多了一个属性叫下划线 fit X，形状是 9 行 2 列——就是我们刚才喂进去的 X 原封不动。",
       "notes": "~270字。\nB 录屏段。本期高潮的实证部分，留概念定名给 seg 6。\n\nstates: timing → peek_inside\nexpect (timing):     输出 fit < 1ms / predict 比 fit 慢明显几倍至一个数量级（首跑数字会浮动，方向稳定）\nexpect (peek_inside): 输出 model._fit_X.shape == (9, 2) · model.classes_ 显示两个类别\n\ncue 词:\n  \"我们给 fit 和 predict 分别计时看看\"  → state timing\n  \"再跑第四个 Cell 验证一下\"            → state peek_inside\n\n录屏注意：Notebook 录制时 restart kernel 后只跑首次，确保 timing 数字稳定；剪辑按首跑数字截图即可，不追求精确数字而追求方向反差。如果想要更稳的数字，可改用 timeit 跑 1000 次累计平均（备选）。\n\ntitle \"反直觉：KNN 的 fit 几乎什么都没干\"[反直觉]\nfigure \"Jupyter 输出：fit < 1ms / predict 数量级反差柱状对比\"\nquote \"predict 明显比 fit 慢\"[关键]\nfigure \"model._fit_X 截图：(9, 2) 就是原 X\""
     },
     {
@@ -58,8 +58,8 @@
       "id": 8,
       "type": "cta",
       "topic": "概念地图 + E05 伏笔",
-      "text": "这一期到这。我们讲清楚了三件事。第一，sklearn 三件套——构造、fit、predict——3 行代码替代上一期的 5 步流程，是 sklearn 全家桶通用模板。第二，输入约束——X 必须二维，y 必须一维，predict 输入也得二维。第三，KNN 是懒学习算法，fit 几乎什么都没干，整个训练集本身就是模型。这一期点到没展开的有几个：sklearn 里其他算法的细节，留到各自专题；numpy 和 pandas 这两个数据准备的常用工具，遇到具体问题再就地讲；从 pandas 表格转换成 sklearn 要的二维 X，也是后面真实数据集出现时再演示。下一期是分类的对偶——预测一个连续数字。还记得上一期我们说的吗——分类切到回归，流水线只换一个零件。下期我们就把这个零件换给你看，3 行代码里只动 1 个字。如果讲得有不对的地方，欢迎在评论区指正。下期见。",
-      "notes": "~360字。\n\nseg 7 完整概念地图（../../_script-guide.md 第 4 节）：\n1. 整期核心论点：sklearn 把 5 步封装成 3 行 + KNN 是 lazy learner\n2. 讲清楚的 3 项：三件套 / 输入约束 / lazy learner（vs eager learner）\n3. 提到没展开的 + 推迟点：\n   - sklearn 全家桶其他算法 → 各自专题（决策树 / SVM / LR）\n   - numpy / pandas 数据准备细节 → 遇到就地讲（CLAUDE.md 第 5 节方针）\n   - pandas DataFrame → sklearn 2D X 转换 → 后续真实数据集章（如 04c-iris）\n4. E05 伏笔：呼应 E03 \"分类切回归只换一个零件\"，预告 \"3 行里只动 1 个字\"\n5. cta 末句固定（不读英文术语）\n\ntitle \"整期概念地图 + 边界声明\"[收敛]\nfigure \"两栏思维导图：左=讲清楚的 3 个 / 右=没展开的 3 个（带箭头指向章节）\"\nquote \"3 行代码里只动 1 个字 — 下期见\"[E05钩]\nquote \"如果讲得有不对的地方，欢迎在评论区指正\"[结尾]\n\n注：cta 故意不重复 E01/E02/E03 已列推迟项（embedding / 其他距离 / 过拟合 / bias-variance / CV / RMSE / R²），保持跨集互不重复。"
+      "text": "这一期到这。我们讲清楚了三件事。第一，sklearn 三件套——构造、fit、predict——3 行代码替代上一期的 5 步流程，是 sklearn 全家桶通用模板。第二，输入约束——X 必须二维，y 必须一维，predict 输入也得二维。第三，KNN 是懒学习算法，fit 几乎什么都没干，整个训练集本身就是模型。这一期点到没展开的有几个：sklearn 里其他算法的细节，留到各自专题；numpy 和 pandas 这两个数据准备的常用工具，遇到具体问题再就地讲；从 pandas 表格转换成 sklearn 要的二维 X，也是后面真实数据集出现时再演示。下一期是分类的对偶——预测一个连续数字。还记得上一期我们说的吗——分类切到回归，流水线只换一个零件。下期我们就把这个零件换给你看，3 行代码里只换 1 个名字。如果讲得有不对的地方，欢迎在评论区指正。下期见。",
+      "notes": "~360字。\n\nseg 7 完整概念地图（../../_script-guide.md 第 4 节）：\n1. 整期核心论点：sklearn 把 5 步封装成 3 行 + KNN 是 lazy learner\n2. 讲清楚的 3 项：三件套 / 输入约束 / lazy learner（vs eager learner）\n3. 提到没展开的 + 推迟点：\n   - sklearn 全家桶其他算法 → 各自专题（决策树 / SVM / LR）\n   - numpy / pandas 数据准备细节 → 遇到就地讲（CLAUDE.md 第 5 节方针）\n   - pandas DataFrame → sklearn 2D X 转换 → 后续真实数据集章（如 04c-iris）\n4. E05 伏笔：呼应 E03 \"分类切回归只换一个零件\"，预告 \"3 行里只动 1 个字\"\n5. cta 末句固定（不读英文术语）\n\ntitle \"整期概念地图 + 边界声明\"[收敛]\nfigure \"两栏思维导图：左=讲清楚的 3 个 / 右=没展开的 3 个（带箭头指向章节）\"\nquote \"3 行代码里只换 1 个名字 — 下期见\"[E05钩]\nquote \"如果讲得有不对的地方，欢迎在评论区指正\"[结尾]\n\n注：cta 故意不重复 E01/E02/E03 已列推迟项（embedding / 其他距离 / 过拟合 / bias-variance / CV / RMSE / R²），保持跨集互不重复。"
     }
   ]
 }

@@ -63,6 +63,7 @@ yarn-error.log*
 # === 录屏 pipeline 产物（大量 PNG / 视频 binaries + WIP 探针脚本）===
 **/recording/
 **/_recording/
+**/frames-*/
 
 # === scratch / sandbox（本地实验，非教材产物）===
 sandbox/

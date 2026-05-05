@@ -1,0 +1,23 @@
+{
+  "type": "grid",
+  "data": {
+    "columns": 24,
+    "rowHeight": 20,
+    "maxWidth": 1280,
+    "bordered": true,
+    "cells": [
+      {"position": null},
+      {"position": [0, 0, 24, 2]},
+      {"position": [0, 2, 12, 4]},
+      {"position": [12, 2, 12, 4]},
+      {"position": null},
+      {"position": [0, 6, 24, 2]},
+      {"position": [0, 8, 12, 14]},
+      {"position": [12, 8, 12, 14]},
+      {"position": [0, 22, 12, 14]},
+      {"position": [12, 22, 12, 14]},
+      {"position": null},
+      {"position": null}
+    ]
+  }
+}
